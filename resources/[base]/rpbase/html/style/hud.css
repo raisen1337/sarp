@@ -1,0 +1,266 @@
+@import url('https://fonts.cdnfonts.com/css/akrobat');
+@import url('https://fonts.cdnfonts.com/css/sf-pro-display');
+* {
+  user-select: none;
+}
+.hud-wrapper {
+  position: absolute;
+  right: 0;
+  top: 5.5%;
+  width: 100%;
+  height: 20%;
+  padding: 1vh;
+}
+
+.hud-wrapper > .hud-items {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 2vw;
+}
+
+.survival-wrapper {
+  position: absolute;
+  bottom: 2vh;
+  left: 30vh;
+  transition: 1s;
+}
+
+.survivalcontainer-wrapper {
+    opacity: 0;
+    position: absolute;
+  top: 13rem;
+  right: 2rem;
+  margin-top: 18px;
+}
+
+.survivalcontainer {
+  display: flex;
+  flex-direction: row;
+  flex-direction: inline-block;
+  gap: 15px;
+}
+
+.circle-progress-value1 {
+  stroke-width: 8px;
+  stroke: rgb(255, 230, 0);
+}
+
+.circle-progress-value2 {
+  stroke-width: 8px;
+  stroke: rgb(255, 230, 0);
+}
+
+.circle-progress-value3 {
+  stroke-width: 8px;
+  stroke: #ffbb00;
+}
+
+.circle-progress-value4 {
+  stroke-width: 8px;
+  stroke: #0066ff;
+}
+
+.circle-progress-value5 {
+  stroke-width: 8px;
+  stroke: #509dca;
+}
+
+.circle-progress-value6 {
+  stroke-width: 8px;
+  stroke: #71c5ac;
+}
+
+.circle-progress-value7 {
+  stroke-width: 8px;
+  stroke: #facc4f;
+}
+
+.circle-progress-value8 {
+  stroke-width: 8px;
+  stroke: #234991;
+}
+
+.survival-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.DreamRP-hud-wrapper {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.DreamRP-hud-wrapper .DreamRP-hud {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.DreamRP-hud-wrapper .DreamRP-hud .DreamRP-logo {
+  /*    width:12vh;
+    height:12vh - DEFAULT */
+
+  width: 9vh;
+  height: 8.5vh;
+}
+
+.DreamRP-hud-wrapper .DreamRP-hud .DreamRP-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  margin-top: 1.6vh;
+  margin-left: 0vh;
+}
+
+.DreamRP-hud-wrapper .DreamRP-hud .DreamRP-hud-data {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.DreamRP-hud-wrapper .DreamRP-hud .DreamRP-hud-data .text {
+  display: inline-flex;
+  font-family: sans-serif;
+  font-size: 1.35vh;
+  margin-left: auto;
+  letter-spacing: 0.5vh;
+}
+
+.DreamRP-hud-wrapper .DreamRP-hud .DreamRP-hud-data .DreamRP-hud-texts {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.DreamRP-hud-wrapper
+  .DreamRP-hud
+  .DreamRP-hud-data
+  .DreamRP-hud-texts
+  .DreamRP-text {
+  font-family: "Akrobat";
+  font-size: 1.5vh;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.DreamRP-hud-wrapper
+  .DreamRP-hud
+  .DreamRP-hud-data
+  .DreamRP-hud-texts
+  .DreamRP-text
+  > p {
+  opacity: 0.5;
+}
+
+.DreamRP-hud-wrapper
+  .DreamRP-hud
+  .DreamRP-hud-data
+  .DreamRP-hud-texts
+  .DreamRP-text
+  b {
+  font-size: 1.7vh;
+}
+.DreamRP-hud-boxes {
+  position: absolute;
+  right: 1px;
+  top: 13%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.DreamRP-hud-boxes .DreamRP-hud-box {
+  padding: 0.7vh;
+  display: flex;
+  flex-direction: inline;
+  gap: 15px;
+  justify-content: right;
+  align-items: right;
+  background: linear-gradient(90deg, transparent, #ffffff30);
+  border-right: 3px solid rgb(169, 2, 235);
+}
+
+.DreamRP-hud-boxes .DreamRP-hud-box .text {
+  font-family: "Akrobat";
+  font-size: 2.3vh;
+  font-weight: 600;
+}
+
+.DreamRP-hud-boxes .DreamRP-hud-box i {
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.4vh;
+  width: 3.1vh;
+  height: 3vh;
+  border-radius: 0.3vw;
+  background: #ffffff25;
+}
+
+.progress1,
+.progress2,
+.progress3,
+.progress4,
+.progress5,
+.progress6,
+.progress7,
+.progress8 {
+  position: relative;
+  width: 40px !important;
+  height: 45px !important;
+  display: flex;
+  font-size: 17px;
+  justify-content: center;
+  align-items: center;
+  color: #d8d8d8;
+  
+}
+
+
+.circle-progress1,
+.circle-progress2,
+.circle-progress3,
+.circle-progress4,
+.circle-progress5,
+.circle-progress6,
+.circle-progress7,
+.circle-progress8 {
+  position: absolute;
+  width: 105% !important;
+  height: 105% !important;
+}
+
+.circle-progress-circle1,
+.circle-progress-circle2,
+.circle-progress-circle3,
+.circle-progress-circle4,
+.circle-progress-circle5,
+.circle-progress-circle6,
+.circle-progress-circle7,
+.circle-progress-circle8 {
+  stroke-width: 7px;
+  stroke: rgba(255, 255, 255, 0.493);
+}
+
+.zone,
+.street,
+.vreme {
+  display: block;
+  color: #ffffff;
+  text-align: left;
+  text-transform: capitalize;
+  font-family: Akrobat, sans-serif;
+}

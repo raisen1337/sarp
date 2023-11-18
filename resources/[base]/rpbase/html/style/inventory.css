@@ -1,0 +1,58 @@
+.inventory-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    box-shadow: 0 0 200rem rgba(0, 0, 0, 1) inset;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+}
+
+.inventory-item {
+    display: flex;
+    margin: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2.8rem;
+    gap: .5rem;
+    border-radius: 1rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.616);
+    width: 30px;
+    height: 30px;
+}
+
+.item-quantity {
+    font-family: Akrobat;
+    color: gray;
+}
+
+.item-name {
+    font-family: Akrobat;
+}
+
+.item-image {
+    width: 80%;
+}
+
+.inventory-items {
+    display: flex;
+    width: 40rem;
+    height: 40rem;
+    flex-direction: row;
+    flex-wrap: wrap; /* Change flex-wrap value to 'wrap' */
+}
+
+.inventory {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    background: rgba(12, 12, 12, 0.81);
+    height: 45rem;
+    width: 45rem;
+    border-radius: 1rem;
+    flex-wrap: wrap; /* Change flex-wrap value to 'wrap' */
+}

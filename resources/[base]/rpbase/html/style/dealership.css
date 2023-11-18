@@ -1,0 +1,253 @@
+.dealership-container {
+    position: absolute;
+    top: 0;
+    display: none;
+    width: 100%;
+    height: 100vh;
+    box-shadow: inset -5rem 0 90rem rgb(24, 33, 110);
+}
+
+
+
+.dealership-top {
+    position: absolute;
+    right: 0;
+    direction: rtl;
+    padding: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    color: white;
+    max-width: 20rem;
+    max-height: 5rem;
+}
+
+.dealership-title {
+    color: white;
+    font-family: Readex Pro;
+    transform: skew(-15deg, 0deg);
+    font-size: 2.4rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.dealership-subtitle {
+    font-family: Akrobat;
+    font-size: 1.1rem;
+}
+
+.dealership-list {
+    position: absolute;
+    top: 20%;
+    right: 0;
+    padding: 3.5rem;
+    color: white;
+   
+    font-family: Readex Pro;
+
+}
+
+.dealership-list-top {
+    max-width: 16rem;
+    direction: rtl;
+}
+
+.dealership-list-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.dealership-categories {
+    border-radius: 3px;
+    overflow-y: scroll;
+    min-height: 10rem;
+    width: 16rem;
+    margin-right: -1.5rem;
+    padding: 1rem;
+    font-family: Akrobat;
+    max-height: 20rem;
+}
+.dealership-categories::-webkit-scrollbar {
+    background: transparent;
+    height: 2px;
+    width: 3px; /* Adjust the width to make the scrollbar thinner */
+}
+
+/* Customize the scrollbar thumb */
+.dealership-categories::-webkit-scrollbar-thumb {
+  background: transparent; /* Set the background color to white */
+  border-radius: 3px; /* Add some border-radius for a rounded thumb appearance */
+  width: 5px; /* Increase the width to make the thumb wider */
+}
+.category-icon {
+    background: rgba(0, 0, 0, 0.632);
+    padding: .8rem;
+    border-radius: .5rem;
+}
+
+.category-title {
+    margin-left: .5rem;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+.dealership-category {
+    padding: 1rem;
+    margin-top: 10px;
+    border-radius: .5rem;
+    background: rgba(0, 0, 0, 0.486);
+    transition: all .2s; /* Animation */
+}
+
+.dealership-category:hover{
+    transform: skew(-1deg, 0deg);
+    background: rgba(17, 42, 185, 0.486);
+    transition: all .2s; /* Animation */
+}
+
+.dealership-vehicles {
+    border-radius: 3px;
+    overflow-y: scroll;
+    min-height: 10rem;
+    width: 16rem;
+    margin-right: -1.5rem;
+    padding: 1rem;
+    font-family: Akrobat;
+    max-height: 20rem;
+}
+.dealership-vehicles::-webkit-scrollbar {
+    background: transparent;
+    height: 2px;
+    width: 3px; /* Adjust the width to make the scrollbar thinner */
+}
+
+/* Customize the scrollbar thumb */
+.dealership-vehicles::-webkit-scrollbar-thumb {
+  background: transparent; /* Set the background color to white */
+  border-radius: 3px; /* Add some border-radius for a rounded thumb appearance */
+  width: 5px; /* Increase the width to make the thumb wider */
+}
+.category-icon {
+    background: rgba(0, 0, 0, 0.632);
+    padding: .8rem;
+    border-radius: .5rem;
+}
+.dealership-vehicle {
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.vehicle-title {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide any overflowed text */
+    text-overflow: ellipsis; /* Show an ellipsis (...) for overflowed text */
+}
+
+.vehicle-price {
+    display: none;
+    font-weight: bolder;
+    color: rgb(255, 252, 252);
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+.dealership-vehicle {
+    padding: 1rem;
+    margin-top: 10px;
+    max-width: 20rem;
+    border-radius: .5rem;
+    background: rgba(0, 0, 0, 0.486);
+    transition: all .2s; /* Animation */
+}
+
+.active {
+    background: rgba(17, 42, 185, 0.486);
+}
+
+.dealership-vehicle:not(.active):hover {
+  transform: skew(-1deg, 0deg);
+  background: rgba(0, 0, 0, 0.686);
+  transition: all .2s; /* Animation */
+}
+.dealership-buttons {
+    margin-top: 2rem;
+}
+
+.dealership-button {
+    background: rgba(0, 0, 0, 0.714);
+    padding: 1.2rem;
+    margin-left: 15px;
+    border-radius: .1rem;
+    transition: all .2s;
+}
+
+.dealership-button:hover {
+    background: rgba(17, 42, 185, 0.486);
+    padding: 1.2rem;
+    transform: scale(1.05);
+    margin-left: 15px;
+    border-radius: .5rem;
+    transition: all .2s;
+}
+
+.dealership-search-vehicle {
+    background: rgba(0, 0, 0, 0.486);
+    border: 1px solid rgb(253, 253, 253);
+    margin-top: 1rem;
+    margin-bottom: .5rem;
+    color: white;
+    border-radius: 1rem;
+    font-size: 1rem;
+    padding: 1rem;
+    font-family: Akrobat;
+    width: 14rem;
+    margin-left: 1rem;
+}
+
+.dealership-search-vehicle::placeholder {
+    color: white;
+}
+
+.dealership-search-vehicle:focus {
+    outline: none;
+}
+
+.selectedvehicle-info {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-family: Readex Pro;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.selectedvehicle-name {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.selectedvehicle-price {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.testdrive {
+    position: absolute;
+    bottom: 0;
+    display: none;
+    right: 0;
+    margin: 2rem;
+    font-size: 1.5rem;
+    transform: skew(-5deg, 0deg);
+    font-family: Akrobat;
+    letter-spacing: 2px;
+    border-radius: .5em;
+    color: white;
+    padding: 1rem;
+    background:rgba(0, 0, 0, 0.63)
+}

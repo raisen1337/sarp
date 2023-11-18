@@ -1,0 +1,220 @@
+.notifications {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    max-width: 19.3rem;
+    bottom: 15rem; /* Add this to set a distance from the top of the container */
+}
+
+.notification {
+    position: relative;
+    margin-left: 2rem;
+    margin-bottom: 20px;
+    left: -40rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    box-shadow: inset 40px 0 50px rgba(255, 0, 0, 0.2);
+    border-radius: 1rem;
+    
+    font-family: Akrobat;
+    padding: 0.8rem;
+   
+}
+@keyframes rotateGradient {
+  0% {
+    border-image-source: linear-gradient(to bottom right, orange 5%, white 90%);
+  }
+  50% {
+    border-image-source: linear-gradient(to bottom right, white 10%, orange 90%);
+  }
+  100% {
+    border-image-source: linear-gradient(to bottom right, orange 5%, white 90%);
+  }
+}
+
+@media (min-width: 800px) {
+  .map-border > .square {
+    left: 2.5vh!important;
+    bottom: 2.2%!important;
+  }
+}
+
+@media (width: 1280px) and (height: 768px) {
+  .map-border > .square {
+    left: 1.9vh!important;
+    bottom: 2.0%!important;
+      width: 30.5vh!important;
+  }
+}
+
+@media (width: 1280px) and (height: 800px) {
+  .map-border > .square {
+    left: 1.9vh!important;
+    bottom: 2.0%!important;
+      width: 29.5vh!important;
+  }
+}
+
+@media (width: 1280px) and (height: 960px) {
+  .map-border > .square {
+    left: 1.9vh!important;
+    bottom: 2.0%!important;
+      width: 24.5vh!important;
+  }
+}
+
+@media (width: 1280px) and (height: 1024px) {
+  .map-border > .square {
+    left: 1.9vh!important;
+    bottom: 2.0%!important;
+      width: 22.5vh!important;
+  }
+}
+
+@media (width: 1440px) and (height: 900px) {
+  .map-border > .square {
+    left: 2.3vh!important;
+    bottom: 2.2%!important;
+      width: 29vh!important;
+  }
+}
+
+@media (width: 1600px) and (height: 1024px) {
+  .map-border > .square {
+    left: 2.3vh!important;
+    bottom: 2.2%!important;
+    width: 28vh!important;
+  }
+}
+
+@media (width: 1680px) and (height: 1050px) {
+  .map-border > .square {
+    left: 2.5vh!important;
+    bottom: 2.2%!important;
+    width: 29vh!important;
+  }
+}
+
+@media (width: 3840px) and (height: 2160px) {
+  .map-border > .square {
+    left: 2.4vh!important;
+    bottom: 6.1%!important;
+      width: 29.3vh!important;
+  }
+}
+
+@media (width: 3440px) and (height: 1440px) {
+  .map-border > .square {
+    left: 2.3vh!important;
+    bottom: 6.1%!important;
+      width: 29.3vh!important;
+  }
+}
+
+@media (width: 2560px) and (height: 1440px) {
+  .map-border > .square {
+    left: 2.3vh!important;
+    bottom: 2.2%!important;
+  }
+}
+
+@media (width: 1920px) and (height: 1440px) {
+  .map-border > .square {
+    left: 2vh!important;
+    bottom: 2.2%!important;
+  }
+}
+
+@media (width: 1920px) and (height: 1200px) {
+  .map-border > .square {
+    left: 2.2vh!important;
+    bottom: 2.2%!important;
+  }
+}
+
+@media (width: 1920px) and (height: 1080px) {
+  .map-border > .square {
+    left: 2.5vh!important;
+    bottom: 2.2%!important;
+  }
+}
+
+@media (width: 1280px) and (height: 720px) {
+  .map-border > .square {
+    left: 2.5vh!important;
+    bottom: 2.2%!important;
+  }
+}
+
+.map-border {
+    position: absolute;
+    bottom: 3.2%;
+    opacity: 0;
+    border: 7px solid white;
+    border-radius: 1rem;
+    width: 14vw;
+    height: 15.3vh;
+    left: 1.20%;
+}
+
+@keyframes leftToRight {
+    0% {
+      left: -40rem; /* Start from the initial position */
+    }
+    50% {
+      left: 5rem; /* Move to the right */
+    }
+    100% {
+      left: -0.2rem; /* End position */
+    }
+  }
+  
+  @keyframes rightToLeft {
+    0% {
+      left: 0; /* Start from the initial position */
+    }
+    50% {
+      left: 5rem; /* Move to the right */
+    }
+    100% {
+      left: -40rem; /* End position */
+    }
+  }
+  
+
+.appear {
+    animation: leftToRight 0.4s ease-in-out;
+    
+    animation-fill-mode: forwards;
+}
+
+.disappear {
+    animation: rightToLeft 0.4s ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+.notification-icon {
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.905);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-title {
+    font-size: 1rem;
+    letter-spacing: 2px;
+}
+
+.notification-message {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}

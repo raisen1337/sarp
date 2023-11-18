@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <link rel="stylesheet" href="style/hud.css">
+  <link rel="stylesheet" href="style/missionpassed.css">
+  <link rel="stylesheet" href="style/moneyhud.css">
+  <link rel="stylesheet" href="style/dialog.css">
+  <link rel="stylesheet" href="style/scoreboard.css">
+  <link rel="stylesheet" href="style/notifications.css">
+  <link rel="stylesheet" href="style/dealership.css">
+  <link rel="stylesheet" href="style/payday.css">
+  <link rel="stylesheet" href="style/subtitles.css">
+  <link rel="stylesheet" href="style/clothing.css">
+  <link rel="stylesheet" href="style/banking.css">
+  <link rel="stylesheet" href="style/market.css">
+  <link rel="stylesheet" href="https://kit-pro.fontawesome.com/releases/v6.3.0/css/pro.min.css">
+  <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@18657a9/css/all.min.css" rel="stylesheet"
+    type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link href="https://fonts.googleapis.com/css?family=Baloo+Bhai&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="moneyhud" style="top: 0;">
+    <div class="server-logo">
+      <div class="server-subname" style='display: none;'>Jucatori online: <span id="onlineCount">2</span></div>
+    </div>
+    <div class="economy">
+      <div class="money"><span class="dsign" style="color: rgba(255, 235, 125, 0.932);">$</span>100.000.000</div>
+      <div class="bank"><span class="dsign" style="color: rgba(255, 235, 125, 0.932);">$</span>100.000.000</div>
+    </div>
+    <div class="social">
+      <div class="hud-text">Job: <span id="jobName" style="color: rgba(255, 235, 125, 0.932);">Unemployed</span>
+      </div>
+      <div class="hud-text">Level: <span id="playerLevel" style="color: rgba(255, 235, 125, 0.932);">1</span>
+      </div>
+    </div>
+
+    <div class="wanted">
+      <i class="fas fa-star wanted-star-inactive" id="wantedA"></i>
+      <i class="fas fa-star wanted-star-inactive" id="wantedB"></i>
+      <i class="fas fa-star wanted-star-inactive" id="wantedC"></i>
+      <i class="fas fa-star wanted-star-inactive" id="wantedD"></i>
+      <i class="fas fa-star wanted-star-inactive" id="wantedE"></i>
+    </div>
+    <div class="survivalcontainer-wrapper">
+      <div class="survivalcontainer">
+        <!-- Microphone Hud -->
+
+        <!-- Health Hud -->
+        <div class="progress2">
+          <i id='hearticon' class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <!-- Armour Hud -->
+        <div class="progress3">
+          <i class="fa-solid fa-shield"></i>
+        </div>
+      </div>
+    </div>
+    <div class="payday-container">
+      <span class="payday-title">Timp ramas pana la <span style="color:rgb(255, 217, 0);">PayDay</span></span>
+      <span class="payday-time">Inca nu a inceput</span>
+    </div>
+
+  </div>
+  <div class="dialog-container">
+    <div class="dialog">
+      <span class="dialog-title">Seteaza numele caracterului</span>
+      <span class="dialog-subtitle">Seteaza numele caracterului </span>
+      <input type="text" class="dialog-input">
+      <div class="dialog-buttons">
+        <button class="dialog-ok">Ok</button>
+        <button class="dialog-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div class="scoreboard">
+    <span class="scoreboard-title">LISTA JUCATORI ONLINE</span>
+    <div class="categories">
+      <div class="category">
+        <span class="category-value">ID</span>
+      </div>
+      <div class="category">
+        <span class="category-value">NUME</span>
+      </div>
+      <div class="category">
+        <span class="category-value">LEVEL</span>
+      </div>
+    </div>
+    <div class="players">
+
+    </div>
+  </div>
+  <div class="mission-passed">
+    <span class="mission-bigtext">mission passed</span>
+    <span class="mission-subtext">ti-ai creat caracterul cu succes!</span>
+  </div>
+
+  <div class="map-border"></div>
+  <div class="notifications"></div>
+  <div class="dealership-container">
+    <div class="dealership-top">
+      <span class="dealership-title">Dealership</span>
+      <span class="dealership-subtitle">Alege masina pe care ti-o doresti din tot catalogul nostru</span>
+    </div>
+    <div class="dealership-list">
+      <div class="dealership-list-top">
+        <span class="dealership-list-title">Alege o categorie din cele de mai jos</span>
+      </div>
+      <div class="dealership-categories" style="display: none;">
+
+      </div>
+      <input class="dealership-search-vehicle" placeholder="Cauta o masina dupa nume">
+      <div class="dealership-vehicles" style="display: block;">
+
+      </div>
+      <div class="dealership-buttons">
+        <span class="dealership-button" id="buyVehicle">CUMPARA</span>
+        <span class="dealership-button" id="testVehicle">TESTEAZA</span>
+      </div>
+    </div>
+    <div class="selectedvehicle-info">
+      <span class="selectedvehicle-name">PariahPariahPariahPariahPariahPariahPariahPariah</span>
+      <span class="selectedvehicle-price">$1.000.000</span>
+    </div>
+  </div>
+  <div class="testdrive" id='testdrivea'>
+    <span class="testdrive-text">Timp ramas:</span>
+    <span class="testdrive-timer">10:00</span>
+  </div>
+  <div class="subtitles">
+    <span class="subtitle-text">Ai prins un peste, mergi la magazin si vinde-l.Ai prins un peste, mergi la magazin si
+      vinde-l. prins un peste, mergi la magazin si vinde-l.</span>
+  </div>
+  <div class="clothingshop-container">
+    <div class="clothing-shop">
+      <div class="cloth-options">
+        <span class="select-item">SELECT CLOTHING</span>
+        <div class="cloth-options-ndcon" style='display: flex; flex-direction: column;'>
+          <span class="cloth-texture">TEXTURA</span>
+          <div class="texture-value-modal">
+            <i class="fa-solid fa-chevron-left" id="texturePrev"></i>
+            <input type="number" value=0 class="cloth-texture-value" placeholder="Nimic selectat"
+              id="textureNumber"></input>
+            <i class="fa-solid fa-chevron-right" id="textureNext"></i>
+          </div>
+          <span class="cloth-variation">VARIATIE</span>
+          <div class="texture-value-modal">
+            <i class="fa-solid fa-chevron-left" id="variationPrev"></i>
+            <input type="number" value=0 class="cloth-texture-value" placeholder="Nimic selectat"
+              id="variationNumber"></input>
+            <i class="fa-solid fa-chevron-right" id="variationNext"></i>
+          </div>
+        </div>
+      </div>
+      <div class="items-menu-container">
+        <div class="divide"></div>
+        <div class="items-menu-ndcnt" style="display: flex; flex-direction: row;">
+          <span class="select-item">CLOTHES SELECTOR</span>
+          <div class="items-menu">
+            <div class="cloth-item" onclick="selectItem('hats', 1); switchCam('head')" id="clothItem1">
+              <i class="clothitem fa-solid fa-hat-cowboy-side"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('torsos', 2); switchCam('torso')" id="clothItem2">
+              <i class="clothitem fa-solid fa-shirt"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('jackets', 3); switchCam('torso')" id="clothItem3">
+              <i class="clothitem fa-solid fa-vest"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('hands', 4); switchCam('torso')" id="clothItem4">
+              <i class="clothitem fas fa-hands"></i>
+            </div>
+            <div class="cloth-item" style="padding: 0; " onclick="selectItem('legs', 5); switchCam('leg')"
+              id="clothItem5">
+              <image class="clothitem" src="assets/pants.png" style='height: 54px; width: 60px;'></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('shoes', 6); switchCam('leg')" id="clothItem6">
+              <i class="clothitem fas fa-shoe-prints"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('masks', 7); switchCam('head')" id="clothItem7">
+              <i class="clothitem fas fa-mask"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('bags', 8); switchCam('torso', true)" id="clothItem8">
+              <i class="clothitem fas fa-backpack"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('face', 9); switchCam('head')" id="clothItem9">
+              <i class="clothitem fas fa-face-smile"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('hair', 10); switchCam('head')" id="clothItem10">
+              <i class="clothitem fas fa-scissors"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('glasses', 11); switchCam('head')" id="clothItem11">
+              <i class="clothitem fas fa-glasses"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('earrings', 12); switchCam('head')" id="clothItem12">
+              <i class="clothitem fas fa-ear"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('watches', 13); switchCam('torso')" id="clothItem13">
+              <i class="clothitem fas fa-watch"></i>
+            </div>
+            <div class="cloth-item" onclick="selectItem('braclets', 14); switchCam('torso')" id="clothItem14">
+              <i class="clothitem fas fa-ring"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="clothingcart-container">
+        <div class="divide"></div>
+        <div class="clothingcart-ndcnt" style="display: flex; flex-direction: row;">
+          <span class="select-item">SHOPPING CART</span>
+          <div class="cart-menu">
+            <span class="total-text">PRET TOTAL:</span>
+            <span class="total-price" id="totalPrice">$500</span>
+            <span class="total-subtext">Poti alege una din urmatoarele:</span>
+            <div class="cart-buttons">
+              <div class="button valid" onclick="buy()">
+                <i class="fa-solid fa-shopping-cart"></i>
+                <span class="btn-text">PLATESTE</span>
+              </div>
+              <div class="button invalid" onclick="cancelbuy()">
+                <i class="fa-solid fa-x"></i>
+                <span class="btn-text">ANULEAZA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="banking-container" id="bankingContainer">
+    <div class="banking-operations" style="display: none;">
+      <div class="banking-operation withdraw">
+        <span class="operation-title">Retrage</span>
+        <span class="operation-subtitle">Scrie mai jos suma pe care doresti sa o retragi</span>
+        <div class="operation-input1">
+          <span class="operation-input1-text">Suma dorita</span>
+          <input type="text" class="operation-input1-input red-operation" id="transactionAmount1"
+            placeholder="Introdu suma">
+        </div>
+        <div class="operation-button red-operation" onclick="confirmTransaction()">Confirma</div>
+      </div>
+
+      <div class="banking-operation deposit" style="display: none;">
+        <span class="operation-title">Depoziteaza</span>
+        <span class="operation-subtitle">Scrie mai jos suma pe care doresti sa o depozitezi</span>
+        <div class="operation-input1">
+          <span class="operation-input1-text">Suma dorita</span>
+          <input type="text" class="operation-input1-input green-operation" id="transactionAmount2"
+            placeholder="Introdu suma">
+        </div>
+        <div class="operation-button green-operation" onclick="confirmTransaction()">Confirma</div>
+      </div>
+
+      <div class="banking-operation transfer" style="display: none;">
+        <span class="operation-title">Transfera</span>
+        <span class="operation-subtitle">Completeaza formularul de mai jos pentru a transfera banii</span>
+        <div class="operation-input1">
+          <span class="operation-input1-text">Suma dorita</span>
+          <input type="text" class="operation-input1-input yellow-operation" id="transactionAmount3"
+            placeholder="Introdu suma">
+        </div>
+        <div class="operation-input1">
+          <span class="operation-input1-text">ID Recipient</span>
+          <input type="text" class="operation-input1-input yellow-operation" id="transactionId"
+            placeholder="Introdu id jucator">
+        </div>
+        <div class="operation-button yellow-operation" onclick="confirmTransaction()">Confirma</div>
+      </div>
+    </div>
+    <div class="banking-inneroutline">
+
+      <div class="banking-top-side">
+        <div class="banking-top-container">
+          <div class="bank-top">
+            <i class="fa-regular fa-building-columns"></i>
+            <div class="bank-title-container">
+              <span class="banking-title">GTA Roleplay</span>
+              <span class="banking-subtitle">Bank</span>
+            </div>
+          </div>
+          <div class="divide"></div>
+          <div class="user-info-container">
+            <span class="user-info" id="playerName">Raisen Developer</span>
+          </div>
+        </div>
+        <div class="banking-sidebar">
+          <div class="banking-sidebar-button">
+            <i class="fa-regular fa-grid-horizontal"></i>
+            <span class="banking-sidebar-button-text">Dashboard</span>
+          </div>
+          <div class="banking-sidebar-button" onclick="deposit()">
+            <i class="fa-solid fa-sack-dollar"></i>
+            <span class="banking-sidebar-button-text">Depoziteaza</span>
+          </div>
+          <div class="banking-sidebar-button" onclick="withdraw()">
+            <i class="fa-solid fa-money-simple-from-bracket"></i>
+            <span class="banking-sidebar-button-text">Retrage</span>
+          </div>
+          <div class="banking-sidebar-button" onclick="transfer()">
+            <i class="fa-solid fa-money-bill-transfer"></i>
+            <span class="banking-sidebar-button-text">Transfera</span>
+          </div>
+        </div>
+      </div>
+      <div class="banking-main-content">
+        <div class="banking-balances-container">
+          <div class="banking-balance-item1">
+            <div class="bank-dollar-icon-bg">
+              <i class="fa-regular fa-dollar-circle fa-spin"></i>
+            </div>
+            <span class="banking-balance-text">BALANTA</span>
+          </div>
+          <div class="banking-balance-item2">
+            <div class="banking-balance-items2">
+              <div class="banking-total-balance-item1">
+                <span class="banking-total-balance">BALANTA TOTALA</span>
+              </div>
+              <div class="banking-total-balance-item2">
+                <span class="banking-total-balance-value" id="playerTotalMoney">$450.000</span>
+              </div>
+            </div>
+          </div>
+          <div class="banking-balance-item3" style="margin-top: 1rem;">
+            <div class="banking-balance-item3-top">
+              <i class="fa-brands fa-cc-mastercard"></i>
+              <span class="user-info" id="playerName">Raisen Developer</span>
+            </div>
+            <div class="banking-balance-item4-mid">
+              <span class="banking-current-bank-balance-text">BALANTA CURENTA</span>
+              <span class="banking-current-bank-balance-value" id="playerBankBalance">$450.000</span>
+            </div>
+          </div>
+          <div class="banking-balance-item4">
+            <div class="banking-balance-item4-top">
+              <i class="fa-regular fa-money-bill"></i>
+              <span class="user-info" id="playerName">RAISEN DEVELOPER</span>
+            </div>
+            <div class="banking-balance-item4-mid">
+              <span class="banking-current-cash-balance-text">BALANTA CURENTA</span>
+              <span class="banking-current-cash-balance-value" id="playerCashBalance">$450.000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="banking-balances-container">
+          <div class="banking-balance-item1">
+            <div class="bank-dollar-icon-bg">
+              <i class="fa-regular fa-money-from-bracket fa-spin"></i>
+            </div>
+            <span class="banking-balance-text">TRANZACTII</span>
+          </div>
+          <div class="banking-balance-item2">
+            <div class="banking-transactions-item1">
+              <!-- <div class="banking-transaction sent">
+                    <div class="banking-transaction-top">
+                      <i class="fa-solid fa-inbox-in"></i>
+                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                    </div>
+                    <div class="banking-transaction-details">
+                      <span class="banking-transaction-type">Trimise</span>
+                      <span class="banking-transaction-amount">$450.000</span>
+                    </div>
+                  </div> -->
+              <!-- <div class="banking-transaction received">
+                    <div class="banking-transaction-top">
+                      <i class="fa-solid fa-inbox-in"></i>
+                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                    </div>
+                    <div class="banking-transaction-details">
+                      <span class="banking-transaction-type">Trimise</span>
+                      <span class="banking-transaction-amount">$450.000</span>
+                    </div>
+                  </div>
+
+                  <div class="banking-transaction sent">
+                    <div class="banking-transaction-top">
+                      <i class="fa-solid fa-inbox-in"></i>
+                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                    </div>
+                    <div class="banking-transaction-details">
+                      <span class="banking-transaction-type">Trimise</span>
+                      <span class="banking-transaction-amount">$450.000</span>
+                    </div>
+                  </div>
+                  <div class="banking-transaction received">
+                    <div class="banking-transaction-top">
+                      <i class="fa-solid fa-inbox-in"></i>
+                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                    </div>
+                    <div class="banking-transaction-details">
+                      <span class="banking-transaction-type">Trimise</span>
+                      <span class="banking-transaction-amount">$450.000</span>
+                    </div>
+                  </div>
+                  <div class="banking-transaction sent">
+                    <div class="banking-transaction-top">
+                      <i class="fa-solid fa-inbox-in"></i>
+                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                    </div>
+                    <div class="banking-transaction-details">
+                      <span class="banking-transaction-type">Trimise</span>
+                      <span class="banking-transaction-amount">$450.000</span>
+                    </div>
+                  </div>
+                  <div class="banking-transaction received">
+                    <div class="banking-transaction-top">
+                      <i class="fa-solid fa-inbox-in"></i>
+                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                    </div>
+                    <div class="banking-transaction-details">
+                      <span class="banking-transaction-type">Trimise</span>
+                      <span class="banking-transaction-amount">$450.000</span>
+                    </div>
+                  </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="banking-bottom-side">
+        <div class="banking-bottom-detail greened">
+          <i class="fa-solid fa-money-check-dollar"></i>
+          <div class="banking-line-divide"></div>
+          <div class="banking-detail-amount" id="totalDeposited">$1.337</div>
+          <div class="banking-bottom-detail-info">
+            <span class="banking-bottom-detail-text">DEPOZITATI</span>
+            <span class="banking-bottom-detail-subtext">IN CONT</span>
+          </div>
+        </div>
+        <div class="banking-bottom-detail orangeish">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+          <div class="banking-line-divide"></div>
+          <div class="banking-detail-amount" id="totalTransferred">$1.337</div>
+          <div class="banking-bottom-detail-info">
+            <span class="banking-bottom-detail-text">TRANSFERATI</span>
+            <span class="banking-bottom-detail-subtext">IN ALTE CONTURI</span>
+          </div>
+        </div>
+        <div class="banking-bottom-detail redish">
+          <i class="fa-solid fa-money-simple-from-bracket"></i>
+          <div class="banking-line-divide"></div>
+          <div class="banking-detail-amount" id="totalWithdrawn">$1.337</div>
+          <div class="banking-bottom-detail-info">
+            <span class="banking-bottom-detail-text">RETRASI</span>
+            <span class="banking-bottom-detail-subtext">DIN CONT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="markets-container">
+    <div class="market-top">
+      <div class="market-top-left">
+        <div class="market-title-container">
+          <i class="fa-solid fa-shopping-basket"></i>
+          <span class="market-title">MAGAZIN 24/7</span>
+        </div>
+      </div>
+      <div class="market-search-container">
+        <input type="text" class="market-search-item" placeholder="Cauta un produs">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+      <div class="market-player-balances">
+        <div class="market-player-cash">
+          <i class="fa-solid fa-money-bill"></i>
+          <span class="market-player-dsign">$</span>
+          <span class="market-player-cash-value">100.000</span>
+        </div>
+        <div class="market-player-bank">
+          <i class="fa-solid fa-building-columns"></i>
+          <span class="market-player-dsign">$</span>
+          <span class="market-player-bank-value">100.000</span>
+        </div>
+      </div>
+    </div>
+    <div class="market-main-content">
+      <div class="market-items">
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+        <div class="market-item">
+          <span class="market-item-name">Cola</span>
+          <image class="market-item-img" src="./assets/items/cola.png"></image>
+          <div class="market-item-bottom">
+            <i class="fa-solid fa-shopping-basket market-button"></i>
+            <div class="market-item-price">500000$</div>
+          </div>
+        </div>
+      </div>
+      <div class="market-divider"></div>
+      <div class="market-cart">
+        <div class="market-cart-title-container">
+          <i class="fa-solid fa-shopping-basket" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="market-cart-items">
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+          <div class="market-cart-item">
+            <image class="market-cart-item-img" src="./assets/items/cola.png"></image>
+            <span class="market-cart-item-name">Cola</span>
+            <div class="market-cart-item-buttons">
+              <span class="market-cart-item-quantity-decrease">-</span>
+              <span class="market-cart-item-quantity">1</span>
+              <span class="market-cart-item-quantity-increase">+</span>
+            </div>
+          </div>
+        </div>
+        <span class="market-cart-total">$120.000</span>
+        <div class="market-cart-buttons">
+          <div class="market-button" style="font-size: 1.2rem;">Cumpara</div>
+          <div class="market-button cancel" style="font-size: 1.2rem;">Goleste</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <script src="js/hud.js"></script>
+  <script src="js/mission-passed.js"></script>
+  <script src="js/dialog.js"></script>
+  <script src="js/notify.js"></script>
+  <script src="js/scoreboard.js"></script>
+  <script src="js/progress-bar.js"></script>
+  <script src="js/status.js"></script>
+  <script src="js/dealership.js"></script>
+  <script src="js/payday.js"></script>
+  <script src="js/subtitles.js"></script>
+  <script src="js/clothing.js"></script>
+  <script src="js/banking.js"></script>
+  <script src="js/market.js"></script>
+</body>
+
+</html>

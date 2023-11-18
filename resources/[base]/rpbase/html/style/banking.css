@@ -1,0 +1,738 @@
+@import url('https://fonts.cdnfonts.com/css/tt-norms-pro');
+
+/* body  {
+    background: url(../assets/workbg.png)
+} */
+
+
+i {
+    color: rgb(195, 195, 195);
+}
+
+.none {
+    display: none;
+}
+
+.banking-operations-container {
+    display: flex;
+    margin-top: 10rem;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.banking-operation-title {
+    font-size: 1.5rem;
+}
+
+.banking-operation-item {
+    display: flex;
+    letter-spacing: 5px;
+    background: rgb(0,0,0, 0.8);
+    padding: 4rem;
+    font-size: 6rem;
+    border-radius: .5rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    gap: 1rem;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    transition: transform .1s ease-in-out;
+    font-family: TT Norms Pro;
+}
+
+.banking-operation-item:hover {
+    transform: scale(1.05);
+    transition: transform .1s ease-in-out;
+}
+
+.banking-operation-item > i {
+    background: rgb(255, 255, 255);
+    padding: 1.5rem;
+    color: black;
+    border-radius: .3rem;
+    font-size: 1.5rem;
+}
+
+.banking-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.619);
+    width: 100vw;
+    height: 100vh;
+    bottom: 0;
+    box-shadow: inset -5rem 0 90rem rgba(111, 0, 255, 0.297);
+}
+
+@keyframes blurIn {
+    from {
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        backdrop-filter: blur(5px);
+    }
+}
+
+@keyframes blurOut {
+    from {
+        backdrop-filter: blur(5px);
+    }
+
+    to {
+        backdrop-filter: blur(0px);
+    }
+}
+
+.blurIn {
+    animation: blurIn .2s ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+.blurOut {
+    animation: blurIn .1s ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+.banking-inneroutline {
+    background: rgba(0, 0, 0, 0.0);
+    width: 98vw;
+    height: 98vh;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.366);
+    bottom: 0;
+}
+
+.bank-title-container {
+    display: flex;
+    margin-top: .5rem;
+    margin-left: 1rem;
+    flex-direction: column;
+}
+
+.banking-top-side {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.bank-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.banking-top-container>.divide {
+    width: 8rem;
+    background: white;
+    height: 1px;
+}
+
+.banking-top-container {
+    width: 10vw;
+    display: flex;
+    flex-direction: column;
+    margin: 4rem;
+    align-items: center;
+}
+
+.bank-top>i {
+    color: white;
+    font-size: 3rem;
+}
+
+.banking-title {
+    color: rgba(255, 255, 255, 0.698);
+    font-family: TT Norms Pro;
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 1.02rem;
+    margin-bottom: -.5rem;
+    text-wrap: wrap;
+}
+
+.banking-subtitle {
+    color: white;
+    font-family: TT Norms Pro;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    text-wrap: wrap;
+}
+
+.banking-sidebar {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+}
+
+.banking-sidebar-button {
+    display: flex;
+    flex-direction: row;
+    transition: filter .1s ease-in-out;
+    width: 10rem;
+    height: max-content;
+    border-radius: .5rem;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.467);
+    padding: .8rem;
+    padding-right: 3rem;
+    font-size: 1.6rem;
+    font-family: TT Norms Pro;
+}
+
+.banking-sidebar-button:hover {
+    display: flex;
+    flex-direction: row;
+    width: 10rem;
+    border-radius: .5rem;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: .8rem;
+    padding-right: 3rem;
+    filter: invert();
+    font-size: 1.6rem;
+    font-family: TT Norms Pro;
+    transition: filter .1s ease-in-out;
+}
+
+.banking-sidebar-button.active {
+    display: flex;
+    flex-direction: row;
+    width: 10rem;
+    border-radius: .5rem;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: .8rem;
+    padding-right: 3rem;
+    filter: invert();
+    font-size: 1.6rem;
+    font-family: TT Norms Pro;
+}
+
+.banking-sidebar-button-text {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-left: 1rem;
+}
+
+.user-info-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1px;
+}
+
+.user-info {
+    color: white;
+    font-weight: 300;
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-family: TT Norms Pro;
+}
+
+.icon-bg {
+    transform: scale(.8);
+    background: white;
+    width: 32px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1rem;
+    height: 30px;
+}
+
+.banking-main-content {
+    display: flex;
+    flex-direction: row;
+    gap: 5rem;
+    justify-content: center;
+}
+
+.banking-balance-item1 {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+.banking-balance-text {
+    color: white;
+    font-family: TT Norms Pro;
+    font-weight: bold;
+    font-size: 1.8rem;
+    margin-left: .5rem;
+}
+
+.banking-transactions-item1 {
+    max-height: 50vh;
+    width: 20vw;
+    gap: 5rem;
+    overflow-y: scroll;
+    direction: rtl;
+}
+
+.banking-transactions-item1::-webkit-scrollbar {
+    width: 8px;
+    /* Adjust the width as needed for your design */
+}
+
+/* Style the scrollbar thumb */
+.banking-transactions-item1::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .5);
+    /* Adjust the color and opacity as desired */
+    border-radius: 4px;
+    /* Adjust the border radius for rounded corners */
+}
+
+/* Make the scrollbar track transparent */
+.banking-transactions-item1::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* Thin scrollbar track, if needed */
+.banking-transactions-item1::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+}
+
+.banking-transaction {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: .5rem;
+    margin-bottom: 5rem;
+    margin-left: 1rem;
+    font-family: TT Norms Pro;
+    color: white;
+}
+
+.received {
+    background: linear-gradient(50deg, rgba(41, 231, 38, 0.237) 0%, rgba(41, 231, 38, 0.015) 100%);
+}
+
+.banking-transaction-type {
+    font-size: 1rem;
+}
+
+.sent {
+    background: linear-gradient(50deg, rgba(231, 38, 38, 0.237) 0%, rgba(231, 38, 38, 0.015) 100%);
+}
+
+.banking-transaction-recipient {
+    margin-right: .5rem;
+    float: left;
+    font-weight: 500;
+    color: rgb(197, 197, 197);
+}
+
+.banking-transaction-details {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: -4rem;
+    color: rgba(255, 255, 255, 0.698);
+    padding-bottom: .5rem;
+    font-size: 1.5rem;
+}
+
+.banking-transaction-amount {
+    float: left;
+    font-weight: bolder;
+}
+
+.banking-transaction-top {
+    padding: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+}
+
+.banking-balance-items2 {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.banking-total-balance-item1 {
+    color: rgb(197, 197, 197);
+    font-family: TT Norms Pro;
+    font-weight: 400;
+    width: max-content;
+    padding: .45rem;
+    border-top-left-radius: .5rem;
+    border-bottom-left-radius: .5rem;
+    padding-left: 5rem;
+    padding-right: 6rem;
+    background: rgba(0, 0, 0, 0.366);
+    font-size: .9rem;
+}
+
+.banking-total-balance-item2 {
+    color: rgb(255, 255, 255);
+    font-family: TT Norms Pro;
+    font-weight: bolder;
+    width: max-content;
+    padding: .36rem;
+    border-top-right-radius: .5rem;
+    border-bottom-right-radius: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background: rgba(154, 154, 154, 0.366);
+    font-size: 1rem;
+}
+
+.banking-balances-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+
+.bank-dollar-icon-bg {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.501);
+    width: max-content;
+    padding: .60rem;
+    border-radius: .5rem;
+}
+
+.transfer {
+    gap: .5rem;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: TT Norms Pro;
+    font-size: 2rem;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(-90deg, rgba(131, 100, 0, 0.098) 0%, rgba(227, 151, 0, 0.222) 100%);  
+    width: 100vw;
+    height: 100vh;
+    bottom: 0;
+    z-index: 2;
+}
+
+.withdraw {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: TT Norms Pro;
+    font-size: 2rem;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(-90deg, rgba(131, 0, 0, 0.098) 0%, rgba(227, 0, 0, 0.094) 100%);  
+    width: 100vw;
+    height: 100vh;
+    bottom: 0;
+    z-index: 2;
+}
+
+.deposit {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: TT Norms Pro;
+    font-size: 2rem;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(-90deg, rgba(13, 131, 0, 0.098) 0%, rgba(30, 227, 0, 0.094) 100%);  
+    width: 100vw;
+    height: 100vh;
+    bottom: 0;
+    z-index: 2;
+}
+
+.operation-title {
+    font-weight: bolder;
+}
+
+.yellow-operation {
+    background: linear-gradient(-90deg, rgba(131, 81, 0, 0.717) 0%, rgba(227, 166, 0, 0.743) 100%);  
+}
+
+.green-operation {
+    background: linear-gradient(-90deg, rgba(7, 131, 0, 0.717) 0%, rgba(49, 227, 0, 0.743) 100%);  
+
+}
+
+.red-operation {
+    background: linear-gradient(-90deg, rgba(131, 0, 0, 0.717) 0%, rgba(227, 0, 0, 0.743) 100%);  
+}
+
+.operation-input1-input {
+    border: none;
+    border-radius: .5rem;
+    padding: .4rem;
+    float: right;
+    margin-left: 4rem;
+    width: 10rem;
+    outline: none;
+    font-size: 1rem;
+    font-family: TT Norms Pro;
+    font-weight: normal;
+    color: white;
+    text-align: right;
+}
+
+.operation-input1-input::placeholder {
+    color: white;
+}
+
+.operation-button {
+    font-size: 1.5rem;
+    font-weight: bolder;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: .3rem;
+}
+
+.operation-button:hover {
+    background: rgba(0, 0, 0, 0.566);
+}
+
+.operation-input1 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bolder;
+    background: rgba(6, 6, 6, 0.947);
+    padding: 2rem;
+    border-radius: .5rem;
+}
+
+.operation-subtitle {
+    font-size: 1rem;
+    font-weight: normal;
+    line-height: 2.5rem;
+    color:rgb(145, 145, 145);
+    letter-spacing: 2px;
+}
+
+.banking-operations {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: TT Norms Pro;
+    font-size: 2rem;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    width: 100vw;
+    height: 100vh;
+    bottom: 0;
+    z-index: 2;
+}
+
+.banking-bottom-side {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 5rem;
+    margin: 4rem;
+}
+
+.banking-bottom-detail {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.689);
+    border-radius: .8em;
+    
+}
+
+.banking-detail-amount {
+    color :white;
+    font-family: TT Norms Pro;
+    font-weight: bolder;
+}
+
+.greened {
+    background: linear-gradient(50deg, rgba(112, 231, 38, 0.237) 0%,rgba(118, 231, 38, 0.015) 100%);
+}
+
+.orangeish {
+    background: linear-gradient(50deg, rgba(231, 186, 38, 0.237) 0%,rgba(231, 170, 38, 0.015) 100%);
+}
+
+.redish {
+    background: linear-gradient(50deg, rgba(231, 38, 38, 0.237) 0%, rgba(231, 38, 38, 0.015) 100%);
+}
+
+.banking-bottom-detail-subtext {
+    font-weight: normal;
+}
+
+.banking-bottom-detail-info {
+    display: flex;
+    font-family: TT Norms Pro;
+    text-align: center;
+    color: white;
+    font-size: .8rem;
+    margin-left: 5rem;
+    font-weight: bolder;
+    flex-direction: column;
+}
+
+.banking-line-divide {
+    background: rgb(169, 169, 169);
+    height: 20px;
+    width: 3px;
+    border-radius: 2px;
+}
+
+.banking-bottom-detail > i {
+    font-size: 2rem;
+}
+
+.bank-dollar-icon-bg>i {
+    color: rgb(208, 208, 208);
+    font-size: 1.25rem;
+}
+
+.banking-balance-item3 {
+    height: 21vh;
+    width: 21.5vw;
+    opacity: .95;
+    border-radius: .5rem;
+    background: linear-gradient(90deg, rgba(23, 153, 0, 0.888) 0%, rgba(0, 236, 255, 0.8463760504201681) 100%), url('https://as2.ftcdn.net/v2/jpg/02/52/58/09/1000_F_252580956_lEL9NuGTm607FIvADIvBalbDAKcONU9y.jpg');
+    background-size: cover;
+    /* Adjust as needed */
+    background-position: center;
+    /* Adjust as needed */
+    background-repeat: no-repeat;
+    /* Adjust as needed */
+}
+
+.banking-balance-item3-top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 1rem;
+}
+
+.banking-balance-item3-top>i {
+    font-size: 1.8rem;
+}
+
+.banking-balance-item3-top>.user-info {
+    font-size: 1rem;
+    color: rgb(189, 189, 189);
+    font-weight: bolder;
+}
+
+.banking-balance-item4-mid {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.banking-current-bank-balance-text {
+    color: rgb(255, 255, 255);
+    font-family: TT Norms Pro;
+    font-weight: bold;
+}
+
+.banking-current-bank-balance-value {
+    color: rgb(255, 255, 255);
+    font-family: TT Norms Pro;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: normal;
+}
+
+
+.banking-balance-item4 {
+    height: 21vh;
+    width: 21.5vw;
+    opacity: .95;
+    border-radius: .5rem;
+    background: linear-gradient(90deg, rgba(153, 84, 0, 0.888) 0%, rgba(187, 0, 255, 0.846) 100%), url('https://as2.ftcdn.net/v2/jpg/02/52/58/09/1000_F_252580956_lEL9NuGTm607FIvADIvBalbDAKcONU9y.jpg');
+    background-size: cover;
+    /* Adjust as needed */
+    background-position: center;
+    /* Adjust as needed */
+    background-repeat: no-repeat;
+    /* Adjust as needed */
+}
+
+.banking-balance-item4-top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 1rem;
+}
+
+.banking-balance-item4-top>i {
+    font-size: 1.8rem;
+}
+
+.banking-balance-item4-top>.user-info {
+    font-size: 1rem;
+    color: rgb(189, 189, 189);
+    font-weight: bolder;
+}
+
+.banking-current-cash-balance-text {
+    color: rgb(255, 255, 255);
+    font-family: TT Norms Pro;
+    font-weight: bold;
+}
+
+.banking-current-cash-balance-value {
+    color: rgb(255, 255, 255);
+    font-family: TT Norms Pro;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: normal;
+}
+@media screen and (min-height: 900px) and (max-height: 900px) {
+    .banking-top-side {
+        transform: scale(0.7);
+    }
+
+
+    .banking-main-content {
+        margin-top: -5rem;
+        transform: scale(0.7);
+    }
+    .banking-bottom-side {
+        transform: scale(0.7);
+    }
+
+}
+@media screen and (min-height: 768px) and (max-height: 768px) {
+    .banking-top-side {
+        transform: scale(0.7);
+    }
+
+
+    .banking-main-content {
+        margin-top: -5rem;
+        transform: scale(0.7);
+    }
+    .banking-bottom-side {
+        transform: scale(0.7);
+    }
+
+}
