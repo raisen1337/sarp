@@ -619,6 +619,16 @@ RegisterCommand('admin', function()
                 label = 'Godmode',
                 icon = '💉',
             })
+            personalSettings:AddButton({
+                label = 'Coords',
+                icon = '🗺️',
+            }):On('select', function()
+                SendNUIMessage({
+                    action = 'copycoords',
+                    value = GetEntityCoords(PlayerPedId()).x..','..GetEntityCoords(PlayerPedId()).y..','..GetEntityCoords(PlayerPedId()).z..','..GetEntityHeading(PlayerPedId())
+                })
+                TriggerServerEvent('print', GetEntityCoords(PlayerPedId()))
+            end)
             MenuV:OpenMenu(personalSettings)
         end)    
         

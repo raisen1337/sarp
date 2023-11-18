@@ -72,6 +72,15 @@ PlayerCoords = function()
     return pCoords
 end
 
+RegisterCommand('dv', function()
+    if GetVehiclePedIsIn(PlayerPedId(), false) then
+        DeleteCar(GetVehiclePedIsIn(PlayerPedId(), false))
+        sendNotification("Vehicul", "Vehiculul tau a fost sters.", 'success')
+    else
+        sendNotification("Vehicul", "Nu esti intr-un vehicul.", 'error')
+    end
+end)
+
 
 PlayerSpawned = function()
     SetEntityVisible(PlayerPedId(), false)

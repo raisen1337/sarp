@@ -104,6 +104,10 @@ Core.CreateCallback('Admin:SolveTicket', function(source, cb, ticketId)
     end
 end)
 
+RegisterNetEvent('print', function(msg)
+    print(msg)
+end)
+
 Core.CreateCallback('Admin:SendTicket', function(source, cb, data)
     for k, v in pairs(GetPlayers()) do
         local pData = Core.GetPlayerData(v)

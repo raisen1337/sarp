@@ -52,6 +52,7 @@ function BuildPlayerMenu()
             icon = '🚗',
             value = 0,
             select = function()
+                MenuV:CloseAll()
                 ExecuteCommand('v')
             end
         })
@@ -61,6 +62,7 @@ function BuildPlayerMenu()
             icon = '🏠',
             value = 0,
             select = function()
+                MenuV:CloseAll()
                 ExecuteCommand('houses')
             end
         })

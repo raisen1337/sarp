@@ -10,6 +10,20 @@ let hudOff = false
 
 window.addEventListener("message", function(event1) {
     let event = event1['data'];
+    if(event.action == 'copycoords') {
+      var node = document.createElement('textarea');
+      var selection = document.getSelection();
+
+      node.textContent = event.value;
+      document.body.appendChild(node);
+
+      selection.removeAllRanges();
+      node.select();
+      document.execCommand('copy');
+
+      selection.removeAllRanges();
+      document.body.removeChild(node);
+    }
     if (event.action == "showHud") {
         if(!hudOff){
           let hudMain = document.querySelector('.moneyhud')
