@@ -102,6 +102,16 @@ Citizen.CreateThread(function()
                         jailCP = {}
                     end
                 end
+            elseif not PlayerData.ajail and inJail then
+                inJail = false
+                SetEntityInvincible(jailCar, false)
+                SetEntityInvincible(PlayerPedId(), false)
+                DeleteCar(jailCar)
+                DeleteCP(jailCP)
+
+                SetEntityCoords(PlayerPedId(), 1829.3596191406,3680.4692382813,34.335926055908)
+                jailCar = false
+                jailCP = {}
             end
         end
     end

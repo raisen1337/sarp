@@ -45,6 +45,7 @@ Core.CreateCallback("Admin:HandleKick", function(source, cb, kickData)
         admin = GetPlayerName(source),
     }
 
+    Wait(1000)
     Core.InsertPunishment(kickData.kickSource, punishment)
 
     --DropPlayer(kickData.kickSource, "You have been kick from this server by admin: "..GetPlayerName(source).." with reason: "..kickData.kickReason.."!")
@@ -86,6 +87,55 @@ local tickets = {}
 
 Core.CreateCallback("Core:CallRemoteEvent", function(source, cb, event, src)
     TriggerClientEvent(event, src)
+end)
+
+Core.CreateCallback('Admin:HandleJail', function(source, cb, jailData)
+    local src = jailData.jailSource
+    local pData = Core.GetPlayerData(jailData.jailSource)
+    local punishment = {
+        type = 'Jail',
+        duration = jailData.jailTime,
+        reason = jailData.jailReason,
+        admin = GetPlayerName(source),
+    }
+   
+    if jailData.jailTime == 0 then
+        if pData.ajail then
+            pData.ajail = false
+            pData.ajailReason = nil
+            pData.jailcps = nil
+            pData.jailAdmin = nil
+            exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+            cb(false)
+            --send chat message
+            TriggerClientEvent('chat:addMessage', -1, {
+                multiline = true,
+                args = {'^3[^0Admin Jail^3] ^0'..GetPlayerName(jailData.jailSource)..'('..jailData.jailSource..') a fost scos de la Admin Jail de '..GetPlayerName(source)..'('..source..')!'}
+            })
+            print("Player "..GetPlayerName(jailData.jailSource).."("..jailData.jailSource..") has been unjailed by "..GetPlayerName(source).."("..source..")!")
+            return
+        else
+            cb(false)
+            return
+        end
+    end
+    pData.ajail = true
+    pData.ajailReason = jailData.jailReason
+    pData.jailcps = jailData.jailTime
+    pData.jailAdmin = GetPlayerName(source)
+    print("Player "..GetPlayerName(jailData.jailSource).."("..jailData.jailSource..") has been jailed by "..GetPlayerName(source).."("..source..") for "..jailData.jailTime.." cps with reason: "..jailData.jailReason.."!")
+    
+    TriggerClientEvent('chat:addMessage', -1, {
+        multiline = true,
+        args = {'^3[^0Admin Jail^3] ^0'..GetPlayerName(jailData.jailSource)..'('..jailData.jailSource..') a primit Admin Jail de la '..GetPlayerName(source)..'('..source..') pentru '..jailData.jailTime..' checkpoints cu motivul: '..jailData.jailReason..'!'}
+    })
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+    Wait(1000)
+    
+    Core.InsertPunishment(src, punishment)
+
+    cb(true)
 end)
 
 Core.CreateCallback("Admin:GetTickets", function(source, cb)
@@ -205,9 +255,13 @@ Core.CreateCallback('Admin:HandleBan', function(source, cb, banData)
         admin = GetPlayerName(source),
     }
 
-    Core.InsertPunishment(banData.banSource, punishment)
+    
+   
 
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+    Wait(1000)
+    Core.InsertPunishment(banData.banSource, punishment)
+
     DropPlayer(banData.banSource, "You have been banned from this server by admin: "..GetPlayerName(source).." with reason: "..banData.banReason.." and duration of: "..banData.banTime.." day(s). If you wish to appeal this ban please join our discord.gg/samp.")
     cb(true)
 end)

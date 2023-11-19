@@ -221,6 +221,9 @@ RegisterCommand('faction', function()
                                                         --print
                                                        
                                                     end, v.model, 1)
+                                                    Core.TriggerCallback('Player:Pay', function (cb)
+                                                                
+                                                    end, 'cash', v.weaponCost)
                                                     return
                                                 else
                                                     sendNotification('Eroare', 'Nu ai destui bani', 'error')
@@ -249,6 +252,11 @@ RegisterCommand('faction', function()
                                                                 --print
                                                               
                                                             end, v.ammoName, ammo)
+                                                            Core.TriggerCallback('Player:Pay', function (cb)
+
+                                                            end, 'cash', tonumber(ammo) * v.ammoCost)
+                                                          
+                                                            
                                                             return
                                                         else
                                                             sendNotification('Armory', 'Nu ai destui bani.', 'error')

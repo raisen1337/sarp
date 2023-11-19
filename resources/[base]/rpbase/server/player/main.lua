@@ -349,7 +349,7 @@ function onMeCommand(source, args)
 end
 RegisterCommand('me', onMeCommand)
 local function OnPlayerConnecting(name, setKickReason, deferrals)
-    --print(getCurrentTimestamp())
+    ----print(getCurrentTimestamp())
     local player = source
     local steamIdentifier
     local identifiers = GetPlayerIdentifiers(player)
@@ -360,7 +360,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
 
     deferrals.update(string.format("Hello %s. Your Steam ID is being checked.", name))
     
-    ----print
+    ------print
 
     for _, v in pairs(identifiers) do
         if string.find(v, "steam") then
@@ -375,8 +375,8 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
     if not steamIdentifier then
         deferrals.done("Steam needs to be running in order to join this server.")
     else
-        print('[RPBase]: Player '..name..'('..steamIdentifier..') is connected to the server.')
-        ----print
+        --print('[RPBase]: Player '..name..'('..steamIdentifier..') is connected to the server.')
+        ------print
 
         exports.oxmysql:query("SELECT * FROM players WHERE identifier = ?", {steamIdentifier}, function(result)
             if result[1] then
@@ -401,7 +401,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                         local banIds = bpData.banIds
                         deferrals.update("🔨 Checking if you are banned on other accounts..")
                         if banIds then
-                            ----print
+                            ------print
                             for key, value in pairs(banIds) do
                                 if value ~= nil then
                                     if value == playerIds[key] and not foundMatch then
@@ -409,7 +409,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                                             Wait(0)
                                             foundMatch = true
                                             foundData = bpData
-                                            print('Id: '..key.." matched from account: "..bpData.user.." ("..value.." | "..playerIds[key]..")")
+                                            --print('Id: '..key.." matched from account: "..bpData.user.." ("..value.." | "..playerIds[key]..")")
                                         else
                                             foundMatch = false
                                         end
@@ -443,7 +443,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                     local banIds = bpData.banIds
                     deferrals.update("🔨 Checking if you are banned on other accounts..")
                     if banIds then
-                        ----print
+                        ------print
                         for key, value in pairs(banIds) do
                             if value ~= nil then
                                 if value == playerIds[key] and not foundMatch then
@@ -451,7 +451,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                                         Wait(0)
                                         foundMatch = true
                                         foundData = bpData
-                                        --print('Id: '..key.." matched from account: "..bpData.user.." ("..value.." | "..playerIds[key]..")")
+                                        ----print('Id: '..key.." matched from account: "..bpData.user.." ("..value.." | "..playerIds[key]..")")
                                     else
                                         foundMatch = false
                                     end
@@ -523,7 +523,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                     PlayerStruct = json.encode(PlayerStruct)
     
                     exports.oxmysql:query("INSERT INTO players(user, identifier, data) VALUES(?, ?, ?)", {name, steamIdentifier, PlayerStruct})
-                    ----print
+                    ------print
                     deferrals.done()
                 end
             
@@ -554,8 +554,8 @@ end)
 RegisterNetEvent("sv-time:update", function()
     local src = source
     TriggerClientEvent("cl-time:update", src, os.date("%H"), os.date("%M"), os.date("%S"))
-    --print("Updated time on "..GetPlayerName(source))
-    --print(os.date("%H"), os.date("%M"), os.date("%S"))
+    ----print("Updated time on "..GetPlayerName(source))
+    ----print(os.date("%H"), os.date("%M"), os.date("%S"))
 end)
 
 RegisterNetEvent("Scoreboard:SetScoreboard", function()
@@ -607,7 +607,7 @@ Core.CreateCallback("Identity:Check", function(source, cb)
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {steamIdentifier})
 
     local pData = json.decode(result[1].data)
-    ----print
+    ------print
     if string.len(pData.character.name..""..pData.character.surname) > 0 then
         cb(true)
     else
@@ -630,17 +630,127 @@ AddEventHandler('__cfx_internal:commandFallback', function(command)
     CancelEvent()
 end)
 
-Core.InsertPunishment = function(source, punishment)
-    local pData = Core.GetPlayerData(source)
+Core.CreateCallback('Admin:MutePlayer', function(source, cb, id, muteTime, muteReason)
+    --print("MutePlayer callback called")
+    local src = source
+    local mpData = Core.GetPlayerData(id)
+    local pData = Core.GetPlayerData(src)
 
-    if not pData.punishHistory or table.empty(pData.punishHistory) then
-        pData.punishHistory = {}
-        table.insert(pData.punishHistory, punishment)
-    else
-        table.insert(pData.punishHistory, punishment)
+    -- if mpData.adminLevel >= 6 then
+    --     TriggerClientEvent('Notify:Send', src, "Admin", "Nu il poti amutii pe "..mpData.user.." pentru ca este admin!", "error")
+    --     cb(false)
+    --     return
+    -- end
+
+    if not mpData.muted then
+        mpData.muted = false
     end
 
-    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+    if mpData.muted then
+        TriggerClientEvent('Notify:Send', src, "Admin", "Nu il poti amutii pe "..mpData.user.." pentru ca este deja amutit!", "error")
+        cb(false)
+        return
+    end
+
+    mpData.muted = true
+    mpData.muteTime = muteTime
+    mpData.muteReason = muteReason
+
+    
+
+    --print("Punishment inserted")
+
+    TriggerClientEvent('Notify:Send', id, "Admin", "Ai fost amutit de catre "..pData.user.." pentru "..muteTime.." minute pentru: "..muteReason.."!", "success")
+    TriggerClientEvent('Notify:Send', src, "Admin", "Ai amutit cu succes pe "..mpData.user.." pentru "..muteTime.." minute pentru: "..muteReason.."!", "success")
+
+    --chat message
+    TriggerClientEvent('chat:addMessage', -1, {
+        multiline = true,
+        args = {'^3[^0Admin Mute^3] ^0'..GetPlayerName(id)..'('..id..') a primit mute de la '..GetPlayerName(src)..'('..src..') pentru '..muteTime..' minute pentru: '..muteReason..'!'}
+    })
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(mpData), mpData.identifier})
+    --print("Player data updated")
+
+    Wait(1000)
+    Core.InsertPunishment(id, {
+        type = "Mute",
+        reason = muteReason,
+        duration = muteTime,
+        admin = pData.user,
+    })
+end)
+
+--now do a unmute callback
+Core.CreateCallback('Admin:UnmutePlayer', function(source, cb, id)
+    local src = source
+    local mpData = Core.GetPlayerData(id)
+    local pData = Core.GetPlayerData(src)
+
+    if not mpData.muted then
+        TriggerClientEvent('Notify:Send', src, "Admin", "Nu il poti amutii pe "..mpData.user.." pentru ca nu este amutit!", "error")
+        cb(false)
+        return
+    end
+
+    mpData.muted = false
+    mpData.muteTime = 0
+    mpData.muteReason = ""
+
+    --send chat message
+    TriggerClientEvent('chat:addMessage', -1, {
+        multiline = true,
+        args = {'^3[^0Admin Mute^3] ^0'..GetPlayerName(id)..'('..id..') a primit unmute de la '..GetPlayerName(src)..'('..src..')!'}
+    })
+
+    TriggerClientEvent('Notify:Send', id, "Admin", "Ai fost dezamutit de catre "..pData.user.."!", "success")
+    TriggerClientEvent('Notify:Send', src, "Admin", "Ai dezamutit cu succes pe "..mpData.user.."!", "success")
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(mpData), mpData.identifier})
+end)
+
+--now do a unmute after expiring time callback
+Core.CreateCallback('Admin:MuteExpire', function(source, cb, id)
+    local src = source
+    local mpData = Core.GetPlayerData(id)
+    local pData = Core.GetPlayerData(src)
+
+    if mpData.adminLevel > 0 then
+        cb(false)
+        return
+    end
+
+    if not mpData.muted then
+        cb(false)
+        return
+    end
+
+    mpData.muted = false
+    mpData.muteTime = 0
+    mpData.muteReason = ""
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(mpData), mpData.identifier})
+end)
+Core.InsertPunishment = function(source, punishment)
+    local src = source
+
+    local pData = Core.GetPlayerData(src)
+    local PlayerPunishes = pData.punishHistory
+
+    table.insert(PlayerPunishes, punishment)
+
+    pData.punishHistory = PlayerPunishes
+
+    local jsonPData = json.encode(pData)
+
+   
+    local result = exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
+
+    if result.affectedRows > 0 then
+        --print("Update successful!")
+    else
+        --print("Update failed!")
+    end
 end
 
 Core.CreateCallback('Player:GetData', function(source, cb)
@@ -720,14 +830,14 @@ Core.CreateCallback('Player:GetData', function(source, cb)
         PlayerStruct = json.encode(PlayerStruct)
 
         exports.oxmysql:query("INSERT INTO players(user, identifier, data) VALUES(?, ?, ?)", {name, steamIdentifier, PlayerStruct})
-        ----print
+        ------print
         cb(json.decode(PlayerStruct))
     end
 end)
 
 Core.CreateCallback('Police:Cuff', function(source, cb, player)
 
-    print(player)
+    --print(player)
     TriggerClientEvent('Player:GetCuffed', player)
     cb(true)
 end)
@@ -748,19 +858,48 @@ Core.GetItem = function(name)
         end
     end
 end
+
+function FormatNumber(amount)
+    amount = tostring(amount)
+  local formatted = amount
+  while true do  
+    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+    if (k==0) then
+      break
+    end
+  end
+  return formatted
+end
+
+Core.CreateCallback('Player:Pay', function(source, cb, type, amount)
+    local pData = Core.GetPlayerData(source)
+    if pData[type] then
+        pData[type] = pData[type] - amount
+    end
+
+    Wait(1500)
+    --send notification
+    TriggerClientEvent('Notify:Send', source, "Banca", "Ai platit "..FormatNumber(amount).."$!", "success")
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+end)
 Core.CreateCallback("Player:AddItem", function(source, cb, name, amount)
-    ----print
+    ------print
+    print(name, amount)
     local pData = Core.GetPlayerData(source)
     local Inventory = pData.inventory
     local itemFound = false
 
-    -- Add logging statement to --print the current name and amount
-    ----print
+    -- Add logging statement to ----print the current name and amount
+    ------print
 
     if not table.empty(Inventory) then
         for _, item in pairs(Inventory) do
             if item.name == name then
-                item.amount = item.amount + amount
+                if not item.amount then
+                    item.amount = amount
+                else
+                    item.amount = item.amount + amount
+                end
                 itemFound = true
                 break
             end
@@ -773,13 +912,13 @@ Core.CreateCallback("Player:AddItem", function(source, cb, name, amount)
 
     pData.inventory = Inventory
 
-    -- Add logging statement to --print the updated inventory
-    --print("Updated inventory:", json.encode(pData.inventory))
+    -- Add logging statement to ----print the updated inventory
+    ----print("Updated inventory:", json.encode(pData.inventory))
 
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
 
-    -- Add logging statement to --print the callback status
-    ----print
+    -- Add logging statement to ----print the callback status
+    ------print
 
     cb(true)
 end)
@@ -826,7 +965,7 @@ end)
 
 
 Core.CreateCallback("Player:RemoveItem", function(source, cb, name, amount)
-    ----print
+    ------print
     local pData = Core.GetPlayerData(source)
     local Inventory = pData.inventory
     local itemFound = false
@@ -835,11 +974,11 @@ Core.CreateCallback("Player:RemoveItem", function(source, cb, name, amount)
         for i, item in ipairs(Inventory) do
             if item.name == name then
                 if item.amount - amount <= 0 then
-                    ----print
+                    ------print
                     table.remove(Inventory, i)
                 else
                     item.amount = item.amount - amount
-                    ----print
+                    ------print
                 end
                 itemFound = true
                 break
@@ -848,7 +987,7 @@ Core.CreateCallback("Player:RemoveItem", function(source, cb, name, amount)
     end
 
     if not itemFound then
-        ----print
+        ------print
     end
 
     pData.inventory = Inventory
@@ -1013,7 +1152,7 @@ RegisterNetEvent("Player:Save", function(pData)
     local src = source
     pData = json.decode(pData)
     exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
-    ----print
+    ------print
     Wait(2000)
     TriggerClientEvent("Player:UpdateData", src)
 end)

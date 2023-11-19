@@ -42,8 +42,12 @@ AddEventHandler('_chat:messageEntered', function(author, color, message)
         end
 
         msg = msg .. author .. "("..src.."): " .. message
-
-        TriggerClientEvent('chatMessage', -1, "",  { 255, 255, 255 }, msg)
+        if pData.muted then
+            TriggerClientEvent('chatMessage', src, "", { 255, 255, 255 }, "[^3SERVER^0]: Ai mute, nu poti vorbii.")
+            return
+        else
+            TriggerClientEvent('chatMessage', -1, "",  { 255, 255, 255 }, msg)
+        end
     end
 end)
 

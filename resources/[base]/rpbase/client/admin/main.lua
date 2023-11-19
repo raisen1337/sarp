@@ -33,6 +33,68 @@ local createBizData = {
     type = 0,
     blip = 0,
 }
+local inNoClip = false
+
+function noClip()
+    local ped = PlayerPedId()
+    local inVehicle = IsPedInAnyVehicle(ped, false)
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    local speed = 1.0
+    if IsControlPressed(0, 21) then
+        speed = 5.0
+    end
+    if IsControlJustPressed(0, 21) then
+        inNoClip = not inNoClip
+    end
+    if inNoClip then
+        SetEntityInvincible(ped, true)
+        SetEntityVisible(ped, false, false)
+        if inVehicle then
+            SetEntityInvincible(vehicle, true)
+            SetEntityVisible(vehicle, false, false)
+            SetEntityCollision(vehicle, false, false)
+            local coords = GetOffsetFromEntityInWorldCoords(vehicle, 0.0, 5.0, 0.0)
+            SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, true, true, true)
+        else
+            local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 5.0, 0.0)
+            SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, true, true, true)
+        end
+        if IsControlPressed(0, 32) then
+            local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, speed, 0.0)
+            SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, true, true, true)
+        end
+        if IsControlPressed(0, 269) then
+            local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, -speed, 0.0)
+            SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, true, true, true)
+        end
+        if IsControlPressed(0, 266) then
+            local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 0.0, 1.0)
+            SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, true, true, true)
+        end
+        if IsControlPressed(0, 267) then
+            local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 0.0, -1.0)
+            SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, true, true, true)
+        end
+        if IsControlPressed(0, 34) then
+            local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 0.0, 0.0)
+            SetEntityHeading(ped, GetEntityHeading(ped) + 3.0)
+        end
+        if IsControlPressed(0, 35) then
+            local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 0.0, 0.0)
+            SetEntityHeading(ped, GetEntityHeading(ped) - 3.0)
+        end
+    else
+        SetEntityInvincible(ped, false)
+        SetEntityVisible(ped, true, false)
+        if inVehicle then
+            SetEntityInvincible(vehicle, false)
+            SetEntityVisible(vehicle, true, false)
+            SetEntityCollision(vehicle, true, true)
+        end
+    end
+end
+
+local godModeOn = false
 
 local ticketCooldown = 0
 
@@ -270,8 +332,127 @@ RegisterCommand('admin', function()
                                 end)
                             end)
                         end
-                        
+                        if HasAccess(1) then
+                            --create car button
+                           
+
+                            playerOptions:AddButton({
+                                label = 'Unmute',
+                                icon = '🔊',
+                                value = 0
+                            }):On('select', function()
+                                Core.TriggerCallback('Admin:UnmutePlayer', function(cb)
+                                    if cb then
+                                        sendNotification("Unmute", 'I-ai scos mute-ul lui: '..v.name..'!')
+                                    end
+                                end, v.source)
+                            end)
+                            playerOptions:AddButton({
+                                label = 'Mute',
+                                icon = '🔇',
+                                value = 0
+                            }):On('select', function()
+                                local event, aMuteReason, aMuteTime
+                                ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul mute-ului.", 'Admin:HandleMuteReason', true, false, 'c')
+                                event = AddEventHandler("Admin:HandleMuteReason", function(muteReason)
+                                    if string.len(muteReason) == 0 then
+                                        muteReason = "Nedeterminata."
+                                        aMuteReason = muteReason
+                                    end
+                                    aMuteReason = muteReason
+                                    --print
+                                    ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a mute-ului!", 'Admin:HandleMuteTime', true, false, 'c')
+                                    RemoveEventHandler(event)
+                                    event = AddEventHandler('Admin:HandleMuteTime', function(muteTime)
+                                        if not tonumber(muteTime) or containsSpaces(muteTime) then
+                                            sendNotification("Eroare", "Nu ai introdus un timp valid.")
+                                            return
+                                        else
+                                            muteTime = tonumber(muteTime)
+                                            aMuteTime = muteTime
+                                            --print
+                                            if muteTime == 0 then
+                                                muteTime = 99999999
+                                            end
+                                            muteData = {
+                                                muteReason = muteReason,
+                                                muteTime = muteTime,
+                                                muteSource = v.source
+                                            }
+                                            Core.TriggerCallback('Admin:MutePlayer', function(cb)
+                                                if cb then
+                                                    sendNotification("Mute", 'L-ai amutit pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
+                                                end
+                                            end, v.source, muteData.muteTime, muteData.muteReason)
+                                            RemoveEventHandler(event)
+                                        end
+                                    end)
+                                end)
+                            end)
+                        end
+                        if HasAccess(2) then
+                            --add unjail 
+                            playerOptions:AddButton({
+                                label = 'Unjail',
+                                icon = '🚓',
+                                value = 0
+                            }):On('select', function()
+                                jailData = {
+                                    jailReason = "",
+                                    jailTime = 0,
+                                    jailSource = v.source
+                                }
+                                Core.TriggerCallback('Admin:HandleJail', function(cb)
+                                    if cb then
+                                        sendNotification("Jail", 'L-ai inchis pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
+                                    end
+                                end, jailData)
+                            end)
+                            playerOptions:AddButton({
+                                label = 'Jail',
+                                icon = '🚓',
+                                value = 0
+                            }):On('select', function()
+                                local event, aJailReason, aJailTime
+                                ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul inchisorii.", 'Admin:HandleJailReason', true, false, 'c')
+                                event = AddEventHandler("Admin:HandleJailReason", function(jailReason)
+                                    if string.len(jailReason) == 0 then
+                                        jailReason = "Nedeterminata."
+                                        aJailReason = jailReason
+                                    end
+                                    aJailReason = jailReason
+                                    --print
+                                    ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a inchisorii!", 'Admin:HandleJailTime', true, false, 'c')
+                                    RemoveEventHandler(event)
+                                    event = AddEventHandler('Admin:HandleJailTime', function(jailTime)
+                                        if not tonumber(jailTime) or containsSpaces(jailTime) then
+                                            sendNotification("Eroare", "Nu ai introdus un timp valid.")
+                                            return
+                                        else
+                                            jailTime = tonumber(jailTime)
+                                            aJailTime = jailTime
+                                            --print
+                                            if jailTime == 0 then
+                                                jailTime = 99999999
+                                            end
+                                            jailData = {
+                                                jailReason = jailReason,
+                                                jailTime = jailTime,
+                                                jailSource = v.source
+                                            }
+                                            Core.TriggerCallback('Admin:HandleJail', function(cb)
+                                                if cb then
+                                                    sendNotification("Jail", 'L-ai inchis pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
+                                                end
+                                            end, jailData)
+                                            RemoveEventHandler(event)
+                                        end
+                                    end)
+                                end)
+                            end)
+                        end
                         if HasAccess(3) then
+
                             playerOptions:AddButton({
                                 icon = "🦶",
                                 label = 'Kick',
@@ -684,13 +865,26 @@ RegisterCommand('admin', function()
                                                     disabled = true
                                                 })
 
-                                                if v.type == 'Ban' or v.type == 'Jail' or v.type == 'Mute' then
+                                                if v.type == 'Ban' then
                                                     playerPunish:AddButton({
-                                                        label = 'Durata: '..v.duration..' day(s)',
+                                                        label = 'Durata: '..v.duration..'/day(s)',
+                                                        icon = '🕛',
+                                                        disabled = true
+                                                    })
+                                                elseif v.type == 'Jail' then
+                                                    playerPunish:AddButton({
+                                                        label = 'Durata: '..v.duration..'/checkpoint(s)',
+                                                        icon = '🕛',
+                                                        disabled = true
+                                                    })
+                                                else
+                                                    playerPunish:AddButton({
+                                                        label = 'Durata: '..v.duration..'/minute(s)',
                                                         icon = '🕛',
                                                         disabled = true
                                                     })
                                                 end
+                                                
 
                                                 playerPunish:AddButton({
                                                     label = 'Actiuni:',
@@ -736,20 +930,45 @@ RegisterCommand('admin', function()
             description = "",
         }):On("select", function()
             personalSettings:ClearItems()
-            personalSettings:AddButton({
-                label = 'Godmode',
-                icon = '💉',
-            })
-            personalSettings:AddButton({
-                label = 'Coords',
-                icon = '🗺️',
-            }):On('select', function()
-                SendNUIMessage({
-                    action = 'copycoords',
-                    value = GetEntityCoords(PlayerPedId()).x..','..GetEntityCoords(PlayerPedId()).y..','..GetEntityCoords(PlayerPedId()).z..','..GetEntityHeading(PlayerPedId())
-                })
-                TriggerServerEvent('print', GetEntityCoords(PlayerPedId()))
-            end)
+            if HasAccess(1) then
+                personalSettings:AddButton({
+                    icon = "🚗",
+                    label = 'Spawncar',
+                    value = 0
+                }):On('select', function()
+                    ShowDialog('Spawncar', 'Scrie mai jos numele masinii pe care vrei sa o creezi.', 'Admin:HandleCreateCar', true, true, 'c')
+                    local event
+                    event = AddEventHandler('Admin:HandleCreateCar', function(carName)
+                        if string.len(carName) == 0 then
+                            sendNotification('Eroare', 'Nu ai introdus un nume valid.')
+                            return
+                        end
+                        local car = CreateCar(carName, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), false, true, true, "ADMIN")
+                        RemoveEventHandler(event)
+                    end)
+                end)
+            end
+            if HasAccess(5) then
+                personalSettings:AddButton({
+                    label = 'Godmode',
+                    icon = '💉',
+                }):On('select', function()
+                    godModeOn = not godModeOn
+                    SetEntityInvincible(PlayerPedId(), godModeOn)
+                    --send notification to tell he activated or deactivated godmode
+                    sendNotification('Admin', 'Ai '..(godModeOn and 'activat' or 'dezactivat')..' godmode!')
+                end)
+                personalSettings:AddButton({
+                    label = 'Coords',
+                    icon = '🗺️',
+                }):On('select', function()
+                    SendNUIMessage({
+                        action = 'copycoords',
+                        value = GetEntityCoords(PlayerPedId()).x..','..GetEntityCoords(PlayerPedId()).y..','..GetEntityCoords(PlayerPedId()).z..','..GetEntityHeading(PlayerPedId())
+                    })
+                    TriggerServerEvent('print', GetEntityCoords(PlayerPedId()))
+                end)
+            end
             MenuV:OpenMenu(personalSettings)
         end)    
         
