@@ -7,7 +7,6 @@ menu1:AddButton({
     disabled = true
 })
 
-
 local confirmIdentity = menu1:AddButton({
     icon = '⏭',
     label = "Next",
@@ -34,6 +33,7 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
 
 confirmIdentity:On("select", function()
     MenuV:CloseAll(true);

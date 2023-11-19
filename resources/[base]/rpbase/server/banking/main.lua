@@ -5,7 +5,7 @@ Core.CreateCallback('Banking:TryTransaction', function(source, cb, transaction)
         })
         return
     end
-    print(je(transaction))
+    --print(je(transaction))
     transaction.amount = tonumber(transaction.amount)
     local src = source
     local PlayerData = Core.GetPlayerData(src)
@@ -89,7 +89,7 @@ Core.CreateCallback('Banking:TryTransaction', function(source, cb, transaction)
                     return
                 end
                 transaction.recipient = tonumber(transaction.recipient)
-                print(transaction.recipient, type(transaction.recipient))
+                --print(transaction.recipient, type(transaction.recipient))
                 local recipientData = Core.GetPlayerByBankId(transaction.recipient)
                 if recipientData then
                     if PlayerData.bank >= transaction.amount then
@@ -160,7 +160,7 @@ Core.GetPlayerByBankId = function(bid)
     if #result ~= 0 then
         for k,v in pairs(result) do
             local pData = jd(v.data)
-            print(pData.bankId, bid, pData.bankId == bid, type(bid), type(pData.bankId))
+            --print(pData.bankId, bid, pData.bankId == bid, type(bid), type(pData.bankId))
             if pData.bankId == bid then
                 return pData
             end

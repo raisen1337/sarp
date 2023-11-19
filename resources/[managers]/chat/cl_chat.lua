@@ -43,7 +43,7 @@ RegisterNetEvent("Chat:Tog", function(tog)
 end)
 
 AddEventHandler('__cfx_internal:serverPrint', function(msg)
-  print(msg)
+  --print
 
   SendNUIMessage({
     type = 'ON_MESSAGE',
@@ -120,7 +120,7 @@ RegisterNUICallback('chatResult', function(data, cb)
       
       ExecuteCommand(data.message:sub(2))
     else
-      print(chatDisabled)
+      --print
       if chatDisabled then
         return
       end

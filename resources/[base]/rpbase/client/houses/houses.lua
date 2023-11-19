@@ -146,7 +146,7 @@ RegisterCommand('rent', function ()
     Core.TriggerCallback("Houses:IsOwner", function(is)
         if not is then
             Core.TriggerCallback('Houses:IsTenant', function(isTenant)
-                print(isTenant)
+                --print
                 if not isTenant then
                     if PlayerData.rentedHouse == 0 or not PlayerData.rentedHouse then
                         if PlayerData.cash >= hData.rent then
@@ -257,10 +257,10 @@ function EnterHouse(house)
 
     local houseData = json.decode(house.data)
     local createShellCoords = GetEntityCoords(PlayerPedId())
-    print(houseData.enter.x, houseData.enter.y, houseData.enter.z - 20.0)
+    --print
     local shellData = CreateShell(housesTypes[houseData.type], vec3(houseData.enter.x, houseData.enter.y, houseData.enter.z - 20.0))
 
-    print('Shell created')
+    --print
 
     local pCoords = GetEntityCoords(PlayerPedId())
     local newCoords = vec3(houseData.enter.x + housesTypes[houseData.type].exit.x, houseData.enter.y + housesTypes[houseData.type].exit.y, houseData.enter.z + housesTypes[houseData.type].exit.z)
@@ -421,7 +421,7 @@ RegisterNetEvent("Houses:HandleSellToPlayer", function (response)
     if tonumber(response) then
         response = tonumber(response)
         Core.TriggerCallback("Players:IsOnline", function(isOnline)
-            print(isOnline)
+            --print
             if isOnline then
                 selltoplayerid = response
                 ShowDialog('Vinde casa', "Scrie suma cu care vrei sa vinzi casa jucatorului respectiv.", 'Houses:SellToPlayer', true, true, "client")
@@ -472,7 +472,7 @@ RegisterNetEvent("Houses:HandleCheck", function (response)
 
         local sell = hData.price /1.4
         sell = math.floor(sell)
-        print(sell)
+        --print
         PlayerData.cash = PlayerData.cash + math.floor(sell)
 
         Core.SavePlayer()
@@ -627,7 +627,7 @@ RegisterCommand('houses', function()
                 })
 
                 setCp:On('select', function()
-                    print(hData.enter.x, hData.enter.y, hData.enter.z)
+                    --print
                     CreateCP(1, vec3(hData.enter.x, hData.enter.y, hData.enter.z), {255, 0, 0, 255}, 1.0, 25, function()
                     end)
                 end)
@@ -894,7 +894,7 @@ RegisterNetEvent('Shell:Create', function(shell)
     local shellExit = housesTypes[shell].exit
     local createShellCoords = GetEntityCoords(PlayerPedId())
     
-    print(createShellCoords)
+    --print
 
     local shellData = CreateShell(housesTypes[shell], vec3(createShellCoords.x, createShellCoords.y, createShellCoords.z - 20.0))
     --to be continued, ai aflat offsetu bun, acuma te descurci cu restu

@@ -91,13 +91,13 @@ RegisterCommand('taketicket', function(source, args, rawCommand)
     local pData = Core.GetPlayerData()
     if pData.adminLevel > 0 then
         Core.TriggerCallback('Admin:GetTickets', function(tickets)
-            print(je(tickets), #tickets)
+            --print(je(tickets), #tickets)
             if #tickets > 0 then
                 for k, v in pairs(tickets) do
                     if tonumber(args[1]) then
                         if tonumber(args[1]) == v.ticketId then
                             if not v.solved then
-                                print('found unsolved ticket')
+                                --print
                                 Core.TriggerCallback('Core:GetPlayers', function(players)
                                     for a,b in pairs(players) do
                                        b.source = tonumber(b.source)
@@ -105,7 +105,7 @@ RegisterCommand('taketicket', function(source, args, rawCommand)
                                        if b.source == v.id then
                                            Core.TriggerCallback("Core:GetPlayerCoords", function(coords)
                                                SetEntityCoords(PlayerPedId(), coords.x, coords.y, coords.z)
-                                               print("Solving ticket with ID: ", v.id)
+                                               --print
                                                Core.TriggerCallback('Admin:SolveTicket', function(cb) end, v.ticketId)
                                                Core.TriggerCallback('Core:CallRemoteEvent', function() end, 'solveTicket', v.id)
                                            end, b.source)
@@ -116,7 +116,7 @@ RegisterCommand('taketicket', function(source, args, rawCommand)
                         end
                     else
                         if not v.solved then
-                            print('found unsolved ticket')
+                            --print
                             Core.TriggerCallback('Core:GetPlayers', function(players)
                                 for a,b in pairs(players) do
                                    b.source = tonumber(b.source)
@@ -124,7 +124,7 @@ RegisterCommand('taketicket', function(source, args, rawCommand)
                                    if b.source == v.id then
                                        Core.TriggerCallback("Core:GetPlayerCoords", function(coords)
                                            SetEntityCoords(PlayerPedId(), coords.x, coords.y, coords.z)
-                                           print("Solving ticket with ID: ", v.id)
+                                           --print
                                            Core.TriggerCallback('Admin:SolveTicket', function(cb) end, v.ticketId)
                                            Core.TriggerCallback('Core:CallRemoteEvent', function() end, 'solveTicket', v.id)
                                        end, b.source)
@@ -238,7 +238,7 @@ RegisterCommand('admin', function()
                                         aBanReason = banReason
                                     end
                                     aBanReason = banReason
-                                    print(aBanReason)
+                                    --print
                                     ShowDialog('Baneaza jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in zile a interdictiei!", 'Admin:HandleBanTime', true, false, 'c')
                                     RemoveEventHandler(event)
                                     event = AddEventHandler('Admin:HandleBanTime', function(banTime)
@@ -248,7 +248,7 @@ RegisterCommand('admin', function()
                                         else
                                             banTime = tonumber(banTime)
                                             aBanTime = banTime
-                                            print(aBanTime)
+                                            --print
                                             if banTime == 0 then
                                                 banTime = 99999999
                                             end
@@ -322,12 +322,12 @@ RegisterCommand('admin', function()
                                                 hData.tenants = {}
 
                                                 Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
-                                                    print(cb)
+                                                    --print
                                                     if cb == true then
                                                         TriggerServerEvent("Houses:RequireUpdate")
                                                         sendNotification('Admin', 'Ai vandut casa '..hData.name.. ' detinuta de '..prevOwner..'!')
                                                     else
-                                                        print(cb)
+                                                        --print
                                                     end
                                                     
                                                 end, hData)
@@ -353,12 +353,12 @@ RegisterCommand('admin', function()
                                                 event = AddEventHandler("Admin:HandleChangeHouseRentAmount", function(price)
                                                     hData.rent = price
                                                     Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
-                                                        print(cb)
+                                                        --print
                                                         if cb == true then
                                                             TriggerServerEvent("Houses:RequireUpdate")
                                                             sendNotification('Admin', 'Ai schimbat pretul chiriei casei: '..hData.name..' la '..FormatNumber(price)..'!')
                                                         else
-                                                            print(cb)
+                                                            --print
                                                         end
                                                         RemoveEventHandler(event)
                                                     end, hData)
@@ -661,7 +661,7 @@ RegisterCommand('admin', function()
                                     createHouseData.type = type
                                     Core.TriggerCallback('Houses:GetTypes', function(types)
                                         print(je(types))
-                                        print(createHouseData.type)
+                                        --print
                                         local pCoords = PlayerCoords()
                                         local shell_data = types[createHouseData.type]
                                         local houseData = {
@@ -699,7 +699,7 @@ RegisterCommand('admin', function()
                 }):On('select', function()
                     Core.TriggerCallback('Server:GetAllHouses', function(houses)
                         serverHouses:ClearItems()
-                        print(#houses)
+                        --print
                         if not houses or table.empty(houses) then
                             serverHouses:AddButton({
                                 label = 'Nu exista case.',

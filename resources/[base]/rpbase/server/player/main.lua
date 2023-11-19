@@ -41,6 +41,85 @@ local PlayerStruct = {
     },
 }
 
+Config = {}
+
+Config.Items = {
+    {
+        model = "weapon_carbinerifle",
+        name = "Carbine",
+        type = "weapon",
+    },
+    {
+        model = "weapon_stungun_mp",
+        name = "Taser",
+        type = "weapon",
+    },
+    {
+        model = "weapon_pistol",
+        name = "Pistol",
+        type = "weapon",
+    },
+    {
+        model = "weapon_combatpistol",
+        name = "Combat Pistol",
+        type = "weapon",
+    },
+    {
+        model = "weapon_pumpshotgun",
+        name = "Pump Shotgun",
+        type = "weapon",
+    },
+    {
+        model = "weapon_sniperrifle",
+        name = "Sniper",
+        type = "weapon",
+    },
+    {
+        model = "weapon_heavypistol",
+        name = "Heavy Pistol",
+        type = "weapon",
+    },
+    {
+        model = "weapon_smg",
+        name = "SMG",
+        type = "weapon",
+    },
+    {
+        model = "weapon_nightstick",
+        name = "Nightstick",
+        type = "weapon",
+    },
+    {
+        model = 'armour',
+        name = "Armour",
+        type = "item",
+    },
+    {
+        model = 'medkit',
+        name = "Medkit",
+        type = "item",
+    },
+    {
+        model = "rifle_ammo",
+        name = "Rifle Ammo",
+        type = "ammo",
+    },
+    {
+        model = "shotgun_ammo",
+        name = "Shotgun Ammo",
+        type = "ammo",
+    },
+    {
+        model = "pistol_ammo",
+        name = "Pistol Ammo",
+        type = "ammo",
+    },
+    {
+        model = "smg_ammo",
+        name = "SMG Ammo",
+        type = "ammo",
+    },
+}
 
 
 Peds = {
@@ -270,7 +349,7 @@ function onMeCommand(source, args)
 end
 RegisterCommand('me', onMeCommand)
 local function OnPlayerConnecting(name, setKickReason, deferrals)
-    print(getCurrentTimestamp())
+    --print(getCurrentTimestamp())
     local player = source
     local steamIdentifier
     local identifiers = GetPlayerIdentifiers(player)
@@ -281,7 +360,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
 
     deferrals.update(string.format("Hello %s. Your Steam ID is being checked.", name))
     
-    print('[RPBase]: Player '..name..' is trying to join the server.')
+    ----print
 
     for _, v in pairs(identifiers) do
         if string.find(v, "steam") then
@@ -297,7 +376,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
         deferrals.done("Steam needs to be running in order to join this server.")
     else
         print('[RPBase]: Player '..name..'('..steamIdentifier..') is connected to the server.')
-        print('[RPBase]: Checking if identifier '..steamIdentifier..' exists in database.')
+        ----print
 
         exports.oxmysql:query("SELECT * FROM players WHERE identifier = ?", {steamIdentifier}, function(result)
             if result[1] then
@@ -322,7 +401,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                         local banIds = bpData.banIds
                         deferrals.update("🔨 Checking if you are banned on other accounts..")
                         if banIds then
-                            print(banIds['steamId'], playerIds['steamId'])
+                            ----print
                             for key, value in pairs(banIds) do
                                 if value ~= nil then
                                     if value == playerIds[key] and not foundMatch then
@@ -364,7 +443,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                     local banIds = bpData.banIds
                     deferrals.update("🔨 Checking if you are banned on other accounts..")
                     if banIds then
-                        print(banIds['steamId'], playerIds['steamId'])
+                        ----print
                         for key, value in pairs(banIds) do
                             if value ~= nil then
                                 if value == playerIds[key] and not foundMatch then
@@ -372,7 +451,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                                         Wait(0)
                                         foundMatch = true
                                         foundData = bpData
-                                        print('Id: '..key.." matched from account: "..bpData.user.." ("..value.." | "..playerIds[key]..")")
+                                        --print('Id: '..key.." matched from account: "..bpData.user.." ("..value.." | "..playerIds[key]..")")
                                     else
                                         foundMatch = false
                                     end
@@ -444,7 +523,7 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                     PlayerStruct = json.encode(PlayerStruct)
     
                     exports.oxmysql:query("INSERT INTO players(user, identifier, data) VALUES(?, ?, ?)", {name, steamIdentifier, PlayerStruct})
-                    print('[RPBase]: Player '..name..' has been registered in the database.')
+                    ----print
                     deferrals.done()
                 end
             
@@ -474,8 +553,8 @@ end)
 
 RegisterNetEvent("sv-time:update", function()
     TriggerClientEvent("cl-time:update", source, os.date("%H"), os.date("%M"), os.date("%S"))
-    print("Updated time on "..GetPlayerName(source))
-    print(os.date("%H"), os.date("%M"), os.date("%S"))
+    --print("Updated time on "..GetPlayerName(source))
+    --print(os.date("%H"), os.date("%M"), os.date("%S"))
 end)
 
 RegisterNetEvent("Scoreboard:SetScoreboard", function()
@@ -527,7 +606,7 @@ Core.CreateCallback("Identity:Check", function(source, cb)
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {steamIdentifier})
 
     local pData = json.decode(result[1].data)
-    print(pData.character.name, pData.character.surname)
+    ----print
     if string.len(pData.character.name..""..pData.character.surname) > 0 then
         cb(true)
     else
@@ -640,7 +719,7 @@ Core.CreateCallback('Player:GetData', function(source, cb)
         PlayerStruct = json.encode(PlayerStruct)
 
         exports.oxmysql:query("INSERT INTO players(user, identifier, data) VALUES(?, ?, ?)", {name, steamIdentifier, PlayerStruct})
-        print('[RPBase]: Player '..name..' has been registered in the database.')
+        ----print
         cb(json.decode(PlayerStruct))
     end
 end)
@@ -652,6 +731,121 @@ Core.CreateCallback("Player:GetDataBySteamId", function(source, cb, steamId)
     else
         cb(false)
     end
+end)
+
+Core.GetItem = function(name)
+    for _, item in pairs(Config.Items) do
+        if item.name == name or item.model == name then
+            return item
+        end
+    end
+end
+Core.CreateCallback("Player:AddItem", function(source, cb, name, amount)
+    ----print
+    local pData = Core.GetPlayerData(source)
+    local Inventory = pData.inventory
+    local itemFound = false
+
+    -- Add logging statement to --print the current name and amount
+    ----print
+
+    if not table.empty(Inventory) then
+        for _, item in pairs(Inventory) do
+            if item.name == name then
+                item.amount = item.amount + amount
+                itemFound = true
+                break
+            end
+        end
+    end
+
+    if not itemFound then
+        table.insert(Inventory, {name = Core.GetItem(name).model, type = Core.GetItem(name).type, amount = amount})
+    end
+
+    pData.inventory = Inventory
+
+    -- Add logging statement to --print the updated inventory
+    --print("Updated inventory:", json.encode(pData.inventory))
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+
+    -- Add logging statement to --print the callback status
+    ----print
+
+    cb(true)
+end)
+
+Core.CreateCallback('Player:GetAmmo', function(source, cb, type)
+    local pData = Core.GetPlayerData(source)
+    local Inventory = pData.inventory
+    if not table.empty(Inventory) then
+        for _, item in pairs(Inventory) do
+            if item.type == 'ammo' then
+                if string.match(item.name, type) then
+                    cb(item.amount)
+                else
+                    cb(false)
+                end
+            end
+        end
+    else
+        cb(false)
+    end
+    
+end)
+
+Core.CreateCallback('Player:GetPlayerWeapons', function(source, cb)
+    local pData = Core.GetPlayerData(source)
+    local Inventory = pData.inventory
+    local weapons = {}
+    if not table.empty(Inventory) then
+        for k,v in pairs(inventory) do
+            if v.type == "weapon" then
+                table.insert(weapons, v)
+            end
+        end
+    end
+    
+    cb(weapons)
+end)
+
+Core.CreateCallback('Player:GetPlayerInventory', function(source, cb)
+    local pData = Core.GetPlayerData(source)
+    local Inventory = pData.inventory
+    cb(Inventory)
+end)
+
+
+Core.CreateCallback("Player:RemoveItem", function(source, cb, name, amount)
+    ----print
+    local pData = Core.GetPlayerData(source)
+    local Inventory = pData.inventory
+    local itemFound = false
+
+    if not table.empty(Inventory) then
+        for i, item in ipairs(Inventory) do
+            if item.name == name then
+                if item.amount - amount <= 0 then
+                    ----print
+                    table.remove(Inventory, i)
+                else
+                    item.amount = item.amount - amount
+                    ----print
+                end
+                itemFound = true
+                break
+            end
+        end
+    end
+
+    if not itemFound then
+        ----print
+    end
+
+    pData.inventory = Inventory
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+    cb(true)
 end)
 
 Core.GetPlayerData = function(source)
@@ -756,7 +950,7 @@ RegisterNetEvent("Player:Save", function(pData)
     local src = source
     pData = json.decode(pData)
     exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
-    print("Player "..pData.user.." saved!")
+    ----print
     Wait(2000)
     TriggerClientEvent("Player:UpdateData", src)
 end)

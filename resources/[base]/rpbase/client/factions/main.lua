@@ -1,4 +1,4 @@
-local Factions = {}
+Factions = {}
 LoadFactions = function()
     Core.TriggerCallback('Factions:GetFactions', function(data)
         Factions = data
@@ -21,6 +21,9 @@ end
 
 Wait(2000)
 LoadFactions()
+
+
+
 
 local canSpawnVehicle = false
 
@@ -143,13 +146,19 @@ RegisterCommand('faction', function()
                     
 
                     if canAccessArmory then
+                        factionArmorySubmenu:ClearItems()
+
                         factionsMenu:AddButton({
                             label = 'Armory',
                             icon = '🔧',
                             value = 'armory',
                         }):On('select', function()
+                            factionArmorySubmenu:ClearItems()
+                            factionArmoryMenu:ClearItems()
                             for k,v in pairs(playerFaction.armory) do
                                 if fData.rank >= v.rank then
+                                    factionArmorySubmenu:ClearItems()
+
                                     factionArmoryMenu:AddButton({
                                         label = v.name,
                                         icon = '🔧',
@@ -200,11 +209,54 @@ RegisterCommand('faction', function()
                                             factionArmorySubmenu:AddButton({
                                                 label = 'Cumpara arma',
                                                 icon = '💸',
-                                            })
+                                            }):On('select', function()
+                                                MenuV:CloseAll()
+                                                --print
+                                                --print
+                                                if pData.cash >= v.weaponCost then
+                                                    pData.cash = pData.cash - v.weaponCost
+                                                    Core.TriggerCallback('Player:AddItem', function(cb)
+                                                        
+                                                        GiveWeaponToPed(PlayerPedId(), GetHashKey(v.model), 1, false, false)
+                                                        --print
+                                                       
+                                                    end, v.model, 1)
+                                                    return
+                                                else
+                                                    sendNotification('Eroare', 'Nu ai destui bani', 'error')
+                                                end
+                                            end)
                                             factionArmorySubmenu:AddButton({
                                                 label = 'Cumpara munitie',
                                                 icon = '💸',
-                                            })
+                                            }):On('select', function()
+                                                MenuV:CloseAll()
+                                                --print
+                                                
+                                                ShowDialog('Cumpara munitie', 'Scrie mai jos cata munitie ai nevoie! (Ex: 150).', 'buyammo', true, false, 'c')
+                                                local event;
+                                                event = AddEventHandler('buyammo', function(ammo)
+                                                    RemoveEventHandler(event)
+                                                    if tonumber(ammo) then
+                                                        if pData.cash >= tonumber(ammo) * v.ammoCost then
+                                                            pData.cash = pData.cash - tonumber(ammo) * v.ammoCost
+                                                            ammo = tonumber(ammo)
+                                            
+                                                            Core.TriggerCallback('Player:AddItem', function(cb)
+                                                                --print
+                                                               
+                                                                AddAmmoToPed(PlayerPedId(), GetHashKey(v.model), ammo)
+                                                                --print
+                                                              
+                                                            end, v.ammoName, ammo)
+                                                            return
+                                                        else
+                                                            sendNotification('Armory', 'Nu ai destui bani.', 'error')
+                                                            --print
+                                                        end
+                                                    end
+                                                end)
+                                            end)
                                         end
                                         MenuV:OpenMenu(factionArmorySubmenu)
                                     end)

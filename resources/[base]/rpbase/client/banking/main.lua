@@ -1,7 +1,7 @@
 
 
 RegisterCommand('test', function()
-    print(PlayerData.bank)
+    --print
     TriggerScreenblurFadeIn(1)
     if PlayerData.totalDeposited == nil then
         PlayerData.totalDeposited = 0
@@ -12,7 +12,7 @@ RegisterCommand('test', function()
     if PlayerData.totalWithdrawn == nil then
         PlayerData.totalWithdrawn = 0
     end
-    print(PlayerData.totalDeposited, PlayerData.totalTransferred, PlayerData.totalWithdrawn)
+    --print
 
     SendNUIMessage({
         action = "openBanking",
@@ -55,7 +55,7 @@ RegisterNUICallback('tryTransaction', function(data)
                 if PlayerData.totalWithdrawn == nil then
                     PlayerData.totalWithdrawn = 0
                 end
-                print(PlayerData.totalDeposited, PlayerData.totalTransferred, PlayerData.totalWithdrawn)
+                --print
                 SendNUIMessage({
                     action = "updateBanking",
                     data = {

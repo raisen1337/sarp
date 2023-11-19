@@ -2,7 +2,7 @@
 -- Hardware Id's logic - remember
 -- for k,v in pairs(GetPlayers()) do
 --     local tokens = GetNumPlayerTokens(v)
---     print(tokens)
+--     --print
 --     for i = 0, tokens do
 --         print(GetPlayerToken(v, i))
 --     end

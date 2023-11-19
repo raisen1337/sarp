@@ -29,7 +29,7 @@ UnloadBusinesses = function()
 end
 
 RegisterNetEvent('Business:Update', function ()
-    print('Business reloaded!')
+    --print
     bizInfo = nil
     for k,v in pairs(bizBlips) do
         RemoveBlip(v.blip)

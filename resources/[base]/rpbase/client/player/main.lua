@@ -59,6 +59,13 @@ SelectGender:AddButton({
     Core.startPayday()
 end)
 
+SelectGender:On('close', function()
+    PlayerData = Core.GetPlayerData()
+    FreezeEntityPosition(PlayerPedId(), true)
+    if not PlayerData.character['ped_model'] then
+        MenuV:OpenMenu(SelectGender)
+    end
+end)
 
 AddEventHandler('onResourceStart', function(resourceName)
   if (GetCurrentResourceName() ~= resourceName) then
@@ -80,6 +87,17 @@ RegisterCommand('dv', function()
         sendNotification("Vehicul", "Nu esti intr-un vehicul.", 'error')
     end
 end)
+function checkWeaponPresence(str_a, str_b)
+    local weapon_name_b = string.match(str_b, "(%a+)_ammo")
+    if weapon_name_b then
+        -- Check if the extracted weapon name from str_b is present in str_a
+        if string.find(str_a, weapon_name_b) then
+            return true
+        end
+    end
+    return false
+end
+
 
 
 PlayerSpawned = function()
@@ -90,7 +108,7 @@ PlayerSpawned = function()
         ClientVehicles = GetVehicles()
         TriggerServerEvent("Scoreboard:AddPlayer")
         TriggerServerEvent("Scoreboard:SetScoreboard")
-        print(PlayerData.position)
+        ----print
         if not PlayerData.position or table.empty(PlayerData.position) then
             SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
             SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
@@ -125,8 +143,26 @@ PlayerSpawned = function()
                         end
                     end, PlayerData.inHouseId)
                 end
+
+                
+                local Inventory = PlayerData.inventory
+                for k,v in pairs(Inventory) do
+                    if v.type == 'weapon' then
+                        local pAmmo = Core.GetPlayerAmmo()
+                        --print(je(pAmmo))
+                        for a, b in pairs(pAmmo) do
+                            --print(checkWeaponPresence(v.name, a))
+                            if checkWeaponPresence(v.name, a) then
+                                GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), b, false, false)
+                            end
+                        end
+                    end
+                end
+
                 Core.SavePlayer()
                 Core.startPayday()
+
+                
                 LoggedIn = true
             end
         end

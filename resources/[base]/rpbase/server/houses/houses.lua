@@ -28,7 +28,7 @@ Core.CreateCallback('Houses:Get', function (source, cb)
 end)
 
 Core.CreateCallback('Houses:DeleteHouse', function(source, cb, id)
-    print(id)
+    --print
     local result = exports.oxmysql:executeSync('DELETE FROM houses WHERE id = ?', {id})
     print(je(result))
     cb(true)

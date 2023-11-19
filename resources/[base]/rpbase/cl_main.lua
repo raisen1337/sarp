@@ -11,12 +11,11 @@ AddEventHandler('onClientMapStart', function()
 end)
 
 function Core.GetPlayerData()
-  if #PlayerData == 0 or PlayerData == nil or PlayerData == {} then
-    Core.TriggerCallback("Player:GetData", function(result)
-      PlayerData = result
+  if not PlayerData or table.empty(PlayerData) then
+    Core.TriggerCallback("Player:GetData", function(data)
+      PlayerData = data
+      return data
     end)
-  else
-    return PlayerData
   end
   return PlayerData
 end
@@ -29,6 +28,8 @@ function Core.SavePlayer()
   PlayerData = PlayerData
   if PlayerData.user == nil then return end
   TriggerServerEvent("Player:Save", json.encode(PlayerData))
+  Wait(500)
+  Core.UpdateAmmo(Core.GetPlayerAmmo())
 end
 
 function Core.SaveHouse(house)
@@ -144,6 +145,102 @@ function CreateCar(model, coords, heading, isnet, tsc, putin, plate)
   TriggerServerEvent("Vehicles:Insert", veh)
 
   return veh
+end
+
+local PlayerAmmo = {}
+AddEventHandler('CEventGunShot', function()
+    local weapon = GetSelectedPedWeapon(PlayerPedId())
+    local ammoType = GetPedAmmoTypeFromWeapon(PlayerPedId(), weapon)
+    local ammo = GetPedAmmoByType(PlayerPedId(), ammoType)
+    local ammoTypes = {
+        [1950175060] = 'pistol_ammo',
+        [218444191] = 'rifle_ammo',
+        [1820140472] = 'smg_ammo',
+        [1285032059] = 'rifle_ammo',
+        [-1878508229] = 'shotgun_ammo',
+    }
+    local ammoName = ammoTypes[ammoType]
+    
+     --insert ammo with ammotype to table playerammo
+    if not PlayerAmmo[ammoName] then
+        PlayerAmmo[ammoName] = ammo
+    end
+
+    if PlayerAmmo[ammoName] then
+        PlayerAmmo[ammoName] = ammo
+    end
+    --print(je(Core.GetPlayerAmmo()))
+end)
+
+function Core.GetPlayerAmmo()
+    local pAmmo = {}
+    local callbackCompleted = false
+
+    Core.TriggerCallback('Core:GetPlayerAmmo', function(cb)
+        pAmmo = cb
+        callbackCompleted = true
+    end)
+
+    while not callbackCompleted do
+        Citizen.Wait(0) -- Yield execution to other scripts
+    end
+
+    return pAmmo
+end
+
+local canRun = true
+local waitg = 5000
+local amountSaved = 0
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(waitg)
+        local selectedWeapon = GetSelectedPedWeapon(PlayerPedId())
+        if selectedWeapon == -1569615261 and canRun then
+          ----print
+            if amountSaved < 5 then
+                amountSaved = amountSaved + 1
+            end
+
+
+            if amountSaved + 1 == 5 then
+                amountSaved = 3
+                ----print
+                Wait(5000)
+                amountSaved = 0
+            end
+
+            ----print
+            canRun = false
+            if PlayerAmmo and not table.empty(PlayerAmmo) then
+              Core.UpdateAmmo(PlayerAmmo)
+            else
+              PlayerAmmo = Core.GetPlayerAmmo()
+              Core.UpdateAmmo(Core.GetPlayerAmmo())
+            end
+            waitg = 1
+        elseif selectedWeapon ~= -1569615261 and not canRun then
+            ----print
+            canRun = true
+        end
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(3 * 60 * 1000)
+        if PlayerAmmo and not table.empty(PlayerAmmo) then
+          Core.UpdateAmmo(PlayerAmmo)
+        else
+          PlayerAmmo = Core.GetPlayerAmmo()
+          Core.UpdateAmmo(Core.GetPlayerAmmo())
+        end
+    end
+end)
+
+function Core.UpdateAmmo(ammo)
+    Core.TriggerCallback('Core:UpdatePlayerAmmo', function(cb)
+        PlayerAmmo = cb
+    end, ammo)
 end
 
 DeleteCar = function(car)

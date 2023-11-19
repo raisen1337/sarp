@@ -43,7 +43,7 @@ Core.CreateCallback('Business:Get', function (source, cb)
 end)
 
 Core.CreateCallback("Business:Delete", function(source, cb, id)
-    print(id)
+    --print
     exports.oxmysql:query("DELETE FROM businesses WHERE id = ?", {id}, function(error, result)
         if not error then
             cb(true)
@@ -56,7 +56,7 @@ end)
 
 
 Core.CreateCallback("Business:EditBusiness", function(source, cb, id, modification, data)
-    print(id)
+    --print
     local bData = exports.oxmysql:executeSync("SELECT * FROM businesses WHERE id = ?", {id})
     bData = jd(bData[1].data)
     if bData[modification] then
