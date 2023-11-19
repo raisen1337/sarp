@@ -1,5 +1,5 @@
 # ⚡ San Andreas Roleplay
- 
+
 A roleplay framework inspired by SA-MP RPG gamemodes. Currently still in development with the following features:
 
 ## 🙍‍♂️ Player Accounting System
