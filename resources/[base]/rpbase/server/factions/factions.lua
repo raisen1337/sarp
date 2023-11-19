@@ -11,6 +11,7 @@ factions = {
         },
         blipName = 'Police HQ',
         blip = 60,
+        color = "^4",
         blipColor = 3,
         ranks = {
             [1] = {

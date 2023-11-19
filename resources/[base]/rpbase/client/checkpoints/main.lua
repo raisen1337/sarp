@@ -1,5 +1,45 @@
 checkpoints = {}
 
+DeleteCP = function(cp)
+    if not table.empty(checkpoints) then
+        for k,v in pairs(checkpoints) do
+            if v.id == cp.id then
+                RemoveBlip(v.blip)
+                table.remove(checkpoints, k)
+                return
+            end
+        end
+    end
+end
+
+DoesCPExist = function(cp)
+    if not table.empty(checkpoints) then
+        for k,v in pairs(checkpoints) do
+            if v.id == cp.id then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+ModifyCP = function(cp, type, coords, color, radius, visible)
+    if not table.empty(checkpoints) then
+        for k,v in pairs(checkpoints) do
+            if v.id == cp.id then
+                print('CP modified with type: '..type..' and colors: '..json.encode(color)..' and coords '..json.encode(coords)..'!')
+                v.type = type
+                v.coords = coords
+                v.color = color
+                v.radius = radius
+                v.visible = visible
+                SetBlipCoords(v.blip, coords)
+                return
+            end
+        end
+    end
+end
+
 CreateCP = function(type, coords1, color, radius, visible, callback)
     if not table.empty(checkpoints) then
         for k,v in pairs(checkpoints) do
@@ -10,10 +50,11 @@ CreateCP = function(type, coords1, color, radius, visible, callback)
         end
     end
     local blip = CreateBlip(coords1, "Destinatie", 1, 1)
+    SetBlipAsShortRange(blip, false)
     print('Cp created with type: '..type..' and colors: '..json.encode(color)..'!')
-    
-    table.insert(checkpoints, {type = type, coords = coords1, color = color, visible = visible, radius = radius, callback = callback, blip = blip})
-    return
+    local cp = {id= #checkpoints + 1, type = type, coords = coords1, color = color, visible = visible, radius = radius, callback = callback, blip = blip}
+    table.insert(checkpoints, {id = #checkpoints + 1, type = type, coords = coords1, color = color, visible = visible, radius = radius, callback = callback, blip = blip})
+    return cp
 end
 
 Citizen.CreateThread(function ()
@@ -33,7 +74,6 @@ Citizen.CreateThread(function ()
                         end
                         RemoveBlip(v.blip)
                         table.remove(checkpoints, k)
-                        sendNotification('Destinatie', "Ai ajuns la destinatie", 'success')
                         wait = 5000
                     end
                 end

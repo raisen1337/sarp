@@ -128,6 +128,32 @@ Core.CreateCallback('Factions:AddMember', function(source, cb, fName, identifier
     end
 end)
 
+Core.CreateCallback('Factions:AddMemberWithRank', function(source, cb, fName, rank, identifier)
+    print('AddMemberWithRank', fName, rank, identifier)
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
+    if not factions[fName].ranks[rank] then
+        cb(false)
+        return
+    end
+    if result[1] then
+        local pData = json.decode(result[1].data)
+        local fData = pData.faction
+        fData.name = factions[fName].name
+        fData.id = factions[fName].id
+        fData.rank = rank
+        fData.rankColor = factions[fName].ranks[rank].color
+        fData.rankName = factions[fName].ranks[rank].rank
+        fData.salary = factions[fName].ranks[rank].salary
+
+        pData.faction = fData
+
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+        cb(true)
+    else
+        cb(false)
+    end
+end)
+
 Core.CreateCallback('Factions:RemoveMember', function(source, cb, identifier)
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
     if result[1] then

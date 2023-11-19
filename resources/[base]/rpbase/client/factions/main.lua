@@ -266,7 +266,6 @@ RegisterCommand('faction', function()
                         end)
                     end
                     if fData.rank == 3 then
-                        
                         factionsMenu:AddButton({
                             label = 'Membrii',
                             icon = '👥',
@@ -346,10 +345,9 @@ RegisterCommand('faction', function()
                                     end)
                                 end
                             end, v.id)
-                            MenuV:OpenMenu(factionMembers)
                         end)
+                        MenuV:OpenMenu(factionMembers)
                     end
-                    
                     MenuV:OpenMenu(factionsMenu)
                 end
             end
@@ -374,7 +372,7 @@ Citizen.CreateThread(function ()
                     if dist[1] < 15.0 then
                         wait = 1
                         DrawText3D(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z, "Vehicle Area - 15m radius.")
-                        DrawMarker(1, coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 15.0, 15.0, 15.0, 255, 255, 255, 100, false, true, 2, false, false, false, false)
+                        DrawMarker(1, coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 15.0, 15.0, 1.0, 255, 255, 255, 50, false, true, 2, false, false, false, false)
                         canSpawnVehicle = true
                     else
                         canSpawnVehicle = false

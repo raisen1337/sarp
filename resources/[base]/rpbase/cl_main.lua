@@ -147,6 +147,133 @@ function CreateCar(model, coords, heading, isnet, tsc, putin, plate)
   return veh
 end
 
+function GetAllVehicles()
+  local ret = {}
+  for veh in EnumerateVehicles() do
+    table.insert(ret, veh)
+  end
+  return ret
+end
+
+AddEventHandler('onClientResourceStop', function(resourceName)
+  Core.TriggerCallback("AC:ReportAnomaly", function()
+  end, 'rstop')
+  if (GetCurrentResourceName() ~= resourceName) then
+    return
+  end
+ 
+end)
+
+local syncedAmmo = false
+
+Citizen.CreateThread(function()
+  while true do
+      Wait(500)
+      vehs = GetAllVehicles()
+      for k,v in pairs(vehs) do
+          if DoesEntityExist(v) then
+              if not ClientVehicles then
+                  if IsPedInVehicle(PlayerPedId(), v, false) then
+                    Core.TriggerCallback('AC:ReportAnomaly', function()
+                    end, 'vehicle')
+                  end
+                  DeleteEntity(v)
+              end
+              if type(ClientVehicles) == 'table' then
+                  for a,b in pairs(ClientVehicles) do
+                      if v ~= b then
+                          if IsPedInVehicle(PlayerPedId(), v, false) then
+                            Core.TriggerCallback('AC:ReportAnomaly', function()
+                            end, 'vehicle')
+                          end
+                          DeleteEntity(v)
+                      end
+                  end
+              end
+          end
+      end
+      local unarmed = GetHashKey('WEAPON_UNARMED')
+      if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed then
+        if not PlayerData then
+          PlayerData = Core.GetPlayerData()
+        end
+          if PlayerData and not table.empty(PlayerData) then
+            
+            if table.empty(PlayerData.inventory) then
+              if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed then
+                Core.TriggerCallback('AC:ReportAnomaly', function()
+                end, 'weapon')
+                RemoveAllPedWeapons(PlayerPedId(), true)
+              end
+            else
+              local gunFound = false
+              for k, v in pairs(PlayerData.inventory) do
+                  local currentgun = GetSelectedPedWeapon(PlayerPedId())
+                  local invgun = GetHashKey(v.name)
+                  
+                  if currentgun == invgun then
+                    gunFound = true
+                    -- local weaponAmmo = GetAmmoInPedWeapon(PlayerPedId(), currentgun)
+                    -- local Inventory = PlayerData.inventory
+                    -- local playerAmmo = Core.GetPlayerAmmo()
+                    
+                    -- local ammoDifference = 10 -- Define the allowable ammo difference
+                    
+                    -- for a, b in pairs(playerAmmo) do
+                       
+                    --     if weaponAmmo ~= b and (b > weaponAmmo + ammoDifference or b < weaponAmmo - ammoDifference) then
+                    --         -- Perform actions when the difference in ammo is greater than the defined threshold
+                    --         Core.TriggerCallback('AC:ReportAnomaly', function()
+                    --         end, 'ammo')
+                    --         RemoveAllPedWeapons(PlayerPedId(), true)
+                    --         Inventory = PlayerData.inventory
+                    --         playerAmmo = Core.GetPlayerAmmo()
+                    --         for k, v in pairs(Inventory) do
+                    --             if v.type == 'weapon' then
+                    --                 for a, b in pairs(playerAmmo) do
+                    --                     if checkWeaponPresence(v.name, a) then
+                    --                         GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), b, false, false)
+                    --                     end
+                    --                 end
+                    --             end
+                    --         end
+                    --     else
+                    --         -- If the difference is within the threshold, update and synchronize the ammo
+                    --         syncedAmmo = true
+                    --         Core.UpdateAmmo(Core.GetPlayerAmmo())
+                    --     end
+                    -- end
+                    break  -- Exit the loop since a match is found
+                end
+                
+              end
+
+              if not gunFound then
+                  Core.TriggerCallback('AC:ReportAnomaly', function()
+                  end, 'weapon')
+                  RemoveAllPedWeapons(PlayerPedId(), true)
+
+                  local Inventory = PlayerData.inventory
+                  local playerAmmo = Core.GetPlayerAmmo()
+                  
+                  for k,v in pairs(Inventory) do
+                      if v.type == 'weapon' then
+                    
+                          for a, b in pairs(playerAmmo) do
+                              GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
+                              if checkWeaponPresence(v.name, a) then
+                                  SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
+                              end
+                          end
+                      end
+                  end
+              end
+            end
+          end
+      end
+  end
+end)
+
 local PlayerAmmo = {}
 AddEventHandler('CEventGunShot', function()
     local weapon = GetSelectedPedWeapon(PlayerPedId())
@@ -241,6 +368,15 @@ function Core.UpdateAmmo(ammo)
     Core.TriggerCallback('Core:UpdatePlayerAmmo', function(cb)
         PlayerAmmo = cb
     end, ammo)
+end
+
+function IsPlayerConnected(id)
+  local isConnected = false
+  Core.TriggerCallback('Core:IsOnline', function(cb)
+    isConnected = cb
+  end, id)
+  Wait(500)
+  return isConnected
 end
 
 DeleteCar = function(car)

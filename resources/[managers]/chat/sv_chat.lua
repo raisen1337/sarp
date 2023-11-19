@@ -7,18 +7,46 @@ RegisterServerEvent('_chat:messageEntered')
 RegisterServerEvent('chat:clear')
 RegisterServerEvent('__cfx_internal:commandFallback')
 
+
+local Core = exports['rpbase']:InitCore()
+
 AddEventHandler('_chat:messageEntered', function(author, color, message)
+    local src = source
+    local tags = {}
+    local msg = ""
     if not message or not author then
         return
     end
-	local msg = "^0"..author..'('..source..') says: '..message
-    TriggerEvent('chatMessage', source, "", msg)
+    local pData = Core.GetPlayerData(src)
+
+    TriggerEvent('chatMessage', src, "", msg)
 
     if not WasEventCanceled() then
-        --print
+
+        if pData.adminLevel > 0 then
+            table.insert(tags, {
+                text = "^3[Admin "..pData.adminLevel.."]",
+            })
+        end
+
+        if pData.faction then
+            local fData = pData.faction
+            local factions = Core.GetFactions()
+            table.insert(tags, {
+                text = ""..factions[fData.name].color.."["..factions[fData.name].name.."]^0 ",
+            })
+        end
+
+        for _, tag in ipairs(tags) do
+            msg = msg .. tag.text .. " "
+        end
+
+        msg = msg .. author .. "("..src.."): " .. message
+
         TriggerClientEvent('chatMessage', -1, "",  { 255, 255, 255 }, msg)
     end
 end)
+
 
 AddEventHandler('__cfx_internal:commandFallback', function(command)
     local name = GetPlayerName(source)

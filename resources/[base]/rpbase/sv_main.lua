@@ -15,6 +15,10 @@ exports('InitCore', function()
     return Core
 end)
 
+Core.GetFactions = function()
+    return factions
+end
+
 Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
     local PlayerAmmo = ammoTable
 
@@ -48,6 +52,54 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
         end
     end
     
+end)
+
+Core.CreateCallback('Core:IsOnline', function(source, cb, id)
+    local players = GetPlayers()
+    local isOnline = false
+    for k, v in pairs(players) do
+        if tonumber(v) == tonumber(id) then
+            isOnline = true
+            cb(isOnline)
+            return
+        end
+    end
+    cb(isOnline)
+end)
+
+Core.CreateCallback('Core:GetNearestPlayer', function (source, cb)
+    local ped = GetPlayerPed(source)
+    local pos = GetEntityCoords(ped)
+
+    local players = GetPlayers()
+    for k, v in pairs(players) do
+        local targetped = GetPlayerPed(v)
+        local targetPos = GetEntityCoords(targetped)
+        local dist = #(pos - targetPos)
+        if GetPlayerPed(source) ~= targetped and dist < 3.0 then
+            cb(v)
+            return
+        end
+    end
+end)
+
+
+
+Core.CreateCallback('AC:ReportAnomaly', function(source, cb, type)
+    local src = source
+    if type == 'vehicle' then
+        print('Player '..GetPlayerName(src)..'(' .. src .. ') has been detected in a unregistered vehicle! (Maybe hacker).')
+    end
+    if type == 'weapon' then
+        print('Player '..GetPlayerName(src)..'(' .. src .. ') has been detected with an unregistered weapon! (Maybe hacker).')
+    end
+    if type == 'ammo' then
+        print('Player '..GetPlayerName(src)..'(' .. src .. ') has been detected with an more weapon ammo than it should! (Maybe hacker).')
+    end
+    if type == 'rstop' then
+        print('Player '..GetPlayerName(src)..'(' .. src .. ') has stopped a resource! (Maybe hacker).')
+    end
+    cb(true)
 end)
 
 Core.CreateCallback('Core:GetPlayerAmmo', function(source, cb)

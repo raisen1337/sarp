@@ -177,6 +177,7 @@ RegisterCommand('createticket', function()
                         sendNotification("Ticket", "Nu sunt membrii staff online!", "error")
                     end
                 end, ticketMsg)
+                return
             end)
         else
             sendNotification("Ticket", "Nu poti sa faci ticket ca admin!", "error")
@@ -194,6 +195,7 @@ RegisterCommand('createticket', function()
                     sendNotification("Ticket", "Nu sunt membrii staff online!", "error")
                 end
             end, ticketMsg)
+            return
         end)
     end
     end)
@@ -510,6 +512,7 @@ RegisterCommand('admin', function()
                                 ShowDialog('Admin', 'Seteaza nivel admin al jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleAdminLevelChange', true, true, 'c')
                                 local event
                                 event = AddEventHandler('Admin:HandleAdminLevelChange', function(admin)
+                                    RemoveEventHandler(event)
                                     if not tonumber(admin) then
                                         sendNotification('Admin', 'Invalid input', 'error')
                                         return
@@ -520,6 +523,124 @@ RegisterCommand('admin', function()
                                         end
                                     end, {src = v.source, lvl = admin})
                                     RemoveEventHandler(event)
+                                end)
+                            end)
+
+                            playerOptions:AddButton({
+                                icon = "💸",
+                                label = 'Ofera bani',
+                                value = 0
+                            }):On('select', function()
+                                ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                local event
+                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    RemoveEventHandler(event)
+                                    if not tonumber(money) then
+                                        sendNotification('Admin', 'Invalid input', 'error')
+                                        return
+                                    end
+                                    Core.TriggerCallback('Admin:Give', function(cb)
+                                        if cb then
+                                            sendNotification('Admin', 'I-ai oferit lui '..v.name..' '..FormatNumber(money)..'$!')
+                                        end
+                                    end, {src = v.source, type = 'cash' ,amount = money})
+                                end)
+                            end)
+
+                            playerOptions:AddButton({
+                                icon = "💸",
+                                label = 'Retrage bani',
+                                value = 0
+                            }):On('select', function()
+                                ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                local event
+                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    RemoveEventHandler(event)
+                                    if not tonumber(money) then
+                                        sendNotification('Admin', 'Invalid input', 'error')
+                                        return
+                                    end
+                                    Core.TriggerCallback('Admin:Take', function(cb)
+                                        if cb then
+                                            sendNotification('Admin', 'I-ai retras lui '..v.name..' '..FormatNumber(money)..'$!')
+                                        end
+                                    end, {src = v.source, type = 'cash' ,amount = money})
+                                end)
+                            end)
+
+                            playerOptions:AddButton({
+                                icon = "⭐",
+                                label = 'Ofera puncte premium',
+                                value = 0
+                            }):On('select', function()
+                                ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                local event
+                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    RemoveEventHandler(event)
+                                    if not tonumber(money) then
+                                        sendNotification('Admin', 'Invalid input', 'error')
+                                        return
+                                    end
+                                    Core.TriggerCallback('Admin:Give', function(cb)
+                                        if cb then
+                                            sendNotification('Admin', 'I-ai oferit lui '..v.name..' '..FormatNumber(money)..'PP!')
+                                        end
+                                    end, {src = v.source, type = 'premiumPoints', amount = money})
+                                end)
+                            end)
+
+                            playerOptions:AddButton({
+                                icon = "⭐",
+                                label = 'Retrage puncte premium',
+                                value = 0
+                            }):On('select', function()
+                                ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                local event
+                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    RemoveEventHandler(event)
+                                    if not tonumber(money) then
+                                        sendNotification('Admin', 'Invalid input', 'error')
+                                        return
+                                    end
+                                    Core.TriggerCallback('Admin:Take', function(cb)
+                                        if cb then
+                                            sendNotification('Admin', 'I-ai retras lui '..v.name..' '..FormatNumber(money)..'PP!')
+                                        end
+                                    end, {src = v.source, type = 'premiumPoints', amount = money})
+                                end)
+                            end)
+
+                            playerOptions:AddButton({
+                                icon = "💼",
+                                label = 'Seteaza factiune',
+                                value = 0
+                            }):On('select', function()
+                                ShowDialog('Seteaza factiune', 'Scrie factiunea pe care vrei sa o setezi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
+                                local event
+                                event = AddEventHandler('Admin:HandleSetFaction', function(faction)
+                                    RemoveEventHandler(event)
+                                    if string.len(faction) == 0 then
+                                        sendNotification('Admin', 'Invalid input', 'error')
+                                        return
+                                    end
+                                    ShowDialog('Seteaza factiune', 'Scrie rankul pe care vrei sa il aiba: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
+                                    event = AddEventHandler('Admin:HandleSetFaction', function(rank)
+                                        RemoveEventHandler(event)
+                                        if not tonumber(rank) then
+                                            sendNotification('Admin', 'Invalid input', 'error')
+                                            return
+                                        end
+                                        if tonumber(rank) then
+                                            rank = tonumber(rank)
+                                        end
+                                        Core.TriggerCallback('Core:GetPlayerById', function(player)
+                                            Core.TriggerCallback('Factions:AddMemberWithRank', function(cb)
+                                                if cb then
+                                                    sendNotification('Admin', 'I-ai setat factiunea lui '..v.name..' la '..faction..'!')
+                                                end
+                                            end, faction, rank, player.data.identifier)
+                                        end, v.source)
+                                    end)
                                 end)
                             end)
             

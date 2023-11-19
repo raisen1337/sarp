@@ -546,18 +546,20 @@ function SetClothing(drawables, props, drawTextures, propTextures)
     end
 end
 function LoadPed(data)
-    UserLocation = GetEntityCoords(PlayerPedId())
-    if data.model == '1885233650' or tonumber(data.model) == 1885233650 then
-        SetSkin('mp_m_freemode_01', true)
-    elseif data.model == '-1667301416' or tonumber(data.model) == -1667301416 then
-        SetSkin('mp_f_freemode_01', true)
+    if data then
+        UserLocation = GetEntityCoords(PlayerPedId())
+        if data.model == '1885233650' or tonumber(data.model) == 1885233650 then
+            SetSkin('mp_m_freemode_01', true)
+        elseif data.model == '-1667301416' or tonumber(data.model) == -1667301416 then
+            SetSkin('mp_f_freemode_01', true)
+        end
+        SetClothing(data.drawables, data.props, data.drawtextures, data.proptextures)
+        Citizen.Wait(500)
+        SetPedHairColor(player, tonumber(data.hairColor[1]), tonumber(data.hairColor[2]))
+        SetPedHeadBlend(data.headBlend)
+        SetHeadStructure(data.headStructure)
+        SetHeadOverlayData(data.headOverlay)
     end
-    SetClothing(data.drawables, data.props, data.drawtextures, data.proptextures)
-    Citizen.Wait(500)
-    SetPedHairColor(player, tonumber(data.hairColor[1]), tonumber(data.hairColor[2]))
-    SetPedHeadBlend(data.headBlend)
-    SetHeadStructure(data.headStructure)
-    SetHeadOverlayData(data.headOverlay)
     return
 end
 

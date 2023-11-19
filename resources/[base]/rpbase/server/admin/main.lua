@@ -108,6 +108,28 @@ RegisterNetEvent('print', function(msg)
     print(msg)
 end)
 
+Core.CreateCallback('Admin:Give', function(source, cb, data)
+    local pData = Core.GetPlayerData(data.src)
+
+    if pData[data.type] then
+        pData[data.type] = pData[data.type] + data.amount
+    end
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
+    cb(true)
+end)
+
+Core.CreateCallback('Admin:Take', function(source, cb, data)
+    local pData = Core.GetPlayerData(data.src)
+
+    if pData[data.type] then
+        pData[data.type] = pData[data.type] - data.amount
+    end
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
+    cb(true)
+end)
+
 Core.CreateCallback('Admin:SendTicket', function(source, cb, data)
     for k, v in pairs(GetPlayers()) do
         local pData = Core.GetPlayerData(v)

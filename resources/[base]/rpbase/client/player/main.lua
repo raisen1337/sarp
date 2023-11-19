@@ -3,7 +3,6 @@ function reloadScripts()
     LoggedIn = true
 end
 
-
 local SelectGender = MenuV:CreateMenu(false, "Selecteaza sexul", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'selectgender')
 
 local function LoadModel(model)
@@ -59,11 +58,20 @@ SelectGender:AddButton({
     Core.startPayday()
 end)
 
+
 SelectGender:On('close', function()
     PlayerData = Core.GetPlayerData()
     FreezeEntityPosition(PlayerPedId(), true)
-    if not PlayerData.character['ped_model'] then
+    print(PlayerData.character['ped_model'])
+    if string.len(PlayerData.character['ped_model']) <= 0 then
         MenuV:OpenMenu(SelectGender)
+    end
+end)
+
+Citizen.CreateThread(function ()
+    while true do
+        Wait(4000)
+        --TriggerServerEvent('print', GetEntityCoords(PlayerPedId()))
     end
 end)
 
@@ -102,78 +110,229 @@ end
 
 PlayerSpawned = function()
     SetEntityVisible(PlayerPedId(), false)
-    
-    Core.TriggerCallback('Player:GetData', function(result)
-        PlayerData = result
-        ClientVehicles = GetVehicles()
-        TriggerServerEvent("Scoreboard:AddPlayer")
-        TriggerServerEvent("Scoreboard:SetScoreboard")
-        ----print
-        if not PlayerData.position or table.empty(PlayerData.position) then
-            SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
-            SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
-            FreezeEntityPosition(PlayerPedId(), true)
-            SetEntityVisible(PlayerPedId(), false)
-            MenuV:OpenMenu(SelectGender)
-            LoggedIn = true
-        else
-            SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
-            FreezeEntityPosition(PlayerPedId(), true)
-            RequestCollisionAtCoord(PlayerData.position.x, PlayerData.position.y, PlayerData.position.z)
-            SetEntityVisible(PlayerPedId(), false)
-            FreezeEntityPosition(PlayerPedId(), false)
-
-            local model = PlayerData.character['ped_model']
-            if IsModelInCdimage(model) and IsModelValid(model) then
-                RequestModel(model)
-                while not HasModelLoaded(model) do
-                    Wait(0)
-                end
-                SetPlayerModel(PlayerId(), model)
-                SetPedDefaultComponentVariation(PlayerPedId())
-                SetModelAsNoLongerNeeded(model)
-                SetEntityVisible(PlayerPedId(), true)
-                Core.TriggerCallback('Clothing:GetClothing', function(cb)
-                    LoadPed(cb)
-                end)
-                if PlayerData.inHouseId ~= 0 then
-                    Core.TriggerCallback("Houses:GetHouseById", function(house)
-                        if house then
-                            EnterHouse(house)
-                        end
-                    end, PlayerData.inHouseId)
-                end
-
-                
-                local Inventory = PlayerData.inventory
-                for k,v in pairs(Inventory) do
-                    if v.type == 'weapon' then
-                        local pAmmo = Core.GetPlayerAmmo()
-                        --print(je(pAmmo))
-                        for a, b in pairs(pAmmo) do
-                            --print(checkWeaponPresence(v.name, a))
-                            if checkWeaponPresence(v.name, a) then
-                                GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), b, false, false)
-                            end
-                        end
-                    end
-                end
-
-                Core.SavePlayer()
-                Core.startPayday()
-
-                
-                LoggedIn = true
-            end
-        end
-    end)
-    Wait(3000)
-    LoggedIn = true
-    ExecuteCommand('loadbiz')
-    ExecuteCommand('loadhouses')
+    Core.TriggerCallback('Player:GetData', OnPlayerDataReceived)
 end
 
+function OnPlayerDataReceived(result)
+    PlayerData = result
+    ClientVehicles = GetVehicles()
+    TriggerServerEvent("Scoreboard:AddPlayer")
+    TriggerServerEvent("Scoreboard:SetScoreboard")
+    
+    if not PlayerData.position or table.empty(PlayerData.position) then
+        SetupCharacterCreation()
+    else
+        SetupExistingCharacter()
+    end
+end
+
+function SetupCharacterCreation()
+    SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
+    SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
+    FreezeEntityPosition(PlayerPedId(), true)
+    SetEntityVisible(PlayerPedId(), false)
+    MenuV:OpenMenu(SelectGender)
+    LoggedIn = true
+end
+
+function SetupExistingCharacter()
+    LoggedIn = true
+  
+    ExecuteCommand('loadbiz')
+    ExecuteCommand('loadhouses')
+
+    SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
+    FreezeEntityPosition(PlayerPedId(), true)
+    RequestCollisionAtCoord(PlayerData.position.x, PlayerData.position.y, PlayerData.position.z)
+    SetEntityVisible(PlayerPedId(), false)
+    FreezeEntityPosition(PlayerPedId(), false)
+    
+    LoadPlayerModel()
+    LoadPlayerClothing()
+
+    if PlayerData.inHouseId ~= 0 then
+        Core.TriggerCallback("Houses:GetHouseById", EnterHouseCallback, PlayerData.inHouseId)
+    end
+    
+    LoadPlayerWeapons()
+    Core.SavePlayer()
+    Core.startPayday()
+    
+   
+end
+
+function LoadPlayerModel()
+    local model = PlayerData.character['ped_model']
+    if IsModelInCdimage(model) and IsModelValid(model) then
+        RequestModel(model)
+        while not HasModelLoaded(model) do
+            Wait(0)
+        end
+        SetPlayerModel(PlayerId(), model)
+        SetPedDefaultComponentVariation(PlayerPedId())
+        SetModelAsNoLongerNeeded(model)
+        SetEntityVisible(PlayerPedId(), true)
+    end
+end
+
+function LoadPlayerClothing()
+    Core.TriggerCallback('Clothing:GetClothing', function(cb)
+        LoadPed(cb)
+    end)
+end
+
+function EnterHouseCallback(house)
+    if house then
+        EnterHouse(house)
+    end
+end
+
+function LoadPlayerWeapons()
+    local Inventory = PlayerData.inventory
+    local playerAmmo = Core.GetPlayerAmmo()
+    
+    for k,v in pairs(Inventory) do
+        if v.type == 'weapon' then
+            for a, b in pairs(playerAmmo) do
+                GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
+                if checkWeaponPresence(v.name, a) then
+                    SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
+                end
+            end
+        end
+    end
+end
+
+
+PlayAnim = function(ped, dict, name, blendInSpeed, blendOutSpeed, duration, flag, playbackRate, lockX, lockY, lockZ)
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        Citizen.Wait(0)
+    end
+    TaskPlayAnim(ped, dict, name, blendInSpeed, blendOutSpeed, duration, flag, playbackRate, lockX, lockY, lockZ)
+end
+
+function GetPedInFront()
+	local player = PlayerId()
+	local plyPed = GetPlayerPed(player)
+	local plyPos = GetEntityCoords(plyPed, false)
+	local plyOffset = GetOffsetFromEntityInWorldCoords(plyPed, 0.0, 1.3, 0.0)
+	local rayHandle = StartShapeTestCapsule(plyPos.x, plyPos.y, plyPos.z, plyOffset.x, plyOffset.y, plyOffset.z, 1.0, 12, plyPed, 7)
+	local _, _, _, _, ped = GetShapeTestResult(rayHandle)
+	return ped
+end
+Citizen.CreateThread(function()
+    SetMapZoomDataLevel(0, 0.96, 0.9, 0.08, 0.0, 0.0)
+    SetMapZoomDataLevel(1, 1.6, 0.9, 0.08, 0.0, 0.0)
+    SetMapZoomDataLevel(2, 8.6, 0.9, 0.08, 0.0, 0.0)
+    SetMapZoomDataLevel(3, 12.3, 0.9, 0.08, 0.0, 0.0)
+    SetMapZoomDataLevel(4, 22.3, 0.9, 0.08, 0.0, 0.0)
+end)
+
+Citizen.CreateThread(function()
+    while true do
+		Citizen.Wait(1)
+		if IsPedOnFoot(GetPlayerPed(-1)) then 
+			SetRadarZoom(1100)
+		elseif IsPedInAnyVehicle(GetPlayerPed(-1), true) then
+			SetRadarZoom(1100)
+		end
+    end
+end)
+function GetNearestPlayer()
+    local player = 0
+    local callbackFinished = false
+
+    Core.TriggerCallback("Core:GetNearestPlayer", function(nearest)
+        player = nearest
+        callbackFinished = true
+    end)
+
+    while not callbackFinished do
+        Citizen.Wait(0)
+    end
+
+    print(player)
+    return player
+end
+
+
+Citizen.CreateThread(function()
+    while true do
+        local wait = 1
+        if not PlayerData then
+            Citizen.Wait(1000)
+        end
+        if PlayerData.cuffed then
+            DisableControlAction(0, 257, true)
+            DisableControlAction(0, 25, true)
+            DisableControlAction(0, 263, true)
+            DisableControlAction(0, 24, true)
+            DisableControlAction(0, 21, true)
+            DisableControlAction(0, 32, true)
+            DisableControlAction(0, 33, true)
+            DisableControlAction(0, 34, true)
+            DisableControlAction(0, 35, true)
+            DisableControlAction(0, 22, true)
+
+            if not IsEntityPlayingAnim(PlayerPedId(), "mp_arresting", "idle", 3) then
+                local animation = {dict = "mp_arresting", name = "idle"}
+                local unarmed = GetHashKey("WEAPON_UNARMED")
+                PlayAnim(PlayerPedId(), animation.dict, animation.name, 8.0, -8, -1, 49, 0, 0, 0, 0)
+                SetEnableHandcuffs(PlayerPedId(), PlayerData.cuffed)
+                SetCurrentPedWeapon(PlayerPedId(), unarmed, true)
+            end
+        else
+            if IsEntityPlayingAnim(PlayerPedId(), "mp_arresting", "idle", 3) then
+                print('called')
+                ClearPedTasksImmediately(PlayerPedId())
+            end
+        end
+        Wait(wait)
+    end
+end)
+
+function SetCuffed()
+    if PlayerData.cuffed then
+        PlayerData.cuffed = false
+        ClearPedTasksImmediately(PlayerPedId())
+        SetEnableHandcuffs(PlayerPedId(), PlayerData.cuffed)
+        Core.SavePlayer()
+        return
+    end
+    if not PlayerData.cuffed then
+        local animation = {dict = "mp_arresting", name = "idle"}
+        local unarmed = GetHashKey("WEAPON_UNARMED")
+        
+        PlayAnim(PlayerPedId(), animation.dict, animation.name, 8.0, -8, -1, 49, 0, 0, 0, 0)
+        Wait(100)
+        PlayerData.cuffed = true
+        SetEnableHandcuffs(PlayerPedId(), PlayerData.cuffed)
+        SetCurrentPedWeapon(PlayerPedId(), unarmed, true)
+        Core.SavePlayer()
+        return
+    end
+end
+
+
+RegisterNetEvent("Player:GetCuffed", function ()
+    if not PlayerData.cuffed then
+        PlayerData.cuffed = false
+        Core.SavePlayer()
+        PlayerData = Core.GetPlayerData()
+    end
+    SetCuffed()
+end)
+
 SetMillisecondsPerGameMinute(60000)
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(10)
+            SetCanAttackFriendly(PlayerPedId(), true, false)
+            NetworkSetFriendlyFireOption(true)
+    end
+end)
+
 
 Citizen.CreateThread(function()
     while true do
@@ -183,6 +342,10 @@ Citizen.CreateThread(function()
 end)
 
 RegisterNetEvent('cl-time:update', function(h, m, s)
+    h = tonumber(h)
+    m = tonumber(m)
+    s = tonumber(s)
+    SetClockTime(h, m, s)
     NetworkOverrideClockTime(h, m, s)
 end)
 
@@ -545,7 +708,9 @@ RegisterNetEvent("Ped:Change", function(id)
     end
     ExecuteCommand('fixskin')
     Core.TriggerCallback('Clothing:GetClothing', function(cb)
-        LoadPed(cb)
+        if cb then
+            LoadPed(cb)
+        end
     end)
 end)
 local density = 0.0 -- Anything between 0.0 and 1.0 is a valid density, anything lower/higher is pointless

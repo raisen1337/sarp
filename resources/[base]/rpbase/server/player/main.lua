@@ -552,7 +552,8 @@ RegisterNetEvent("Scoreboard:AddPlayer", function()
 end)
 
 RegisterNetEvent("sv-time:update", function()
-    TriggerClientEvent("cl-time:update", source, os.date("%H"), os.date("%M"), os.date("%S"))
+    local src = source
+    TriggerClientEvent("cl-time:update", src, os.date("%H"), os.date("%M"), os.date("%S"))
     --print("Updated time on "..GetPlayerName(source))
     --print(os.date("%H"), os.date("%M"), os.date("%S"))
 end)
@@ -722,6 +723,13 @@ Core.CreateCallback('Player:GetData', function(source, cb)
         ----print
         cb(json.decode(PlayerStruct))
     end
+end)
+
+Core.CreateCallback('Police:Cuff', function(source, cb, player)
+
+    print(player)
+    TriggerClientEvent('Player:GetCuffed', player)
+    cb(true)
 end)
 
 Core.CreateCallback("Player:GetDataBySteamId", function(source, cb, steamId)
@@ -895,6 +903,61 @@ Citizen.CreateThread(function()
             exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), GetPlayerSteamId(src)})
         end
     end
+end)
+
+Core.CreateCallback('Core:GetPlayerById', function(source, cb, id)
+    local players = GetPlayers()
+    local player = {}
+    for k, v in pairs(players) do
+        if v == id then
+            player = {
+                id = v,
+                name = GetPlayerName(v),
+                ped = GetPlayerPed(v),
+                coords = GetEntityCoords(GetPlayerPed(v)),
+                heading = GetEntityHeading(GetPlayerPed(v)),
+                data = Core.GetPlayerData(v),
+            }
+            cb(player)
+            return
+        end
+    end
+    cb(false)
+end)
+
+RegisterNetEvent("sv:updatetargetdata", function(a,b)
+    TriggerClientEvent('updatetargetdata', source, a,b)
+end)
+
+Core.CreateCallback('Police:SetWanted', function(source, cb, id, level, reason)
+    local pData = Core.GetPlayerData(id)
+    pData.wantedLevel = level
+
+    if not pData.wantedReason then
+        pData.wantedReason = reason
+    end
+
+    exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), GetPlayerSteamId(id)})
+    cb(true)
+end)
+
+Core.CreateCallback('Police:GetWanted', function (source, cb)
+    local players = GetPlayers()
+    local wanteds = {}
+    for k, v in pairs(players) do
+        local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {GetPlayerSteamId(v)})
+        local pData = json.decode(result[1].data)
+
+        if pData.wantedLevel then
+            table.insert(wanteds, {
+                id = v,
+                level = pData.wantedLevel,
+                name = pData.user,
+                reason = pData.wantedReason,
+            })
+        end
+    end
+    cb(wanteds)
 end)
 
 Core.CreateCallback('PayDay:Finish', function(source, cb)
