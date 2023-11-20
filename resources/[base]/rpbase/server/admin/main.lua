@@ -138,6 +138,67 @@ Core.CreateCallback('Admin:HandleJail', function(source, cb, jailData)
     cb(true)
 end)
 
+-- make a callback called Admin:Log that saves the adminLog  to a file with player name, and if that file exists, insert the log into it
+
+Core.CreateCallback('Admin:TeleportPlayer', function(source, cb, id, coords)
+    local players = GetPlayers()
+    for k,v in pairs(players) do
+        if v == id then
+            local ped = GetPlayerPed(id)
+            SetEntityCoords(ped, coords.x, coords.y, coords.z)
+            cb(true)
+            break
+        end
+    end
+end)
+
+Core.CreateCallback('Admin:RevivePlayer', function(source, cb, id)
+    local src = id
+    local pData = Core.GetPlayerData(id)
+    
+    if pData.dead then
+        pData.dead = false
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+        Wait(1000)
+        TriggerClientEvent('chat:addMessage', -1, {
+            multiline = true,
+            args = {'^3[^0Admin^3] ^0'..GetPlayerName(id)..'('..id..') a primit revive de la'..GetPlayerName(source)..'('..source..')!'}
+        })
+        cb(true)
+    else
+        cb(false)
+    end
+end)
+
+
+local function SaveLogToFile(pData, logText)
+    local userLogsFile = LoadResourceFile(GetCurrentResourceName(), "logs/"..pData.user..".log")
+    local serverLogsFile = LoadResourceFile(GetCurrentResourceName(), "server.log")
+    if serverLogsFile then
+        logText = "["..os.date("%d/%m/%Y - %H:%M").."] - "..logText
+        SaveResourceFile(GetCurrentResourceName(), "server.log", serverLogsFile.."\n"..logText, -1)
+    else
+        logText = "["..os.date("%d/%m/%Y - %H:%M").."] - "..logText
+        SaveResourceFile(GetCurrentResourceName(), "server.log", logText, -1)
+    end
+    if userLogsFile then
+        logText = "["..os.date("%d/%m/%Y - %H:%M").."] - "..logText
+        SaveResourceFile(GetCurrentResourceName(), "logs/"..pData.user..".log", userLogsFile.."\n"..logText, -1)
+    else
+        logText = "["..os.date("%d/%m/%Y - %H:%M").."] - "..logText
+        SaveResourceFile(GetCurrentResourceName(), "logs/"..pData.user..".log", logText, -1)
+    end
+end
+
+Core.CreateCallback('Admin:Log', function(source, cb, logText)
+    local src = source
+    local pData = Core.GetPlayerData(src)
+    print(logText)
+
+    SaveLogToFile(pData, logText)
+end)
+
+
 Core.CreateCallback("Admin:GetTickets", function(source, cb)
     cb(tickets)
 end)
@@ -165,6 +226,11 @@ Core.CreateCallback('Admin:Give', function(source, cb, data)
         pData[data.type] = pData[data.type] + data.amount
     end
 
+    TriggerClientEvent('chat:addMessage', -1, {
+        multiline = true,
+        args = {'^3[^0Admin^3] ^0'..GetPlayerName(data.src)..'('..data.src..') a primit '..FormatNumber(data.amount)..' '..data.type..' de la '..GetPlayerName(source)..'('..source..')!'}
+    })
+
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
     cb(true)
 end)
@@ -175,6 +241,12 @@ Core.CreateCallback('Admin:Take', function(source, cb, data)
     if pData[data.type] then
         pData[data.type] = pData[data.type] - data.amount
     end
+
+    TriggerClientEvent('chat:addMessage', -1, {
+        multiline = true,
+        args = {'^3[^0Admin^3] ^0'..GetPlayerName(source)..'('..source..') i-a scos lui '..GetPlayerName(data.src)..'('..data.src..') '..FormatNumber(data.amount)..' '..data.type..'!'}
+    })
+
 
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
     cb(true)

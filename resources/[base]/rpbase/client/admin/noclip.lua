@@ -166,6 +166,7 @@ Citizen.CreateThread(function()
             local PlayerData = Core.GetPlayerData()
             if PlayerData.adminLevel >= 3 then
                 noclipActive = not noclipActive
+                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..PlayerData.user..' a '..(noclipActive and 'activat' or 'dezactivat')..' ^3Noclip^0.')
 
                 if IsPedInAnyVehicle(PlayerPedId(), false) then
                     noclipEntity = GetVehiclePedIsIn(PlayerPedId(), false)

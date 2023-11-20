@@ -1,0 +1,85 @@
+/* make .deathscreen full screen */
+.deathscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: Akrobat;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.8);
+  
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.deathscreen-container > span {
+    color: white;
+}
+
+.deathscreen-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.deathscreen-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: .2rem;
+    font-weight: bold;
+
+}
+
+.deathscreen-subtitle {
+    font-size: 1.5rem;
+    margin-top: -1rem;
+    letter-spacing: .4rem;
+    text-transform: uppercase;
+    font-weight: light;
+}
+
+.deathscreen-time {
+   color: red;
+   font-weight: bolder;
+
+}
+
+.pulse {
+    animation: pulseOpacity 3s infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.pulseB {
+    animation: pulseOpacityB 3s infinite;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes pulseOpacityB {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: .4;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes pulseOpacity {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+

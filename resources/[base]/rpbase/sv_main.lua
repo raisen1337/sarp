@@ -76,11 +76,16 @@ Core.CreateCallback('Core:GetNearestPlayer', function (source, cb)
         local targetped = GetPlayerPed(v)
         local targetPos = GetEntityCoords(targetped)
         local dist = #(pos - targetPos)
-        if GetPlayerPed(source) ~= targetped and dist < 3.0 then
+        if dist < 3.0 then
             cb(v)
             return
         end
+        -- if GetPlayerPed(source) ~= targetped and dist < 3.0 then
+        --     cb(v)
+        --     return
+        -- end
     end
+    cb(false)
 end)
 
 
@@ -121,14 +126,23 @@ RegisterNetEvent("showPlayerNametags", function()
     TriggerClientEvent('txcl:showPlayerIDsd', src, true)
 end)
 
+Core.CreateCallback('Player:SetRouting', function(source, cb, routing)
+    SetPlayerRoutingBucket(source, routing)
+    cb(true)
+end)
+
 RegisterNetEvent('Vehicles:Insert', function(vehicle)
     table.insert(ServerVehicles, vehicle)
-    TriggerClientEvent("Vehicles:Update", source, ServerVehicles)
+    for k,v in pairs(GetPlayers()) do
+        TriggerClientEvent("Vehicles:Update", v, ServerVehicles)
+    end
 end)
 
 RegisterNetEvent('Vehicles:Remove', function(key)
     table.remove(ServerVehicles, key)
-    TriggerClientEvent("Vehicles:Update", source, ServerVehicles)
+    for k,v in pairs(GetPlayers()) do
+        TriggerClientEvent("Vehicles:Update", v, ServerVehicles)
+    end
 end)
 
 Core.CreateCallback('Vehicles:Get', function(source, cb)

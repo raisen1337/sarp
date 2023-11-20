@@ -98,7 +98,11 @@ function EnumeratePickups()
 end
 
 RegisterNetEvent('Vehicles:Update', function(vehicles)
-  ClientVehicles = vehicles
+  if not ClientVehicles then
+    ClientVehicles = vehicles
+  else
+    ClientVehicles = vehicles
+  end
 end)
 
 function GetVehicles()
@@ -136,13 +140,19 @@ function CreateCar(model, coords, heading, isnet, tsc, putin, plate)
   if putin then
     SetPedIntoVehicle(PlayerPedId(), veh, -1)
   end
+  local netID = NetworkGetNetworkIdFromEntity(veh)
+
+  SetNetworkIdExistsOnAllMachines(netID, true)
+
 
   if not ClientVehicles then
     ClientVehicles = {}
+    table.insert(ClientVehicles, {netID = netID, localId = veh})
+  else
+    table.insert(ClientVehicles, {netID = netID, localId = veh})
   end
-  table.insert(ClientVehicles, veh)
 
-  TriggerServerEvent("Vehicles:Insert", veh)
+  TriggerServerEvent("Vehicles:Insert", {netID = netID, localId = veh})
 
   return veh
 end
@@ -166,29 +176,37 @@ end)
 
 local syncedAmmo = false
 
+function isVehicleRegistered(veh)
+  local found = false
+  if not ClientVehicles then
+    found = false
+    return found
+  end
+  if table.empty(ClientVehicles) then
+    found = false
+    return found
+  end
+  for k, v in pairs(ClientVehicles) do
+    if v.netID == NetworkGetNetworkIdFromEntity(veh) then
+      found = true
+      break
+    end
+  end
+  return found
+end
+
 Citizen.CreateThread(function()
   while true do
       Wait(500)
       vehs = GetAllVehicles()
       for k,v in pairs(vehs) do
           if DoesEntityExist(v) then
-              if not ClientVehicles then
-                  if IsPedInVehicle(PlayerPedId(), v, false) then
+              if not isVehicleRegistered(v) then
+                  if IsPedInVehicle(PlayerPedId(), v) then
                     Core.TriggerCallback('AC:ReportAnomaly', function()
                     end, 'vehicle')
                   end
-                  DeleteEntity(v)
-              end
-              if type(ClientVehicles) == 'table' then
-                  for a,b in pairs(ClientVehicles) do
-                      if v ~= b then
-                          if IsPedInVehicle(PlayerPedId(), v, false) then
-                            Core.TriggerCallback('AC:ReportAnomaly', function()
-                            end, 'vehicle')
-                          end
-                          DeleteEntity(v)
-                      end
-                  end
+                  DeleteCar(v)
               end
           end
       end
@@ -275,28 +293,29 @@ Citizen.CreateThread(function()
 end)
 
 local PlayerAmmo = {}
+
 AddEventHandler('CEventGunShot', function()
-    local weapon = GetSelectedPedWeapon(PlayerPedId())
-    local ammoType = GetPedAmmoTypeFromWeapon(PlayerPedId(), weapon)
-    local ammo = GetPedAmmoByType(PlayerPedId(), ammoType)
-    local ammoTypes = {
-        [1950175060] = 'pistol_ammo',
-        [218444191] = 'rifle_ammo',
-        [1820140472] = 'smg_ammo',
-        [1285032059] = 'rifle_ammo',
-        [-1878508229] = 'shotgun_ammo',
-    }
-    local ammoName = ammoTypes[ammoType]
-    
-     --insert ammo with ammotype to table playerammo
+  local weapon = GetSelectedPedWeapon(PlayerPedId())
+  local ammoType = GetPedAmmoTypeFromWeapon(PlayerPedId(), weapon)
+  local ammo = GetPedAmmoByType(PlayerPedId(), ammoType)
+  local ammoTypes = {
+    [1950175060] = 'pistol_ammo',
+    [218444191] = 'rifle_ammo',
+    [1820140472] = 'smg_ammo',
+    [1285032059] = 'rifle_ammo',
+    [-1878508229] = 'shotgun_ammo',
+  }
+  local ammoName = ammoTypes[ammoType]
+
+  if ammoName then
     if not PlayerAmmo[ammoName] then
-        PlayerAmmo[ammoName] = ammo
+      PlayerAmmo[ammoName] = ammo
     end
 
     if PlayerAmmo[ammoName] then
-        PlayerAmmo[ammoName] = ammo
+      PlayerAmmo[ammoName] = ammo
     end
-    --print(je(Core.GetPlayerAmmo()))
+  end
 end)
 
 function Core.GetPlayerAmmo()
@@ -386,20 +405,29 @@ DeleteCar = function(car)
       DeleteEntity(car)
     end
   end
-  if table.empty(ClientVehicles) then
+  if not ClientVehicles then
     while DoesEntityExist(car) == 1 do
       Wait(1)
       DeleteEntity(car)
     end
-  end
-  for k, v in pairs(ClientVehicles) do
-    if v == car then
-      DeleteVehicle(car)
-      table.remove(ClientVehicles, k)
-      TriggerServerEvent('Vehicles:Remove', k)
+  else
+    if table.empty(ClientVehicles) then
+      while DoesEntityExist(car) == 1 do
+        Wait(1)
+        DeleteEntity(car)
+      end
     else
-      DeleteVehicle(car)
+      for k, v in pairs(ClientVehicles) do
+        if v == car then
+          DeleteVehicle(car)
+          table.remove(ClientVehicles, k)
+          TriggerServerEvent('Vehicles:Remove', k)
+        else
+          DeleteVehicle(car)
+        end
+      end
     end
   end
+  
 end
 

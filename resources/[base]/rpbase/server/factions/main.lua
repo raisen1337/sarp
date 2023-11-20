@@ -129,7 +129,6 @@ Core.CreateCallback('Factions:AddMember', function(source, cb, fName, identifier
 end)
 
 Core.CreateCallback('Factions:AddMemberWithRank', function(source, cb, fName, rank, identifier)
-    print('AddMemberWithRank', fName, rank, identifier)
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
     if not factions[fName].ranks[rank] then
         cb(false)

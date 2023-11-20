@@ -106,7 +106,132 @@ function checkWeaponPresence(str_a, str_b)
     return false
 end
 
+inComa = false
+comaTime = 300
 
+
+Citizen.CreateThread(function()
+    while true do
+        local wait = 1000
+        if inComa then
+            wait = 1
+            SetPedToRagdoll(PlayerPedId(), 1000, 1000, 0, 0, 0, 0)
+
+            DisableControlAction(0, 30, true)  -- Disable A (left)
+            DisableControlAction(0, 31, true)  -- Disable S (back)
+            DisableControlAction(0, 32, true)  -- Disable D (right)
+            DisableControlAction(0, 33, true)  -- Disable W (front)
+
+            DisableControlAction(0, 22, true)  -- Jump
+            DisableControlAction(0, 24, true)  -- Disable attack control
+            DisableControlAction(0, 25, true)  -- Disable aim control
+            DisableControlAction(0, 140, true)  -- Disable aim control
+        else
+            wait = 1000
+        end
+        Wait(wait)
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        local wait = 1000
+        if inComa then
+            comaTime = comaTime - 1
+            SendNUIMessage({
+                action = "updateDeathScreen",
+                time = comaTime,
+            })
+            if comaTime <= 0 then
+                SendNUIMessage({
+                    action = "hideDeathScreen",
+                })
+                Core.TriggerCallback('Player:Revive', function(cb)
+                    if cb then
+                        inComa = false
+                        ResurrectPed(PlayerPedId())
+                        ReviveInjuredPed(PlayerPedId())
+                        SetEntityInvincible(PlayerPedId(), false)
+                        SetEntityHealth(PlayerPedId(), 200)
+                        SetEntityCoords(PlayerPedId(), 1768.0767822266,3639.5483398438,35.071006774902)
+                        SetEntityHeading(PlayerPedId(), 177.82786560059)
+                        comaTime = 300
+                    end
+                end)
+            end
+        end
+        Wait(wait)
+    end
+end)
+
+-- Citizen.CreateThread(function ()
+--     while true do
+--         Wait(5000)
+--     end
+-- end)
+
+Citizen.CreateThread(function()
+    while true do
+        Wait(1000)
+        if PlayerData then
+            local pHealth = GetEntityHealth(PlayerPedId())
+            if pHealth <= 0 and not inComa then
+                inComa = true
+                PlayerData.dead = true
+                Core.SavePlayer()
+                SetEntityInvincible(PlayerPedId(), true)
+                SetEntityHealth(PlayerPedId(), 200)
+                ResurrectPed(PlayerPedId())
+                ReviveInjuredPed(PlayerPedId())
+                ClearPedTasksImmediately(PlayerPedId())
+                NetworkResurrectLocalPlayer(GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false)
+                SetEntityHealth(PlayerPedId(), 200)
+                SetEntityInvincible(PlayerPedId(), false)
+
+                comaTime = 300
+                pHealth = 200
+                SendNUIMessage({
+                    action = "showDeathScreen",
+                    time = comaTime,
+                })
+            end
+            if PlayerData.dead and not inComa then
+                inComa = true
+                SetEntityInvincible(PlayerPedId(), true)
+                SetEntityHealth(PlayerPedId(), 200)
+
+                comaTime = 300
+                SendNUIMessage({
+                    action = "showDeathScreen",
+                    time = comaTime,
+                })
+            elseif not PlayerData.dead and inComa then
+                inComa = false
+                comaTime = 300
+                SendNUIMessage({
+                    action = "hideDeathScreen",
+                })
+                ResurrectPed(PlayerPedId())
+                ReviveInjuredPed(PlayerPedId())
+                ClearPedTasksImmediately(PlayerPedId())
+                NetworkResurrectLocalPlayer(GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false)
+                SetEntityHealth(PlayerPedId(), 200)
+                SetEntityInvincible(PlayerPedId(), false)
+            end
+        end
+    end
+end)
+
+PlayerKilled = function(killerid, coords)
+    print(killerid, coords)
+end
+
+PlayerDied = function(killertype, coords)
+    print(killertype, coords)
+end
+
+AddEventHandler('playerKilled', PlayerKilled)
+AddEventHandler('playerDied', PlayerDied)
 
 PlayerSpawned = function()
     SetEntityVisible(PlayerPedId(), false)
@@ -266,6 +391,7 @@ Citizen.CreateThread(function()
         if PlayerData.cuffed then
             DisableControlAction(0, 257, true)
             DisableControlAction(0, 25, true)
+            DisableControlAction(0, 141, true)
             DisableControlAction(0, 263, true)
             DisableControlAction(0, 24, true)
             DisableControlAction(0, 21, true)

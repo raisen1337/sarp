@@ -681,6 +681,19 @@ Core.CreateCallback('Admin:MutePlayer', function(source, cb, id, muteTime, muteR
     })
 end)
 
+Core.CreateCallback("Player:Revive", function(source, cb)
+    local src = source
+    local pData = Core.GetPlayerData(src)
+    if pData.dead then
+        pData.dead = false
+    else
+        pData.dead = false
+    end
+    Wait(1000)
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+    cb(true)
+end)
+
 --now do a unmute callback
 Core.CreateCallback('Admin:UnmutePlayer', function(source, cb, id)
     local src = source
@@ -731,6 +744,72 @@ Core.CreateCallback('Admin:MuteExpire', function(source, cb, id)
 
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(mpData), mpData.identifier})
 end)
+
+Core.CreateCallback('Police:Arrest', function(source, cb, id, time, reason)
+    local tData = Core.GetPlayerData(id)
+    local pData = Core.GetPlayerData(source)
+    
+    if not tData.jail then
+        tData.jail = true
+    else
+        tData.jail = true
+    end
+
+    if not tData.jailTime then
+        tData.jailTime = time
+    else
+        tData.jailTime = time
+    end
+
+    if not tData.jailReason then
+        tData.jailReason = reason
+    else
+        tData.jailReason = reason
+    end
+
+    if not tData.wantedLevel then
+        tData.wantedLevel = 0
+    else
+        tData.wantedLevel = 0
+    end
+
+    TriggerClientEvent('Notify:Send', id, "Politie", "Ai fost arestat de catre "..pData.user.." pentru "..time.." minute pentru: "..reason.."!", "success")
+    TriggerClientEvent('Notify:Send', source, "Politie", "Ai arestat cu succes pe "..tData.user.." pentru "..time.." minute pentru: "..reason.."!", "success")
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(tData), tData.identifier})
+    cb(true)
+end)
+
+Core.CreateCallback("Police:Free", function(source, cb, id)
+    local tData = Core.GetPlayerData(id)
+    local pData = Core.GetPlayerData(source)
+
+    if not tData.jail then
+        tData.jail = false
+    else
+        tData.jail = false
+    end
+
+    if not tData.jailTime then
+        tData.jailTime = 0
+    else
+        tData.jailTime = 0
+    end
+
+    if not tData.jailReason then
+        tData.jailReason = ""
+    else
+        tData.jailReason = ""
+    end
+
+    TriggerClientEvent('Notify:Send', id, "Politie", "Ai fost eliberat de catre "..pData.user.."!", "success")
+    TriggerClientEvent('Notify:Send', source, "Politie", "Ai eliberat cu succes pe "..tData.user.."!", "success")
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(tData), tData.identifier})
+    cb(true)
+end)
+
+
 Core.InsertPunishment = function(source, punishment)
     local src = source
 

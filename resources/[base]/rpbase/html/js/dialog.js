@@ -52,7 +52,7 @@ window.addEventListener("message", function (event1) {
         dialogOkListener = () => {
             let dialogInputValue = dialogInput.value;
             if (dialogInputValue) {
-                console.log(event.dialogEvent);
+                //console.log(event.dialogEvent);
                 $.post('http://rpbase/dialogCallback', JSON.stringify({
                     eventName: event.dialogEvent,
                     response: dialogInputValue,
@@ -72,7 +72,7 @@ window.addEventListener("message", function (event1) {
         dialogOk.addEventListener('click', dialogOkListener);
 
         const handleInputKeyPress = (event) => {
-            console.log(event.key)
+            //console.log(event.key)
             if (event.key === 'Enter') {
                 dialogOk.click();
             } else if (event.key === 'Escape') {

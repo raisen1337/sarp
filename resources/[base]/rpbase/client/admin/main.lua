@@ -20,8 +20,10 @@ local personalSetting = MenuV:CreateMenu(false, "Optiuni personale", "centerrigh
 local businessesSettings = MenuV:CreateMenu(false, "Optiuni afaceri", "centerright", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-serverbizsettings')
 local businessesList = MenuV:CreateMenu(false, "Lista afaceri", "centerright", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-serverbizlist')
 local businessCfg = MenuV:CreateMenu(false, "Optiuni afacere", "centerright", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-serverbizcfg')
-local ticketsList = MenuV:CreateMenu(false, "Tickete in desfasurare", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-ticketslist')
-
+local sanctionsMenu = MenuV:CreateMenu(false, "Sanctiuni", "centerright", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-sanctionsmenu')
+local ticketsList = MenuV:CreateMenu(false, "Tickete in desfasurare", "centerright", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-ticketslist')
+local economyMenu = MenuV:CreateMenu(false, "Economie", "centerright", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-economymenu')
+local playerSubOptions = MenuV:CreateMenu(false, "Optiuni jucator", "centerright", 255, 0, 0, 'size-150', 'none', 'menuv', 'admin-playersubopt')
 local createHouseData = {
     price = 0,
     type = 'Low',
@@ -137,6 +139,7 @@ RegisterCommand('tickets', function()
                             icon = '✅',
                         }):On('select', function()
                             MenuV:CloseAll()
+                            Core.TriggerCallback('Admin:Log', function() end, 'a luat ticket-ul cu id-ul '..v.ticketId)
                             ExecuteCommand('taketicket '..v.ticketId)
                         end)
                     end
@@ -168,6 +171,7 @@ RegisterCommand('taketicket', function(source, args, rawCommand)
                                            Core.TriggerCallback("Core:GetPlayerCoords", function(coords)
                                                SetEntityCoords(PlayerPedId(), coords.x, coords.y, coords.z)
                                                --print
+                                               Core.TriggerCallback('Admin:Log', function() end, 'a rezolvat ticket-ul cu id-ul '..v.ticketId)
                                                Core.TriggerCallback('Admin:SolveTicket', function(cb) end, v.ticketId)
                                                Core.TriggerCallback('Core:CallRemoteEvent', function() end, 'solveTicket', v.id)
                                            end, b.source)
@@ -234,6 +238,7 @@ RegisterCommand('createticket', function()
                 Core.TriggerCallback('Admin:SendTicket', function(ticket)
                     if ticket then
                         ticketCooldown = 10
+                        
                         sendNotification("Ticket", "Ai trimis ticket-ul cu succes. Asteapta pana un admin te va ajuta.", "success")
                     else
                         sendNotification("Ticket", "Nu sunt membrii staff online!", "error")
@@ -267,6 +272,7 @@ end)
 
 RegisterCommand('admin', function()
     adminMenu:ClearItems()
+    local pData = PlayerData
     if HasAccess(1) then
 
         adminMenu:AddButton({
@@ -287,632 +293,733 @@ RegisterCommand('admin', function()
                         description = "",
                     }):On("select", function()
                         playerOptions:ClearItems()
-
-                        if HasAccess(6) then
-                            playerOptions:AddButton({
-                                icon = "🚫",
-                                label = 'Ban',
-                                value = 0
-                            }):On("select", function()
-                                local event, aBanReason, aBanTime
-                                ShowDialog('Baneaza jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul interdictiei.", 'Admin:HandleBanReason', true, false, 'c')
-                                event = AddEventHandler("Admin:HandleBanReason", function(banReason)
-                                    if string.len(banReason) == 0 then
-                                        banReason = "Nedeterminata."
-                                        aBanReason = banReason
-                                    end
-                                    aBanReason = banReason
-                                    --print
-                                    ShowDialog('Baneaza jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in zile a interdictiei!", 'Admin:HandleBanTime', true, false, 'c')
-                                    RemoveEventHandler(event)
-                                    event = AddEventHandler('Admin:HandleBanTime', function(banTime)
-                                        if not tonumber(banTime) or containsSpaces(banTime) then
-                                            sendNotification("Eroare", "Nu ai introdus un timp valid.")
-                                            return
-                                        else
-                                            banTime = tonumber(banTime)
-                                            aBanTime = banTime
-                                            --print
-                                            if banTime == 0 then
-                                                banTime = 99999999
-                                            end
-                                            banData = {
-                                                banReason = banReason,
-                                                banTime = banTime,
-                                                banSource = v.source
-                                            }
-                                            Core.TriggerCallback('Admin:HandleBan', function(cb)
-                                                if cb then
-                                                    sendNotification("Ban", 'L-ai banat pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
-                                                end
-                                            end, banData)
-                                            RemoveEventHandler(event)
-                                        end
-                                    end)
-                                end)
-                            end)
-                        end
                         if HasAccess(1) then
-                            --create car button
-                           
-
                             playerOptions:AddButton({
-                                label = 'Unmute',
-                                icon = '🔊',
-                                value = 0
+                                label = 'Sanctiuni',
+                                icon = '🚫',
                             }):On('select', function()
-                                Core.TriggerCallback('Admin:UnmutePlayer', function(cb)
-                                    if cb then
-                                        sendNotification("Unmute", 'I-ai scos mute-ul lui: '..v.name..'!')
-                                    end
-                                end, v.source)
-                            end)
-                            playerOptions:AddButton({
-                                label = 'Mute',
-                                icon = '🔇',
-                                value = 0
-                            }):On('select', function()
-                                local event, aMuteReason, aMuteTime
-                                ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul mute-ului.", 'Admin:HandleMuteReason', true, false, 'c')
-                                event = AddEventHandler("Admin:HandleMuteReason", function(muteReason)
-                                    if string.len(muteReason) == 0 then
-                                        muteReason = "Nedeterminata."
-                                        aMuteReason = muteReason
-                                    end
-                                    aMuteReason = muteReason
-                                    --print
-                                    ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a mute-ului!", 'Admin:HandleMuteTime', true, false, 'c')
-                                    RemoveEventHandler(event)
-                                    event = AddEventHandler('Admin:HandleMuteTime', function(muteTime)
-                                        if not tonumber(muteTime) or containsSpaces(muteTime) then
-                                            sendNotification("Eroare", "Nu ai introdus un timp valid.")
-                                            return
-                                        else
-                                            muteTime = tonumber(muteTime)
-                                            aMuteTime = muteTime
-                                            --print
-                                            if muteTime == 0 then
-                                                muteTime = 99999999
+                                sanctionsMenu:ClearItems()
+                                if HasAccess(6) then
+                                    sanctionsMenu:AddButton({
+                                        icon = "🚫",
+                                        label = 'Ban',
+                                        value = 0
+                                    }):On("select", function()
+                                        local event, aBanReason, aBanTime
+                                        ShowDialog('Baneaza jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul interdictiei.", 'Admin:HandleBanReason', true, false, 'c')
+                                        event = AddEventHandler("Admin:HandleBanReason", function(banReason)
+                                            if string.len(banReason) == 0 then
+                                                banReason = "Nedeterminata."
+                                                aBanReason = banReason
                                             end
-                                            muteData = {
-                                                muteReason = muteReason,
-                                                muteTime = muteTime,
-                                                muteSource = v.source
-                                            }
-                                            Core.TriggerCallback('Admin:MutePlayer', function(cb)
-                                                if cb then
-                                                    sendNotification("Mute", 'L-ai amutit pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
-                                                end
-                                            end, v.source, muteData.muteTime, muteData.muteReason)
-                                            RemoveEventHandler(event)
-                                        end
-                                    end)
-                                end)
-                            end)
-                        end
-                        if HasAccess(2) then
-                            --add unjail 
-                            playerOptions:AddButton({
-                                label = 'Unjail',
-                                icon = '🚓',
-                                value = 0
-                            }):On('select', function()
-                                jailData = {
-                                    jailReason = "",
-                                    jailTime = 0,
-                                    jailSource = v.source
-                                }
-                                Core.TriggerCallback('Admin:HandleJail', function(cb)
-                                    if cb then
-                                        sendNotification("Jail", 'L-ai inchis pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
-                                    end
-                                end, jailData)
-                            end)
-                            playerOptions:AddButton({
-                                label = 'Jail',
-                                icon = '🚓',
-                                value = 0
-                            }):On('select', function()
-                                local event, aJailReason, aJailTime
-                                ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul inchisorii.", 'Admin:HandleJailReason', true, false, 'c')
-                                event = AddEventHandler("Admin:HandleJailReason", function(jailReason)
-                                    if string.len(jailReason) == 0 then
-                                        jailReason = "Nedeterminata."
-                                        aJailReason = jailReason
-                                    end
-                                    aJailReason = jailReason
-                                    --print
-                                    ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a inchisorii!", 'Admin:HandleJailTime', true, false, 'c')
-                                    RemoveEventHandler(event)
-                                    event = AddEventHandler('Admin:HandleJailTime', function(jailTime)
-                                        if not tonumber(jailTime) or containsSpaces(jailTime) then
-                                            sendNotification("Eroare", "Nu ai introdus un timp valid.")
-                                            return
-                                        else
-                                            jailTime = tonumber(jailTime)
-                                            aJailTime = jailTime
+                                            aBanReason = banReason
                                             --print
-                                            if jailTime == 0 then
-                                                jailTime = 99999999
-                                            end
-                                            jailData = {
-                                                jailReason = jailReason,
-                                                jailTime = jailTime,
-                                                jailSource = v.source
-                                            }
-                                            Core.TriggerCallback('Admin:HandleJail', function(cb)
-                                                if cb then
-                                                    sendNotification("Jail", 'L-ai inchis pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
-                                                end
-                                            end, jailData)
+                                            ShowDialog('Baneaza jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in zile a interdictiei!", 'Admin:HandleBanTime', true, false, 'c')
                                             RemoveEventHandler(event)
-                                        end
+                                            event = AddEventHandler('Admin:HandleBanTime', function(banTime)
+                                                if not tonumber(banTime) or containsSpaces(banTime) then
+                                                    sendNotification("Eroare", "Nu ai introdus un timp valid.")
+                                                    return
+                                                else
+                                                    banTime = tonumber(banTime)
+                                                    aBanTime = banTime
+                                                    --print
+                                                    if banTime == 0 then
+                                                        banTime = 99999999
+                                                    end
+                                                    banData = {
+                                                        banReason = banReason,
+                                                        banTime = banTime,
+                                                        banSource = v.source
+                                                    }
+                                                    Core.TriggerCallback('Admin:HandleBan', function(cb)
+                                                        if cb then
+                                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a banat jucatorul '..v.name..'['..v.source..'] pe motivul: '..banReason..'!')
+                                                            sendNotification("Ban", 'L-ai banat pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
+                                                        end
+                                                    end, banData)
+                                                    RemoveEventHandler(event)
+                                                end
+                                            end)
+                                        end)
                                     end)
-                                end)
+                                end
+                                if HasAccess(1) then
+                                    --create car button
+                                    
+        
+                                    sanctionsMenu:AddButton({
+                                        label = 'Unmute',
+                                        icon = '🔊',
+                                        value = 0
+                                    }):On('select', function()
+                                        Core.TriggerCallback('Admin:UnmutePlayer', function(cb)
+                                            if cb then
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a scos mute-ul jucatorului '..v.name..'['..v.source..']!')
+                                                sendNotification("Unmute", 'I-ai scos mute-ul lui: '..v.name..'!')
+                                            end
+                                        end, v.source)
+                                    end)
+                                    sanctionsMenu:AddButton({
+                                        label = 'Mute',
+                                        icon = '🔇',
+                                        value = 0
+                                    }):On('select', function()
+                                        local event, aMuteReason, aMuteTime
+                                        ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul mute-ului.", 'Admin:HandleMuteReason', true, false, 'c')
+                                        event = AddEventHandler("Admin:HandleMuteReason", function(muteReason)
+                                            if string.len(muteReason) == 0 then
+                                                muteReason = "Nedeterminata."
+                                                aMuteReason = muteReason
+                                            end
+                                            aMuteReason = muteReason
+                                            --print
+                                            ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a mute-ului!", 'Admin:HandleMuteTime', true, false, 'c')
+                                            RemoveEventHandler(event)
+                                            event = AddEventHandler('Admin:HandleMuteTime', function(muteTime)
+                                                if not tonumber(muteTime) or containsSpaces(muteTime) then
+                                                    sendNotification("Eroare", "Nu ai introdus un timp valid.")
+                                                    return
+                                                else
+                                                    muteTime = tonumber(muteTime)
+                                                    aMuteTime = muteTime
+                                                    --print
+                                                    if muteTime == 0 then
+                                                        muteTime = 99999999
+                                                    end
+                                                    muteData = {
+                                                        muteReason = muteReason,
+                                                        muteTime = muteTime,
+                                                        muteSource = v.source
+                                                    }
+                                                    Core.TriggerCallback('Admin:MutePlayer', function(cb)
+                                                        if cb then
+                                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a dat mute jucatorului '..v.name..'['..v.source..'] pe motivul: '..muteReason..'!')
+                                                            sendNotification("Mute", 'L-ai amutit pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
+                                                        end
+                                                    end, v.source, muteData.muteTime, muteData.muteReason)
+                                                    RemoveEventHandler(event)
+                                                end
+                                            end)
+                                        end)
+                                    end)
+                                end
+                                if HasAccess(2) then
+                                    --add unjail 
+                                    sanctionsMenu:AddButton({
+                                        label = 'Unjail',
+                                        icon = '🚓',
+                                        value = 0
+                                    }):On('select', function()
+                                        jailData = {
+                                            jailReason = "",
+                                            jailTime = 0,
+                                            jailSource = v.source
+                                        }
+                                        Core.TriggerCallback('Admin:HandleJail', function(cb)
+                                            if cb then
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a scos din inchisoare jucatorul '..v.name..'['..v.source..']!')
+                                                sendNotification("Jail", 'L-ai inchis pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
+                                            end
+                                        end, jailData)
+                                    end)
+                                    sanctionsMenu:AddButton({
+                                        label = 'Jail',
+                                        icon = '🚓',
+                                        value = 0
+                                    }):On('select', function()
+                                        local event, aJailReason, aJailTime
+                                        ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul inchisorii.", 'Admin:HandleJailReason', true, false, 'c')
+                                        event = AddEventHandler("Admin:HandleJailReason", function(jailReason)
+                                            if string.len(jailReason) == 0 then
+                                                jailReason = "Nedeterminata."
+                                                aJailReason = jailReason
+                                            end
+                                            aJailReason = jailReason
+                                            --print
+                                            ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a inchisorii!", 'Admin:HandleJailTime', true, false, 'c')
+                                            RemoveEventHandler(event)
+                                            event = AddEventHandler('Admin:HandleJailTime', function(jailTime)
+                                                if not tonumber(jailTime) or containsSpaces(jailTime) then
+                                                    sendNotification("Eroare", "Nu ai introdus un timp valid.")
+                                                    return
+                                                else
+                                                    jailTime = tonumber(jailTime)
+                                                    aJailTime = jailTime
+                                                    --print
+                                                    if jailTime == 0 then
+                                                        jailTime = 99999999
+                                                    end
+                                                    jailData = {
+                                                        jailReason = jailReason,
+                                                        jailTime = jailTime,
+                                                        jailSource = v.source
+                                                    }
+                                                    Core.TriggerCallback('Admin:HandleJail', function(cb)
+                                                        if cb then
+                                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a inchis jucatorul '..v.name..'['..v.source..'] pe motivul: '..jailReason..'!')
+                                                            sendNotification("Jail", 'L-ai inchis pe jucatorul: '..v.name..' pe motiv: '..v.source..'!')
+                                                        end
+                                                    end, jailData)
+                                                    RemoveEventHandler(event)
+                                                end
+                                            end)
+                                        end)
+                                    end)
+                                end
+                                if HasAccess(3) then
+        
+                                    sanctionsMenu:AddButton({
+                                        icon = "🦶",
+                                        label = 'Kick',
+                                        value = 0
+                                    }):On("select", function()
+                                        local event
+                                        ShowDialog("Kick "..v.name.."["..v.source.."]", 'Scrie mai jos motivul kickului.', 'Admin:HandleKickReason', false, false, 'c')
+                                        event = AddEventHandler('Admin:HandleKickReason', function(reason)
+                                            kickData = {
+                                                kickSource = v.source,
+                                                kickReason = reason
+                                            }
+                                            Core.TriggerCallback("Admin:HandleKick", function(cb)
+                                                if cb then
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a dat kick jucatorului '..v.name..'['..v.source..'] pe motivul: '..reason..'!')
+                                                    sendNotification("Kick", 'L-ai dat afara pe jucatorul '..v.name..'['..v.source..'] pe motivul: '..reason..'!')
+                                                end
+                                                RemoveEventHandler(event)
+                                            end, kickData)
+                                        end)
+                                    end)
+                                end
+                                if HasAccess(7) then
+                                    sanctionsMenu:AddButton({
+                                        icon = "📃",
+                                        label = 'Vezi istoric sanctiuni',
+                                        value = 0
+                                    }):On('select', function()
+                                        playerPunishes:ClearItems()
+                                        local player = v.source
+                                        local pname = v.name
+                                        Core.TriggerCallback("Player:GetPunishes", function(punishes)
+                                            if #punishes == 0 then
+                                                playerPunishes:AddButton({
+                                                    label = 'Nu are sanctiuni',
+                                                    icon = '🚫'
+                                                })
+                                            else
+                                                for k,v in pairs(punishes) do
+                                                    playerPunishes:AddButton({
+                                                        label = v.type,
+                                                        icon = '⭕'
+                                                    }):On('select', function()
+                                                        playerPunish:ClearItems()
+                                                        
+                                                        playerPunish:AddButton({
+                                                            label = 'Tip: '..v.type,
+                                                            icon = '🔗',
+                                                            disabled = true
+                                                        })
+        
+                                                        playerPunish:AddButton({
+                                                            label = 'Motiv: '..v.reason,
+                                                            icon = '🔗',
+                                                            disabled = true
+                                                        })
+        
+                                                        playerPunish:AddButton({
+                                                            label = 'Admin: '..v.admin,
+                                                            icon = '🙍‍♂️',
+                                                            disabled = true
+                                                        })
+        
+                                                        if v.type == 'Ban' then
+                                                            playerPunish:AddButton({
+                                                                label = 'Durata: '..v.duration..'/day(s)',
+                                                                icon = '🕛',
+                                                                disabled = true
+                                                            })
+                                                        elseif v.type == 'Jail' then
+                                                            playerPunish:AddButton({
+                                                                label = 'Durata: '..v.duration..'/checkpoint(s)',
+                                                                icon = '🕛',
+                                                                disabled = true
+                                                            })
+                                                        else
+                                                            playerPunish:AddButton({
+                                                                label = 'Durata: '..v.duration..'/minute(s)',
+                                                                icon = '🕛',
+                                                                disabled = true
+                                                            })
+                                                        end
+                                                        
+        
+                                                        playerPunish:AddButton({
+                                                            label = 'Actiuni:',
+                                                            disabled = true
+                                                        })
+        
+                                                        playerPunish:AddButton({
+                                                            label = 'Sterge',
+                                                            icon = '🚫'
+                                                        }):On('select', function()
+                                                            local removedata = {
+                                                                player = player,
+                                                                key = k
+                                                            }
+                                                            Core.TriggerCallback('Admin:RemovePlayerPunish', function(cb)
+                                                                if cb then
+                                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a scos sanctiunea cu numarul '..k..' de tip '..v.type..' a lui '..pname..'!')
+                                                                    sendNotification('Admin', 'Ai scos sanctiunea cu numarul '..k..' de tip '..v.type..' a lui '..pname..'!')
+                                                                end
+                                                            end, removedata)
+                                                        end)
+        
+                                                        MenuV:OpenMenu(playerPunish)
+                                                    end)
+                                                end
+                                            end
+                                        end, v.source)
+                                        MenuV:OpenMenu(playerPunishes)
+                                    end)
+                                end
+                                MenuV:OpenMenu(sanctionsMenu)
                             end)
                         end
-                        if HasAccess(3) then
-
-                            playerOptions:AddButton({
-                                icon = "🦶",
-                                label = 'Kick',
-                                value = 0
-                            }):On("select", function()
-                                local event
-                                ShowDialog("Kick "..v.name.."["..v.source.."]", 'Scrie mai jos motivul kickului.', 'Admin:HandleKickReason', false, false, 'c')
-                                event = AddEventHandler('Admin:HandleKickReason', function(reason)
-                                    kickData = {
-                                        kickSource = v.source,
-                                        kickReason = reason
-                                    }
-                                    Core.TriggerCallback("Admin:HandleKick", function(cb)
-                                        if cb then
-                                            sendNotification("Kick", 'L-ai dat afara pe jucatorul '..v.name..'['..v.source..'] pe motivul: '..reason..'!')
-                                        end
-                                        RemoveEventHandler(event)
-                                    end, kickData)
-                                end)
-                            end)
-                        end
+                        
         
                         if HasAccess(7) then
                             playerOptions:AddButton({
-                                icon = "🏠",
-                                label = 'Vezi case',
-                                value = 0
+                                label = 'Economie',
+                                icon = '💸',
                             }):On('select', function()
-                                playerHouses:ClearItems()
-                                MenuV:CloseAll()
-                                Core.TriggerCallback("Houses:GetOwnedById", function(houses)
-                                    for k,v in pairs(houses) do
-                                        local hData = json.decode(v.data)
-                                        playerHouses:AddButton({
-                                            label = hData.name,
-                                            icon = '🏠',
-                                            value = 0
-                                        }):On('select', function()
-                                            MenuV:CloseAll()
-                                            playerHouse:ClearItems()
-                                            playerHouse:AddButton({
-                                                label = 'Vinde',
-                                                icon = '💰',
-                                                value = 0,
-                                            }):On('select', function()
-                                                local prevOwner = hData.owner
-                                                hData.owner = 'The State'
-                                                hData.ownerId = 0
-
-                                                hData.tenants = {}
-
-                                                Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
-                                                    --print
-                                                    if cb == true then
-                                                        TriggerServerEvent("Houses:RequireUpdate")
-                                                        sendNotification('Admin', 'Ai vandut casa '..hData.name.. ' detinuta de '..prevOwner..'!')
-                                                    else
-                                                        --print
-                                                    end
-                                                    
-                                                end, hData)
-                                            end)
-
-                                            playerHouse:AddButton({
-                                                label = 'Teleport',
-                                                icon = '🔗',
-                                                value = 0,
+                                economyMenu:ClearItems()
+                                economyMenu:AddButton({
+                                    icon = "🏠",
+                                    label = 'Vezi case',
+                                    value = 0
+                                }):On('select', function()
+                                    playerHouses:ClearItems()
+                                    MenuV:CloseAll()
+                                    Core.TriggerCallback("Houses:GetOwnedById", function(houses)
+                                        for k,v in pairs(houses) do
+                                            local hData = json.decode(v.data)
+                                            playerHouses:AddButton({
+                                                label = hData.name,
+                                                icon = '🏠',
+                                                value = 0
                                             }):On('select', function()
                                                 MenuV:CloseAll()
-                                                SetEntityCoords(PlayerPedId(), hData.enter.x, hData.enter.y, hData.enter.z)
-                                            end)
-
-                                            playerHouse:AddButton({
-                                                label = 'Schimba pret chirie',
-                                                icon = '💸',
-                                                value = 0,
-                                            }):On('select', function()
-                                                MenuV:CloseAll()
-                                                ShowDialog('Schimba pretul chiriei pentru casa: '..hData.name..'!', 'Scrie mai jos noul pret al chiriei pentru casa '..hData.name..' detinuta de '..hData.owner..'!', 'Admin:HandleChangeHouseRentAmount', false, true, 'c')
-                                                local event 
-                                                event = AddEventHandler("Admin:HandleChangeHouseRentAmount", function(price)
-                                                    hData.rent = price
+                                                playerHouse:ClearItems()
+                                                playerHouse:AddButton({
+                                                    label = 'Vinde',
+                                                    icon = '💰',
+                                                    value = 0,
+                                                }):On('select', function()
+                                                    local prevOwner = hData.owner
+                                                    hData.owner = 'The State'
+                                                    hData.ownerId = 0
+    
+                                                    hData.tenants = {}
+    
                                                     Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                         --print
                                                         if cb == true then
                                                             TriggerServerEvent("Houses:RequireUpdate")
-                                                            sendNotification('Admin', 'Ai schimbat pretul chiriei casei: '..hData.name..' la '..FormatNumber(price)..'!')
+                                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a vandut casa '..hData.name.. ' detinuta de '..prevOwner..'!')
+                                                            sendNotification('Admin', 'Ai vandut casa '..hData.name.. ' detinuta de '..prevOwner..'!')
                                                         else
                                                             --print
                                                         end
-                                                        RemoveEventHandler(event)
+                                                        
                                                     end, hData)
-                                                end)    
-                                            end)
-
-                                            playerHouse:AddButton({
-                                                label = 'Vezi chiriasi',
-                                                icon = '🙍‍♂️',
-                                                value = 0,
-                                            }):On('select', function()
-                                                houseTenants:ClearItems()
-                                                Core.TriggerCallback("Houses:GetHouseTenants", function(tenants)
-                                                    if #tenants == 0 then
-                                                        houseTenants:AddButton({
-                                                            label = 'Nu are chiriasi',
-                                                            disabled = true,
-                                                            icon = '🚫',
-                                                            value = 0
-                                                        })
-                                                    else
-                                                        for k,v in pairs(tenants) do
-                                                            Core.TriggerCallback("Player:GetDataBySteamId", function(data)
-                                                                houseTenants:AddButton({
-                                                                    label = data.user,
-                                                                    disabled = true,
-                                                                    icon = '🙍‍♂️',
-                                                                    value = 0
-                                                                })
-                                                            end, v.tenantId)
-                                                        end
-                                                    end
-                                                end, {id = hData.id})
-                                                MenuV:CloseAll()
-                                                MenuV:OpenMenu(houseTenants)
-                                            end)
-                                            MenuV:OpenMenu(playerHouse)
-                                        end)
-                                    end
-                                    MenuV:OpenMenu(playerHouses)
-                                end, v.source)
-                            end)
-            
-                            -- playerOptions:AddButton({
-                            --     icon = "🏪",
-                            --     label = 'Vezi afaceri',
-                            --     value = 0
-                            -- })
-            
-                            playerOptions:AddButton({
-                                icon = "🚗",
-                                label = 'Vezi masini',
-                                value = 0
-                            }):On('select', function()
-                                playerCars:ClearItems()
-                                Core.TriggerCallback("Player:GetVehiclesById", function(vehicles)
-                                    if #vehicles == 0 then
-                                        playerCars:AddButton({
-                                            label = 'Nu detine vehicule',
-                                            icon = '🚫',
-                                            disabled = true
-                                        })
-                                    else
-                                        for k,v in pairs(vehicles) do
-                                            local vData = json.decode(v.data)
-                                            playerCars:AddButton({
-                                                label = vData.name.."["..vData.plate.."]",
-                                                icon = '🚗',
-                                                value = 0
-                                            }):On("select", function()
-                                                playerCar:ClearItems()
-                                                playerCar:AddButton({
-                                                    label = 'Sterge',
-                                                    icon = '🚫'
-                                                }):On('select', function()
-                                                    Core.TriggerCallback("Admin:RemoveOwnedVehicle", function(cb)
-                                                        if cb then
-                                                            MenuV:CloseAll()
-                                                            sendNotification('Admin', 'Ai sters masina '..vData.name..'!', 'success')
-                                                        end
-                                                    end, vData.plate)
                                                 end)
-
-                                                if vData.addons.vip then
-                                                    playerCar:AddButton({
-                                                        label = 'Scoate VIP',
-                                                        icon = '⭐'
-                                                    }):On('select', function()
-                                                        vData.addons.vip = false
-                                                        vData.id = v.id
-                                                        Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
-                                                            if cb then
-                                                                MenuV:CloseAll()
-                                                                sendNotification('Admin', 'Ai sters VIP-ul masinii: '..vData.name..'!', 'success')
-                                                            end
-                                                        end, vData)
-                                                    end)
-                                                end
-                                                if vData.addons.rainbow then
-                                                    playerCar:AddButton({
-                                                        label = 'Scoate Rainbow',
-                                                        icon = '🌈'
-                                                    }):On('select', function()
-                                                        vData.addons.rainbow = false
-                                                        vData.id = v.id
-                                                        Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
-                                                            if cb then
-                                                                MenuV:CloseAll()
-                                                                sendNotification('Admin', 'Ai sters Rainbow-ul masinii: '..vData.name..'!', 'success')
-                                                            end
-                                                        end, vData)
-                                                    end)
-                                                end
-                                            
-                                                playerCar:AddButton({
-                                                    label = 'Schimba numar inmatriculare',
-                                                    icon = '📃'
+    
+                                                playerHouse:AddButton({
+                                                    label = 'Teleport',
+                                                    icon = '🔗',
+                                                    value = 0,
                                                 }):On('select', function()
-                                                    ShowDialog('Schimba numarul de inmatriculare', 'Scrie mai jos noul numar de inmatriculare:', 'Admin:HandleChangeVehiclePlate', true, true, 'c')
-                                                
-                                                    local event
-                                                    event = AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
-                                                        if string.len(plate) <= 6 then
-                                                            local oldplate = vData.plate
-                                                            vData.plate = plate
-                                                            vData.id = v.id
-                                                            TriggerServerEvent('Vehicles:ChangePlate', oldplate, plate)
+                                                    MenuV:CloseAll()
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' s-a teleportat la casa jucatorului '..hData.owner..'!')
+                                                    SetEntityCoords(PlayerPedId(), hData.enter.x, hData.enter.y, hData.enter.z)
+                                                end)
+    
+                                                playerHouse:AddButton({
+                                                    label = 'Schimba pret chirie',
+                                                    icon = '💸',
+                                                    value = 0,
+                                                }):On('select', function()
+                                                    MenuV:CloseAll()
+                                                    ShowDialog('Schimba pretul chiriei pentru casa: '..hData.name..'!', 'Scrie mai jos noul pret al chiriei pentru casa '..hData.name..' detinuta de '..hData.owner..'!', 'Admin:HandleChangeHouseRentAmount', false, true, 'c')
+                                                    local event 
+                                                    event = AddEventHandler("Admin:HandleChangeHouseRentAmount", function(price)
+                                                        hData.rent = price
+                                                        Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
+                                                            --print
+                                                            if cb == true then
+                                                                TriggerServerEvent("Houses:RequireUpdate")
+                                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a schimbat pretul chiriei casei: '..hData.name..' la '..FormatNumber(price)..'!')
+                                                                sendNotification('Admin', 'Ai schimbat pretul chiriei casei: '..hData.name..' la '..FormatNumber(price)..'!')
+                                                            else
+                                                                --print
+                                                            end
+                                                            RemoveEventHandler(event)
+                                                        end, hData)
+                                                    end)    
+                                                end)
+    
+                                                playerHouse:AddButton({
+                                                    label = 'Vezi chiriasi',
+                                                    icon = '🙍‍♂️',
+                                                    value = 0,
+                                                }):On('select', function()
+                                                    houseTenants:ClearItems()
+                                                    Core.TriggerCallback("Houses:GetHouseTenants", function(tenants)
+                                                        if #tenants == 0 then
+                                                            houseTenants:AddButton({
+                                                                label = 'Nu are chiriasi',
+                                                                disabled = true,
+                                                                icon = '🚫',
+                                                                value = 0
+                                                            })
                                                         else
-                                                            sendNotification('Eroare', 'Numarul de inmatriculare trebuie sa fie de maxim 6 caractere', 'error')
+                                                            for k,v in pairs(tenants) do
+                                                                Core.TriggerCallback("Player:GetDataBySteamId", function(data)
+                                                                    houseTenants:AddButton({
+                                                                        label = data.user,
+                                                                        disabled = true,
+                                                                        icon = '🙍‍♂️',
+                                                                        value = 0
+                                                                    })
+                                                                end, v.tenantId)
+                                                            end
                                                         end
-                                                        RemoveEventHandler(event)
-                                                    end)
-                                                      
+                                                    end, {id = hData.id})
+                                                    MenuV:CloseAll()
+                                                    MenuV:OpenMenu(houseTenants)
                                                 end)
-                                                MenuV:OpenMenu(playerCar)
+                                                MenuV:OpenMenu(playerHouse)
                                             end)
-                                            
                                         end
-                                         
-                                    end
-                                    MenuV:OpenMenu(playerCars)
-                                end, v.source)
-                            end)
-
-                            playerOptions:AddButton({
-                                label = 'Seteaza admin level',
-                                icon = '🔨'
-                            }):On('select', function()
-                                ShowDialog('Admin', 'Seteaza nivel admin al jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleAdminLevelChange', true, true, 'c')
-                                local event
-                                event = AddEventHandler('Admin:HandleAdminLevelChange', function(admin)
-                                    RemoveEventHandler(event)
-                                    if not tonumber(admin) then
-                                        sendNotification('Admin', 'Invalid input', 'error')
-                                        return
-                                    end
-                                    Core.TriggerCallback('Admin:SetLevel', function(cb)
-                                        if cb then
-                                            sendNotification('Admin', 'I-ai setat lui '..v.name..' admin level '..admin..'!')
-                                        end
-                                    end, {src = v.source, lvl = admin})
-                                    RemoveEventHandler(event)
+                                        MenuV:OpenMenu(playerHouses)
+                                    end, v.source)
                                 end)
-                            end)
-
-                            playerOptions:AddButton({
-                                icon = "💸",
-                                label = 'Ofera bani',
-                                value = 0
-                            }):On('select', function()
-                                ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
-                                local event
-                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
-                                    RemoveEventHandler(event)
-                                    if not tonumber(money) then
-                                        sendNotification('Admin', 'Invalid input', 'error')
-                                        return
-                                    end
-                                    Core.TriggerCallback('Admin:Give', function(cb)
-                                        if cb then
-                                            sendNotification('Admin', 'I-ai oferit lui '..v.name..' '..FormatNumber(money)..'$!')
+                
+                                -- economyMenu:AddButton({
+                                --     icon = "🏪",
+                                --     label = 'Vezi afaceri',
+                                --     value = 0
+                                -- })
+                
+                                economyMenu:AddButton({
+                                    icon = "🚗",
+                                    label = 'Vezi masini',
+                                    value = 0
+                                }):On('select', function()
+                                    playerCars:ClearItems()
+                                    Core.TriggerCallback("Player:GetVehiclesById", function(vehicles)
+                                        if not vehicles then
+                                            playerCars:AddButton({
+                                                label = 'Nu detine vehicule',
+                                                icon = '🚫',
+                                                disabled = true
+                                            })
+                                        else
+                                            for k,v in pairs(vehicles) do
+                                                local vData = json.decode(v.data)
+                                                playerCars:AddButton({
+                                                    label = vData.name.."["..vData.plate.."]",
+                                                    icon = '🚗',
+                                                    value = 0
+                                                }):On("select", function()
+                                                    playerCar:ClearItems()
+                                                    playerCar:AddButton({
+                                                        label = 'Sterge',
+                                                        icon = '🚫'
+                                                    }):On('select', function()
+                                                        Core.TriggerCallback("Admin:RemoveOwnedVehicle", function(cb)
+                                                            if cb then
+                                                                MenuV:CloseAll()
+                                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a sters masina '..vData.name..'!')
+                                                                sendNotification('Admin', 'Ai sters masina '..vData.name..'!', 'success')
+                                                            end
+                                                        end, vData.plate)
+                                                    end)
+    
+                                                    if vData.addons.vip then
+                                                        playerCar:AddButton({
+                                                            label = 'Scoate VIP',
+                                                            icon = '⭐'
+                                                        }):On('select', function()
+                                                            vData.addons.vip = false
+                                                            vData.id = v.id
+                                                            Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
+                                                                if cb then
+                                                                    MenuV:CloseAll()
+                                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a sters VIP-ul masinii: '..vData.plate..'!')
+                                                                    sendNotification('Admin', 'Ai sters VIP-ul masinii: '..vData.name..'!', 'success')
+                                                                end
+                                                            end, vData)
+                                                        end)
+                                                    end
+                                                    if vData.addons.rainbow then
+                                                        playerCar:AddButton({
+                                                            label = 'Scoate Rainbow',
+                                                            icon = '🌈'
+                                                        }):On('select', function()
+                                                            vData.addons.rainbow = false
+                                                            vData.id = v.id
+                                                            Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
+                                                                if cb then
+                                                                    MenuV:CloseAll()
+                                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a sters Rainbow-ul masinii: '..vData.plate..'!')
+                                                                    sendNotification('Admin', 'Ai sters Rainbow-ul masinii: '..vData.name..'!', 'success')
+                                                                end
+                                                            end, vData)
+                                                        end)
+                                                    end
+                                                
+                                                    playerCar:AddButton({
+                                                        label = 'Schimba numar inmatriculare',
+                                                        icon = '📃'
+                                                    }):On('select', function()
+                                                        ShowDialog('Schimba numarul de inmatriculare', 'Scrie mai jos noul numar de inmatriculare:', 'Admin:HandleChangeVehiclePlate', true, true, 'c')
+                                                    
+                                                        local event
+                                                        event = AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
+                                                            if string.len(plate) <= 6 then
+                                                                local oldplate = vData.plate
+                                                                vData.plate = plate
+                                                                vData.id = v.id
+                                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..Core.GetPlayerData().user..' a schimbat numarul de inmatriculare al masinii: '..oldplate..' in '..plate..'!')
+                                                                TriggerServerEvent('Vehicles:ChangePlate', oldplate, plate)
+                                                            else
+                                                                sendNotification('Eroare', 'Numarul de inmatriculare trebuie sa fie de maxim 6 caractere', 'error')
+                                                            end
+                                                            RemoveEventHandler(event)
+                                                        end)
+                                                          
+                                                    end)
+                                                    MenuV:OpenMenu(playerCar)
+                                                end)
+                                                
+                                            end
+                                             
                                         end
-                                    end, {src = v.source, type = 'cash' ,amount = money})
+                                        MenuV:OpenMenu(playerCars)
+                                    end, v.source)
                                 end)
-                            end)
-
-                            playerOptions:AddButton({
-                                icon = "💸",
-                                label = 'Retrage bani',
-                                value = 0
-                            }):On('select', function()
-                                ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
-                                local event
-                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
-                                    RemoveEventHandler(event)
-                                    if not tonumber(money) then
-                                        sendNotification('Admin', 'Invalid input', 'error')
-                                        return
-                                    end
-                                    Core.TriggerCallback('Admin:Take', function(cb)
-                                        if cb then
-                                            sendNotification('Admin', 'I-ai retras lui '..v.name..' '..FormatNumber(money)..'$!')
-                                        end
-                                    end, {src = v.source, type = 'cash' ,amount = money})
-                                end)
-                            end)
-
-                            playerOptions:AddButton({
-                                icon = "⭐",
-                                label = 'Ofera puncte premium',
-                                value = 0
-                            }):On('select', function()
-                                ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
-                                local event
-                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
-                                    RemoveEventHandler(event)
-                                    if not tonumber(money) then
-                                        sendNotification('Admin', 'Invalid input', 'error')
-                                        return
-                                    end
-                                    Core.TriggerCallback('Admin:Give', function(cb)
-                                        if cb then
-                                            sendNotification('Admin', 'I-ai oferit lui '..v.name..' '..FormatNumber(money)..'PP!')
-                                        end
-                                    end, {src = v.source, type = 'premiumPoints', amount = money})
-                                end)
-                            end)
-
-                            playerOptions:AddButton({
-                                icon = "⭐",
-                                label = 'Retrage puncte premium',
-                                value = 0
-                            }):On('select', function()
-                                ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
-                                local event
-                                event = AddEventHandler('Admin:HandleGiveMoney', function(money)
-                                    RemoveEventHandler(event)
-                                    if not tonumber(money) then
-                                        sendNotification('Admin', 'Invalid input', 'error')
-                                        return
-                                    end
-                                    Core.TriggerCallback('Admin:Take', function(cb)
-                                        if cb then
-                                            sendNotification('Admin', 'I-ai retras lui '..v.name..' '..FormatNumber(money)..'PP!')
-                                        end
-                                    end, {src = v.source, type = 'premiumPoints', amount = money})
-                                end)
-                            end)
-
-                            playerOptions:AddButton({
-                                icon = "💼",
-                                label = 'Seteaza factiune',
-                                value = 0
-                            }):On('select', function()
-                                ShowDialog('Seteaza factiune', 'Scrie factiunea pe care vrei sa o setezi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
-                                local event
-                                event = AddEventHandler('Admin:HandleSetFaction', function(faction)
-                                    RemoveEventHandler(event)
-                                    if string.len(faction) == 0 then
-                                        sendNotification('Admin', 'Invalid input', 'error')
-                                        return
-                                    end
-                                    ShowDialog('Seteaza factiune', 'Scrie rankul pe care vrei sa il aiba: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
-                                    event = AddEventHandler('Admin:HandleSetFaction', function(rank)
+                                economyMenu:AddButton({
+                                    icon = "💸",
+                                    label = 'Ofera bani',
+                                    value = 0
+                                }):On('select', function()
+                                    ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                    local event
+                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
                                         RemoveEventHandler(event)
-                                        if not tonumber(rank) then
+                                        if not tonumber(money) then
                                             sendNotification('Admin', 'Invalid input', 'error')
                                             return
                                         end
-                                        if tonumber(rank) then
-                                            rank = tonumber(rank)
-                                        end
-                                        Core.TriggerCallback('Core:GetPlayerById', function(player)
-                                            Core.TriggerCallback('Factions:AddMemberWithRank', function(cb)
-                                                if cb then
-                                                    sendNotification('Admin', 'I-ai setat factiunea lui '..v.name..' la '..faction..'!')
-                                                end
-                                            end, faction, rank, player.data.identifier)
-                                        end, v.source)
+                                        Core.TriggerCallback('Admin:Give', function(cb)
+                                            
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a oferit lui '..v.name..'['..v.source..'] '..FormatNumber(money)..'$!')
+                                                sendNotification('Admin', 'I-ai oferit lui '..v.name..' '..FormatNumber(money)..'$!')
+                                         
+                                        end, {src = v.source, type = 'cash' ,amount = money})
                                     end)
                                 end)
-                            end)
-            
-                            playerOptions:AddButton({
-                                icon = "📃",
-                                label = 'Vezi istoric sanctiuni',
-                                value = 0
-                            }):On('select', function()
-                                playerPunishes:ClearItems()
-                                local player = v.source
-                                local pname = v.name
-                                Core.TriggerCallback("Player:GetPunishes", function(punishes)
-                                    if #punishes == 0 then
-                                        playerPunishes:AddButton({
-                                            label = 'Nu are sanctiuni',
-                                            icon = '🚫'
-                                        })
-                                    else
-                                        for k,v in pairs(punishes) do
-                                            playerPunishes:AddButton({
-                                                label = v.type,
-                                                icon = '⭕'
-                                            }):On('select', function()
-                                                playerPunish:ClearItems()
-                                                
-                                                playerPunish:AddButton({
-                                                    label = 'Tip: '..v.type,
-                                                    icon = '🔗',
-                                                    disabled = true
-                                                })
-
-                                                playerPunish:AddButton({
-                                                    label = 'Motiv: '..v.reason,
-                                                    icon = '🔗',
-                                                    disabled = true
-                                                })
-
-                                                playerPunish:AddButton({
-                                                    label = 'Admin: '..v.admin,
-                                                    icon = '🙍‍♂️',
-                                                    disabled = true
-                                                })
-
-                                                if v.type == 'Ban' then
-                                                    playerPunish:AddButton({
-                                                        label = 'Durata: '..v.duration..'/day(s)',
-                                                        icon = '🕛',
-                                                        disabled = true
-                                                    })
-                                                elseif v.type == 'Jail' then
-                                                    playerPunish:AddButton({
-                                                        label = 'Durata: '..v.duration..'/checkpoint(s)',
-                                                        icon = '🕛',
-                                                        disabled = true
-                                                    })
-                                                else
-                                                    playerPunish:AddButton({
-                                                        label = 'Durata: '..v.duration..'/minute(s)',
-                                                        icon = '🕛',
-                                                        disabled = true
-                                                    })
-                                                end
-                                                
-
-                                                playerPunish:AddButton({
-                                                    label = 'Actiuni:',
-                                                    disabled = true
-                                                })
-
-                                                playerPunish:AddButton({
-                                                    label = 'Sterge',
-                                                    icon = '🚫'
-                                                }):On('select', function()
-                                                    local removedata = {
-                                                        player = player,
-                                                        key = k
-                                                    }
-                                                    Core.TriggerCallback('Admin:RemovePlayerPunish', function(cb)
-                                                        if cb then
-                                                            sendNotification('Admin', 'Ai scos sanctiunea cu numarul '..k..' de tip '..v.type..' a lui '..pname..'!')
-                                                        end
-                                                    end, removedata)
-                                                end)
-
-                                                MenuV:OpenMenu(playerPunish)
-                                            end)
+    
+                                economyMenu:AddButton({
+                                    icon = "💸",
+                                    label = 'Retrage bani',
+                                    value = 0
+                                }):On('select', function()
+                                    ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                    local event
+                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                        RemoveEventHandler(event)
+                                        if not tonumber(money) then
+                                            sendNotification('Admin', 'Invalid input', 'error')
+                                            return
                                         end
-                                    end
-                                end, v.source)
-                                MenuV:OpenMenu(playerPunishes)
+                                        Core.TriggerCallback('Admin:Take', function(cb)
+                                            if cb then
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a retras lui '..v.name..'['..v.source..'] '..FormatNumber(money)..'$!')
+                                                sendNotification('Admin', 'I-ai retras lui '..v.name..' '..FormatNumber(money)..'$!')
+                                            end
+                                        end, {src = v.source, type = 'cash' ,amount = money})
+                                    end)
+                                end)
+    
+                                economyMenu:AddButton({
+                                    icon = "⭐",
+                                    label = 'Ofera puncte premium',
+                                    value = 0
+                                }):On('select', function()
+                                    ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                    local event
+                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                        RemoveEventHandler(event)
+                                        if not tonumber(money) then
+                                            sendNotification('Admin', 'Invalid input', 'error')
+                                            return
+                                        end
+                                        Core.TriggerCallback('Admin:Give', function(cb)
+                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a oferit lui '..v.name..' '..FormatNumber(money)..'PP!')
+                                            sendNotification('Admin', 'I-ai oferit lui '..v.name..' '..FormatNumber(money)..'PP!')
+                                        end, {src = v.source, type = 'premiumPoints', amount = money})
+                                    end)
+                                end)
+    
+                                economyMenu:AddButton({
+                                    icon = "⭐",
+                                    label = 'Retrage puncte premium',
+                                    value = 0
+                                }):On('select', function()
+                                    ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
+                                    local event
+                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                        RemoveEventHandler(event)
+                                        if not tonumber(money) then
+                                            sendNotification('Admin', 'Invalid input', 'error')
+                                            return
+                                        end
+                                        Core.TriggerCallback('Admin:Take', function(cb)
+                                            if cb then
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a retras lui '..v.name..' '..FormatNumber(money)..'PP!')
+                                                sendNotification('Admin', 'I-ai retras lui '..v.name..' '..FormatNumber(money)..'PP!')
+                                            end
+                                        end, {src = v.source, type = 'premiumPoints', amount = money})
+                                    end)
+                                end)
+                                MenuV:OpenMenu(economyMenu)
                             end)
+                            
+                            if HasAccess(1) then
+                                playerOptions:AddButton({
+                                    label = 'Optiuni',
+                                    icon = '🔧',
+                                }):On('select', function ()
+                                    playerSubOptions:ClearItems()
+                                    playerSubOptions:AddButton({
+                                        label = 'Teleport',
+                                        icon = '🔗'
+                                    }):On('select', function()
+                                        Core.TriggerCallback('Core:GetPlayerById', function(player)
+                                            local coords = player.coords
+                                            SetEntityCoords(PlayerPedId(), coords.x, coords.y, coords.z)
+                                            sendNotification('Admin', 'Te-ai teleportat la '..v.name..'!')
+                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..GetPlayerName(PlayerId())..' s-a teleportat la '..v.name..'!')
+                                        end, v.source)
+                                    end)
+
+                                    playerSubOptions:AddButton({
+                                        label = 'Revive',
+                                        icon = '🚑'
+                                    }):On('select', function()
+                                        Core.TriggerCallback('Admin:RevivePlayer', function(cb)
+                                            if cb then
+                                                sendNotification('Admin', 'I-ai dat revive lui '..v.name..'!')
+                                            end
+                                        end, v.source)
+                                    end)
+
+                                    --tp to me
+                                    playerSubOptions:AddButton({
+                                        label = 'TpToMe',
+                                        icon = '🔗'
+                                    }):On('select', function()
+                                        local coords = GetEntityCoords(PlayerPedId())
+                                        Core.TriggerCallback('Admin:TeleportPlayer', function(cb)
+                                            if cb then
+                                                sendNotification('Admin', 'L-ai teleportat pe '..v.name..' la tine!')
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' l-a teleportat pe '..v.name..' la el!')
+                                            end
+                                        end, v.source, coords)
+                                    end)
+                                    
+                                    --respawn player
+                                    playerSubOptions:AddButton({
+                                        label = 'Respawn',
+                                        icon = '🔗'
+                                    }):On('select', function()
+                                        Core.TriggerCallback('Admin:TeleportPlayer', function(cb)
+                                            if cb then
+                                                sendNotification('Admin', 'I-ai dat respawn lui '..v.name..'!')
+                                                --add log
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' l-a respawnat pe '..v.name..'!')
+                                            end
+                                        end, v.source, {x = 1829.4075927734, y = 3681.0861816406, z = 34.335926055908}, 'respawn')
+                                    end)
+                                    
+                                
+                                    playerSubOptions:AddButton({
+                                        label = 'Seteaza admin level',
+                                        icon = '🔨'
+                                    }):On('select', function()
+                                        ShowDialog('Admin', 'Seteaza nivel admin al jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleAdminLevelChange', true, true, 'c')
+                                        local event
+                                        event = AddEventHandler('Admin:HandleAdminLevelChange', function(admin)
+                                            RemoveEventHandler(event)
+                                            if not tonumber(admin) then
+                                                sendNotification('Admin', 'Invalid input', 'error')
+                                                return
+                                            end
+                                            Core.TriggerCallback('Admin:SetLevel', function(cb)
+                                                if cb then
+                                                    sendNotification('Admin', 'I-ai setat lui '..v.name..' admin level '..admin..'!')
+                                                    --ADD LOG
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a setat lui '..v.name..' admin level '..admin..'!')
+                                                end
+                                            end, {src = v.source, lvl = admin})
+                                            RemoveEventHandler(event)
+                                        end)
+                                    end)
+                                   
+        
+                                    playerSubOptions:AddButton({
+                                        icon = "💼",
+                                        label = 'Seteaza factiune',
+                                        value = 0
+                                    }):On('select', function()
+                                        ShowDialog('Seteaza factiune', 'Scrie factiunea pe care vrei sa o setezi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
+                                        local event
+                                        event = AddEventHandler('Admin:HandleSetFaction', function(faction)
+                                            RemoveEventHandler(event)
+                                            if string.len(faction) == 0 then
+                                                sendNotification('Admin', 'Invalid input', 'error')
+                                                return
+                                            end
+                                            ShowDialog('Seteaza factiune', 'Scrie rankul pe care vrei sa il aiba: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
+                                            event = AddEventHandler('Admin:HandleSetFaction', function(rank)
+                                                RemoveEventHandler(event)
+                                                if not tonumber(rank) then
+                                                    sendNotification('Admin', 'Invalid input', 'error')
+                                                    return
+                                                end
+                                                if tonumber(rank) then
+                                                    rank = tonumber(rank)
+                                                end
+                                                Core.TriggerCallback('Core:GetPlayerById', function(player)
+                                                    Core.TriggerCallback('Factions:AddMemberWithRank', function(cb)
+                                                        if cb then
+                                                            sendNotification('Admin', 'I-ai setat factiunea lui '..v.name..' la '..faction..'!')
+                                                            --ADD LOG
+                                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a setat lui '..v.name..' factiunea '..faction..'!')
+                                                        end
+                                                    end, faction, rank, player.data.identifier)
+                                                end, v.source)
+                                            end)
+                                        end)
+                                    end)
+                                    MenuV:OpenMenu(playerSubOptions)
+                                end)
+                            end
+                            
+            
+                            
                         end
                         
                         MenuV:OpenMenu(playerOptions)
@@ -943,7 +1050,8 @@ RegisterCommand('admin', function()
                             sendNotification('Eroare', 'Nu ai introdus un nume valid.')
                             return
                         end
-                        local car = CreateCar(carName, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), false, true, true, "ADMIN")
+                        local car = CreateCar(carName, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, true, true, "ADMIN")
+                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a creat masina '..carName..'!')
                         RemoveEventHandler(event)
                     end)
                 end)
@@ -957,6 +1065,7 @@ RegisterCommand('admin', function()
                     SetEntityInvincible(PlayerPedId(), godModeOn)
                     --send notification to tell he activated or deactivated godmode
                     sendNotification('Admin', 'Ai '..(godModeOn and 'activat' or 'dezactivat')..' godmode!')
+                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' '..(godModeOn and 'a activat' or 'a dezactivat')..' godmode!')
                 end)
                 personalSettings:AddButton({
                     label = 'Coords',
@@ -967,6 +1076,7 @@ RegisterCommand('admin', function()
                         value = GetEntityCoords(PlayerPedId()).x..','..GetEntityCoords(PlayerPedId()).y..','..GetEntityCoords(PlayerPedId()).z..','..GetEntityHeading(PlayerPedId())
                     })
                     TriggerServerEvent('print', GetEntityCoords(PlayerPedId()))
+                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a copiat coordonatele!')
                 end)
             end
             MenuV:OpenMenu(personalSettings)
@@ -1021,6 +1131,7 @@ RegisterCommand('admin', function()
                                             owner = 'The State'
                                         }
                                         sendNotification("Casa", 'Ai creat o casa de tip: '..createHouseData.type..' cu pretul de: $'..FormatNumber(createHouseData.price)..'!', "success")
+                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a creat o casa de tip: '..createHouseData.type..' cu pretul de: $'..FormatNumber(createHouseData.price)..'!')
                                         TriggerServerEvent("Houses:Create", houseData)
                                     end)
                                 else
@@ -1122,6 +1233,7 @@ RegisterCommand('admin', function()
                                                     MenuV:CloseMenu(serverHouse)
                                                     sendNotification('Admin', 'Ai sters casa cu id: '..hData.id..'!')
                                                     TriggerServerEvent("Houses:RequireUpdate")
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a sters casa cu id: '..hData.id..'!')
                                                 end
                                             end, hData.id)
                                         end)
@@ -1139,6 +1251,7 @@ RegisterCommand('admin', function()
                                                 if cb then
                                                     TriggerServerEvent("Houses:RequireUpdate")
                                                     sendNotification('Admin', 'Ai scos la vanzare casa cu id: '..hData.id..'!')
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a scos la vanzare casa cu id: '..hData.id..'!')
                                                 end
                                             end, hData)
                                         end)
@@ -1159,6 +1272,7 @@ RegisterCommand('admin', function()
                                                     if cb then
                                                         TriggerServerEvent("Houses:RequireUpdate")
                                                         sendNotification('Admin', 'Ai schimbat pretul casei cu id: '..hData.id..' la $'..FormatNumber(hData.price)..'!')
+                                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a schimbat pretul casei cu id: '..hData.id..' la $'..FormatNumber(hData.price)..'!')
                                                     end
                                                 end, hData)
                                             end)
@@ -1179,6 +1293,7 @@ RegisterCommand('admin', function()
                                                 Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                     if cb then
                                                         TriggerServerEvent("Houses:RequireUpdate")
+                                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a schimbat pretul chiriei casei cu id: '..hData.id..' la $'..FormatNumber(hData.rent)..'!')
                                                         sendNotification('Admin', 'Ai schimbat pretul chiriei casei cu id: '..hData.id..' la $'..FormatNumber(hData.price)..'!')
                                                     end
                                                 end, hData)
@@ -1199,6 +1314,7 @@ RegisterCommand('admin', function()
                                             Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                 if cb then
                                                     TriggerServerEvent("Houses:RequireUpdate")
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a scos toti chiriasii casei cu id: '..hData.id..'!')
                                                     sendNotification('Admin', 'Ai scos toti chiriasii casei cu id: '..hData.id..'!')
                                                 end
                                             end, hData)
@@ -1275,6 +1391,7 @@ RegisterCommand('admin', function()
                                             Core.TriggerCallback("Houses:DeleteHouse", function(cb)
                                                 if cb then
                                                     MenuV:CloseMenu(serverHouse)
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a sters casa cu id: '..hData.id..'!')
                                                     sendNotification('Admin', 'Ai sters casa cu id: '..hData.id..'!')
                                                     TriggerServerEvent("Houses:RequireUpdate")
                                                 end
@@ -1293,6 +1410,7 @@ RegisterCommand('admin', function()
                                             Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                 if cb then
                                                     TriggerServerEvent("Houses:RequireUpdate")
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a scos la vanzare casa cu id: '..hData.id..'!')
                                                     sendNotification('Admin', 'Ai scos la vanzare casa cu id: '..hData.id..'!')
                                                 end
                                             end, hData)
@@ -1313,6 +1431,7 @@ RegisterCommand('admin', function()
                                                 Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                     if cb then
                                                         TriggerServerEvent("Houses:RequireUpdate")
+                                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a schimbat pretul casei cu id: '..hData.id..' la $'..FormatNumber(hData.price)..'!')
                                                         sendNotification('Admin', 'Ai schimbat pretul casei cu id: '..hData.id..' la $'..FormatNumber(hData.price)..'!')
                                                     end
                                                 end, hData)
@@ -1334,6 +1453,7 @@ RegisterCommand('admin', function()
                                                 Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                     if cb then
                                                         TriggerServerEvent("Houses:RequireUpdate")
+                                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a schimbat pretul chiriei casei cu id: '..hData.id..' la $'..FormatNumber(hData.rent)..'!')
                                                         sendNotification('Admin', 'Ai schimbat pretul chiriei casei cu id: '..hData.id..' la $'..FormatNumber(hData.price)..'!')
                                                     end
                                                 end, hData)
@@ -1354,6 +1474,7 @@ RegisterCommand('admin', function()
                                             Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                 if cb then
                                                     TriggerServerEvent("Houses:RequireUpdate")
+                                                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a scos toti chiriasii casei cu id: '..hData.id..'!')
                                                     sendNotification('Admin', 'Ai scos toti chiriasii casei cu id: '..hData.id..'!')
                                                 end
                                             end, hData)
@@ -1434,6 +1555,7 @@ RegisterCommand('admin', function()
                                                     
                                                         Core.TriggerCallback("Business:Create", function(cb)
                                                             if cb then
+                                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a creat o afacere cu numele: '..createBizData.name..'!')
                                                                 sendNotification('Afacere', Lang[Language]['BusinessCreated'])
                                                                 TriggerServerEvent('Business:RequireUpdate')
                                                             else
@@ -1511,6 +1633,7 @@ RegisterCommand('admin', function()
                                     }):On('select', function()
                                         Core.TriggerCallback('Business:Delete', function(cb)
                                             if cb then
+                                                Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a sters o afacere cu numele: '..bData.name..'!')
                                                 sendNotification('Afacere', Lang[Language]['BusinessRemoved'])
                                                 TriggerServerEvent('Business:RequireUpdate')
                                             else
@@ -1531,6 +1654,7 @@ RegisterCommand('admin', function()
                                             if string.len(bizname) > 3 then
                                                 Core.TriggerCallback('Business:EditBusiness', function(cb)
                                                     if cb then
+                                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a editat o afacere cu numele: '..bData.name..'!')
                                                         sendNotification('Afacere', Lang[Language]['BusinessUpdated'])
                                                         TriggerServerEvent('Business:RequireUpdate')
                                                     else
@@ -1555,6 +1679,7 @@ RegisterCommand('admin', function()
                                             if tonumber(bizprice) then
                                                 Core.TriggerCallback('Business:EditBusiness', function(cb)
                                                     if cb then
+                                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a editat o afacere cu numele: '..bData.name..'!')
                                                         sendNotification('Afacere', Lang[Language]['BusinessUpdated'])
                                                         TriggerServerEvent('Business:RequireUpdate')
                                                     else
@@ -1571,6 +1696,7 @@ RegisterCommand('admin', function()
                                         icon = '🗺️'
                                     }):On('select', function()
                                         local bCoords = bData.coords
+                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' s-a teleportat la afacerea cu numele: '..bData.name..'!')
                                         SetEntityCoords(PlayerPedId(), bCoords.x, bCoords.y, bCoords.z, 0, 0, 0, 0)
                                         sendNotification('Afacere', 'Te-ai teleportat la afacere.')
                                     end)
@@ -1614,6 +1740,7 @@ RegisterCommand('admin', function()
                             }):On('select', function()
                                 Core.TriggerCallback('Admin:RemoveOwnedVehicle', function(cb)
                                     if cb then
+                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a sters masina cu numarul de inmatriculare: '..v.plate..'!')
                                         sendNotification('Admin', 'Ai sters masina: '..vData.name..'['..vData.plate..']!')
                                         MenuV:CloseAll()
                                     end
@@ -1632,6 +1759,7 @@ RegisterCommand('admin', function()
                                         local oldplate = vData.plate
                                         vData.plate = plate
                                         vData.id = v.id
+                                        Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a schimbat numarul de inmatriculare de la: '..oldplate..' la '..plate..'!')
                                         TriggerServerEvent('Vehicles:ChangePlate', oldplate, plate)
                                     else
                                         sendNotification('Eroare', 'Numarul de inmatriculare trebuie sa fie de maxim 6 caractere', 'error')
@@ -1652,6 +1780,7 @@ RegisterCommand('admin', function()
                                     Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
                                         if cb then
                                             MenuV:CloseAll()
+                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a adaugat VIP masinii: '..vData.name..'!')
                                             sendNotification('Admin', 'Ai adaugat VIP masinii: '..vData.name..'!', 'success')
                                         end
                                     end, vData)
@@ -1666,6 +1795,7 @@ RegisterCommand('admin', function()
                                     Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
                                         if cb then
                                             MenuV:CloseAll()
+                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a scos VIP-ul masinii: '..vData.name..'!')
                                             sendNotification('Admin', 'Ai scos VIP-ul masinii: '..vData.name..'!', 'success')
                                         end
                                     end, vData)
@@ -1682,6 +1812,7 @@ RegisterCommand('admin', function()
                                     Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
                                         if cb then
                                             MenuV:CloseAll()
+                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a adaugat Rainbow masinii: '..vData.name..'!')
                                             sendNotification('Admin', 'Ai adaugat Rainbow masinii: '..vData.name..'!', 'success')
                                         end
                                     end, vData)
@@ -1696,6 +1827,7 @@ RegisterCommand('admin', function()
                                     Core.TriggerCallback("Admin:UpdateVehicleData", function(cb)
                                         if cb then
                                             MenuV:CloseAll()
+                                            Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a scos Rainbow-ul masinii: '..vData.name..'!')
                                             sendNotification('Admin', 'Ai sters Rainbow-ul masinii: '..vData.name..'!', 'success')
                                         end
                                     end, vData)
@@ -1714,6 +1846,7 @@ RegisterCommand('admin', function()
         MenuV:OpenMenu(adminMenu)
     else
         sendNotification("Admin", Lang[Language]['NoAccessToCMD'])
+        
         return
     end
    

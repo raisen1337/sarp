@@ -93,15 +93,7 @@ function BuildPlayerMenu()
     
     local factionData = pData.faction
 
-    playerMenu:AddButton({
-        label = 'Optiuni jucator',
-        icon = '🙍‍♂️', 
-        value = 0,
-    }):On('select', function()
-        playerOptions:ClearItems()
-        BuildPlayerOptions()
-        MenuV:OpenMenu(playerOptions)
-    end)
+   
 
     if table.empty(factions) then
         Core.TriggerCallback('Factions:GetFactions', function(data)
@@ -110,212 +102,299 @@ function BuildPlayerMenu()
         return
     end
     BuildPlayerOptions = function()
-        playerOptions:AddButton({
-            label = 'Optiuni factiune',
-            icon = '',
-            value = 0,
-            disabled = true
-        })
-        if factions[fData.name].type == 'lege' or factions[fData.name].type == 'mafie' then
+        
+        if factions[fData.name] then
             playerOptions:AddButton({
-                label = 'Incatuseaza jucator',
-                icon = '👮‍♂️',
+                label = 'Optiuni factiune',
+                icon = '',
                 value = 0,
-            }):On('select', function()
-                local nearestPed = GetPedInFront()
-               
-                local cuffPlayer
-                if nearestPed then
-                    cuffPlayer = GetNearestPlayer()
-                    print('Cuff nearest player for debug (Ped Id: '..nearestPed..' - Player Id: '..cuffPlayer..'!')
-                    if IsPedInAnyVehicle(PlayerPedId(), false) then
-                        sendNotification('Catuse', 'Nu poti incatusa un jucator dintr-o masina.', 'error')
-                        return
-                    end
-    
-                    Core.TriggerCallback('Police:Cuff', function(cuffed)
-                        if cuffed then
-                            --sendNotification('Catuse', 'L-ai incatusat pe ' .. GetPlayerName(cuffPlayer).. '!', 'success')
-                        else
-                            --sendNotification('Catuse', 'Jucatorul nu a putut fi incatusat!', 'error')
+                disabled = true
+            })
+            if factions[fData.name].type == 'lege' or factions[fData.name].type == 'mafie' then
+                playerOptions:AddButton({
+                    label = 'Incatuseaza jucator',
+                    icon = '👮‍♂️',
+                    value = 0,
+                }):On('select', function()
+                    local nearestPed = GetPedInFront()
+                   
+                    local cuffPlayer
+                    if nearestPed then
+                        cuffPlayer = GetNearestPlayer()
+                        print('Cuff nearest player for debug (Ped Id: '..nearestPed..' - Player Id: '..cuffPlayer..'!')
+                        if IsPedInAnyVehicle(PlayerPedId(), false) then
+                            sendNotification('Catuse', 'Nu poti incatusa un jucator dintr-o masina.', 'error')
+                            return
                         end
-                    end, cuffPlayer)
-                end
-            end)
-        end
-        if factions[fData.name].type == 'lege' then
-            playerOptions:AddButton({
-                label = 'Lista wanted',
-                icon = '⭐',
-            }):On('select', function()
-                Core.TriggerCallback("Police:GetWanted", function(wanteds)
-                    if table.empty(wanteds) then
-                        sendNotification('Wanted', 'Nu exista jucatori wanted.', 'error')
-                        return
+        
+                        Core.TriggerCallback('Police:Cuff', function(cuffed)
+                            if cuffed then
+                                --sendNotification('Catuse', 'L-ai incatusat pe ' .. GetPlayerName(cuffPlayer).. '!', 'success')
+                            else
+                                --sendNotification('Catuse', 'Jucatorul nu a putut fi incatusat!', 'error')
+                            end
+                        end, cuffPlayer)
                     end
-                    wantedPlayers:ClearItems()
-                    for k, v in pairs(wanteds) do
-                        if v.level > 0 then
-                            wantedPlayers:AddButton({
-                                label = v.name..'['..v.level..'⭐]',
-                                icon = '⭐',
-                                value = 0,
-                                description = v.reason,
-                            }):On('select', function ()
-                                wantedPlayer:ClearItems()
-                                wantedPlayer:AddButton({
-                                    label = 'Nume: '..v.name,
-                                    icon = '👤',
-                                    value = 0,
-                                    description = v.reason,
-                                    disabled = true
-                                })
-                                wantedPlayer:AddButton({
-                                    label = 'Wanted level: '..v.level,
+                end)
+            end
+            if factions[fData.name].type == 'lege' then
+                playerOptions:AddButton({
+                    label = 'Lista wanted',
+                    icon = '⭐',
+                }):On('select', function()
+                    Core.TriggerCallback("Police:GetWanted", function(wanteds)
+                        if table.empty(wanteds) then
+                            sendNotification('Wanted', 'Nu exista jucatori wanted.', 'error')
+                            return
+                        end
+                        wantedPlayers:ClearItems()
+                        for k, v in pairs(wanteds) do
+                            if v.level > 0 then
+                                wantedPlayers:AddButton({
+                                    label = v.name..'['..v.level..'⭐]',
                                     icon = '⭐',
                                     value = 0,
                                     description = v.reason,
-                                    disabled = true
-                                })
-                                wantedPlayer:AddButton({
-                                    label = 'Reason: '..v.reason,
-                                    icon = '📃',
-                                    value = 0,
-                                    description = v.reason,
-                                    disabled = true
-                                })
-                                wantedPlayer:AddButton({
-                                    label = 'Optiuni',
-                                    icon = '',
-                                    value = 0,
-                                    description = v.reason,
-                                    disabled = true
-                                })
-
-                                wantedPlayer:AddButton({
-                                    label = 'Sterge',
-                                    icon = '❌',
-                                    value = 0,
-                                    description = v.reason,
                                 }):On('select', function ()
-                                    Core.TriggerCallback('Police:SetWanted', function(cb)
-                                        MenuV:CloseAll()
-                                    end, v.id, 0, '')
-                                end)
-
-                                wantedPlayer:AddButton({
-                                    label = 'Modifica',
-                                    icon = '✏️',
-                                    value = 0,
-                                    description = v.reason,
-                                }):On('select', function ()
-                                    ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true, false, 'c')
-                                    event = AddEventHandler('wanted', function(level)
-                                        RemoveEventHandler(event)
-                                        if tonumber(level) then
-                                            level = tonumber(level)
-                                            ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.', 'wanted', true, false, 'c')
-                                            event = AddEventHandler('wanted', function(reason)
-                                                RemoveEventHandler(event)
-                                                if string.len(reason) > 0 then
-                                                    Core.TriggerCallback('Police:SetWanted', function()
-                                                        sendNotification("Wanted", 'Ai dat wanted level '..level..' unui jucator!')
-                                                    end, v.id, level, reason)
-                                                else
-                                                    sendNotification("Wanted", 'Invalid reason', 'error')
-                                                end
-                                            end)
-                                        else
-                                            sendNotification("Wanted", 'Invalid level', 'error')
-                                        end
+                                    wantedPlayer:ClearItems()
+                                    wantedPlayer:AddButton({
+                                        label = 'Nume: '..v.name,
+                                        icon = '👤',
+                                        value = 0,
+                                        description = v.reason,
+                                        disabled = true
+                                    })
+                                    wantedPlayer:AddButton({
+                                        label = 'Wanted level: '..v.level,
+                                        icon = '⭐',
+                                        value = 0,
+                                        description = v.reason,
+                                        disabled = true
+                                    })
+                                    wantedPlayer:AddButton({
+                                        label = 'Reason: '..v.reason,
+                                        icon = '📃',
+                                        value = 0,
+                                        description = v.reason,
+                                        disabled = true
+                                    })
+                                    wantedPlayer:AddButton({
+                                        label = 'Optiuni',
+                                        icon = '',
+                                        value = 0,
+                                        description = v.reason,
+                                        disabled = true
+                                    })
+    
+                                    wantedPlayer:AddButton({
+                                        label = 'Sterge',
+                                        icon = '❌',
+                                        value = 0,
+                                        description = v.reason,
+                                    }):On('select', function ()
+                                        Core.TriggerCallback('Police:SetWanted', function(cb)
+                                            MenuV:CloseAll()
+                                        end, v.id, 0, '')
                                     end)
-                                end)
-
-                                wantedPlayer:AddButton({
-                                    label = 'Seteaza checkpoint',
-                                    icon = '🔴',
-                                    value = 0,
-                                    description = v.reason,
-                                }):On('select', function ()
-                                    if table.empty(targetCp) then
-                                        Core.TriggerCallback('Core:GetPlayerById', function(player)
-                                            if player then
-                                                local targetPlayer = player
-                                                local targetCp = CreateCP(1, player.coords, {255, 0, 0, 255}, 5.0, 200.0, function()
+    
+                                    wantedPlayer:AddButton({
+                                        label = 'Modifica',
+                                        icon = '✏️',
+                                        value = 0,
+                                        description = v.reason,
+                                    }):On('select', function ()
+                                        ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true, false, 'c')
+                                        event = AddEventHandler('wanted', function(level)
+                                            RemoveEventHandler(event)
+                                            if tonumber(level) then
+                                                level = tonumber(level)
+                                                ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.', 'wanted', true, false, 'c')
+                                                event = AddEventHandler('wanted', function(reason)
+                                                    RemoveEventHandler(event)
+                                                    if string.len(reason) > 0 then
+                                                        Core.TriggerCallback('Police:SetWanted', function()
+                                                            sendNotification("Wanted", 'Ai dat wanted level '..level..' unui jucator!')
+                                                        end, v.id, level, reason)
+                                                    else
+                                                        sendNotification("Wanted", 'Invalid reason', 'error')
+                                                    end
                                                 end)
-
-                                                TriggerServerEvent('sv:updatetargetdata', targetCp, targetPlayer)
-                                                sendNotification('Checkpoint', 'Ai setat checkpoint la infractor!', 'success')
+                                            else
+                                                sendNotification("Wanted", 'Invalid level', 'error')
                                             end
-                                        end, v.id)
-                                    else
-                                        DeleteCP(targetCp)
-                                        targetCp = {}
-                                        sendNotification('Checkpoint', 'Ti-ai anulat checkpointul', 'success')
-                                    end
-                                    
-                                end)
-
-                                MenuV:OpenMenu(wantedPlayer)
-
-                            end)
-                        end
-                        
-                    end
-                    MenuV:OpenMenu(wantedPlayers)
-                end)
-            end)
-            playerOptions:AddButton({
-                label = 'Amendeaza',
-                icon = '📃',
-            })
-            playerOptions:AddButton({
-                label = 'Aresteaza',
-                icon = '🚧',
-            })
-            playerOptions:AddButton({
-                label = 'Seteaza wanted',
-                icon = '⭐',
-            }):On('select', function()
-                ShowDialog("Seteaza wanted", 'Scrie mai jos ID-ul jucatorului caruia vrei sa-i dai wanted.', 'wanted', true, false, 'c')
-                local event
-                event = AddEventHandler('wanted', function(id)
-                    RemoveEventHandler(event)
-                    if tonumber(id) then
-                        id = tonumber(id)
-                        print(IsPlayerConnected(id))
-                        if IsPlayerConnected(id) then
-                            ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true, false, 'c')
-                            event = AddEventHandler('wanted', function(level)
-                                RemoveEventHandler(event)
-                                if tonumber(level) then
-                                    level = tonumber(level)
-                                    ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.', 'wanted', true, false, 'c')
-                                    event = AddEventHandler('wanted', function(reason)
-                                        RemoveEventHandler(event)
-                                        if string.len(reason) > 0 then
-                                            Core.TriggerCallback('Police:SetWanted', function()
-                                                sendNotification("Wanted", 'Ai dat wanted level '..level..' unui jucator!')
-                                            end, id, level, reason)
+                                        end)
+                                    end)
+    
+                                    wantedPlayer:AddButton({
+                                        label = 'Seteaza checkpoint',
+                                        icon = '🔴',
+                                        value = 0,
+                                        description = v.reason,
+                                    }):On('select', function ()
+                                        if table.empty(targetCp) then
+                                            Core.TriggerCallback('Core:GetPlayerById', function(player)
+                                                if player then
+                                                    local targetPlayer = player
+                                                    local targetCp = CreateCP(1, player.coords, {255, 0, 0, 255}, 5.0, 200.0, function()
+                                                    end)
+    
+                                                    TriggerServerEvent('sv:updatetargetdata', targetCp, targetPlayer)
+                                                    sendNotification('Checkpoint', 'Ai setat checkpoint la infractor!', 'success')
+                                                end
+                                            end, v.id)
                                         else
-                                            sendNotification("Wanted", 'Invalid reason', 'error')
+                                            DeleteCP(targetCp)
+                                            targetCp = {}
+                                            sendNotification('Checkpoint', 'Ti-ai anulat checkpointul', 'success')
                                         end
                                         
                                     end)
-                                else
-                                    sendNotification("Wanted", 'Invalid level', 'error')
-                                end
-                            end)
+    
+                                    MenuV:OpenMenu(wantedPlayer)
+    
+                                end)
+                            end
+                            
+                        end
+                        MenuV:OpenMenu(wantedPlayers)
+                    end)
+                end)
+                playerOptions:AddButton({
+                    label = 'Amendeaza',
+                    icon = '📃',
+                })
+                playerOptions:AddButton({
+                    label = 'Aresteaza',
+                    icon = '🚧',
+                }):On('select', function()
+                    ShowDialog("Aresteaza", 'Scrie mai jos ID-ul jucatorului caruia vrei sa-l arestezi.', 'arest', true, false, 'c')
+                    local event
+                    event = AddEventHandler('arest', function(id)
+                        RemoveEventHandler(event)
+                        if tonumber(id) then
+                            id = tonumber(id)
+                            if IsPlayerConnected(id) then
+                                ShowDialog("Aresteaza", 'Scrie mai jos timpul de arestare.', 'arest', true, false, 'c')
+                                event = AddEventHandler('arest', function(time)
+                                    RemoveEventHandler(event)
+                                    if tonumber(time) then
+                                        time = tonumber(time)
+                                        ShowDialog("Aresteaza", 'Scrie motivul arestarii mai jos.', 'arest', true, false, 'c')
+                                        event = AddEventHandler('arest', function(reason)
+                                            RemoveEventHandler(event)
+                                            if string.len(reason) > 0 then
+                                                print('Calling callback')
+                                                Core.TriggerCallback("Core:GetNearestPlayer", function(closestPlayer)
+                                                    if not closestPlayer then
+                                                        sendNotification("Arest", 'Nu exista jucatori in apropiere!', 'error')
+                                                        return
+                                                    end
+                                                    closestPlayer = tonumber(closestPlayer)
+                                                    id = tonumber(id)
+                                                    if closestPlayer ~= id then
+                                                        sendNotification("Arest", 'Nu poti aresta un jucator care nu e langa tine!', 'error')
+                                                        return
+                                                    end
+
+                                                    Core.TriggerCallback('Core:GetPlayerById', function(player)
+                                                
+                                                        Core.TriggerCallback('Police:Arrest', function()
+                                                        end, id, time, reason)
+                                                        Core.TriggerCallback('Admin:Log', function()
+                                                        end, 'arest', '[^2POLITIE^0] Politistul '..GetPlayerName(PlayerId())..' l-a arestat pe '..GetPlayerName(id)..' pentru '..time..' minute pentru '..reason..'.')
+                                                    end, id)
+                                                end)
+                                            else
+                                                sendNotification("Arest", 'Invalid reason', 'error')
+                                            end
+                                            
+                                        end)
+                                    else
+                                        sendNotification("Arest", 'Invalid time', 'error')
+                                    end
+                                end)
+                            else
+                                sendNotification("Arest", 'Invalid id', 'error')
+                            end
+                        else
+                            sendNotification("Arest", 'Invalid id', 'error')
+                        end
+                        
+                    end)
+                end)
+                playerOptions:AddButton({
+                    label = 'Scoate din arest',
+                    icon = '🚧',
+                }):On('select', function()
+                    ShowDialog("Scoate din arest", 'Scrie mai jos ID-ul jucatorului caruia vrei sa-l scoti din arest.', 'unarest', true, false, 'c')
+                    local event
+                    event = AddEventHandler('unarest', function(id)
+                        RemoveEventHandler(event)
+                        if tonumber(id) then
+                            id = tonumber(id)
+                            print(IsPlayerConnected(id))
+                            if IsPlayerConnected(id) then
+                                Core.TriggerCallback('Police:Free', function()
+                                end, id)
+                                Core.TriggerCallback('Admin:Log', function()
+                                end, 'unarest', '[^2POLITIE^0] Politistul '..GetPlayerName(PlayerId())..' l-a scos din arest pe '..GetPlayerName(id)..'.')
+                            else
+                                sendNotification("Unarest", 'Invalid id', 'error')
+                            end
+                        else
+                            sendNotification("Unarest", 'Invalid id', 'error')
+                        end
+                        
+                    end)
+                end)
+                playerOptions:AddButton({
+                    label = 'Seteaza wanted',
+                    icon = '⭐',
+                }):On('select', function()
+                    ShowDialog("Seteaza wanted", 'Scrie mai jos ID-ul jucatorului caruia vrei sa-i dai wanted.', 'wanted', true, false, 'c')
+                    local event
+                    event = AddEventHandler('wanted', function(id)
+                        RemoveEventHandler(event)
+                        if tonumber(id) then
+                            id = tonumber(id)
+                            print(IsPlayerConnected(id))
+                            if IsPlayerConnected(id) then
+                                ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true, false, 'c')
+                                event = AddEventHandler('wanted', function(level)
+                                    RemoveEventHandler(event)
+                                    if tonumber(level) then
+                                        level = tonumber(level)
+                                        ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.', 'wanted', true, false, 'c')
+                                        event = AddEventHandler('wanted', function(reason)
+                                            RemoveEventHandler(event)
+                                            if string.len(reason) > 0 then
+                                                Core.TriggerCallback('Police:SetWanted', function()
+                                                    sendNotification("Wanted", 'Ai dat wanted level '..level..' unui jucator!')
+                                                end, id, level, reason)
+                                            else
+                                                sendNotification("Wanted", 'Invalid reason', 'error')
+                                            end
+                                            
+                                        end)
+                                    else
+                                        sendNotification("Wanted", 'Invalid level', 'error')
+                                    end
+                                end)
+                            else
+                                sendNotification("Wanted", 'Invalid id', 'error')
+                            end
                         else
                             sendNotification("Wanted", 'Invalid id', 'error')
                         end
-                    else
-                        sendNotification("Wanted", 'Invalid id', 'error')
-                    end
-                    
+                        
+                    end)
                 end)
-            end)
+            end
+        else
+            --sendNotification('Factiune', 'Nu esti intr-o factiune!', 'error')
         end
+        
+        
         playerOptions:AddButton({
             label = 'Optiuni player',
             icon = '',
@@ -331,6 +410,15 @@ function BuildPlayerMenu()
             end
         })
     end
+    playerMenu:AddButton({
+        label = 'Optiuni jucator',
+        icon = '🙍‍♂️', 
+        value = 0,
+    }):On('select', function()
+        playerOptions:ClearItems()
+        BuildPlayerOptions()
+        MenuV:OpenMenu(playerOptions)
+    end)
 
     if factionData.id ~= 0 then
         playerMenu:AddButton({
