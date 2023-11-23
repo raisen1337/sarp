@@ -25,16 +25,19 @@ AddEventHandler('_chat:messageEntered', function(author, color, message)
 
         if pData.adminLevel > 0 then
             table.insert(tags, {
-                text = "^3[Admin "..pData.adminLevel.."]",
+                text = "^3[Admin "..pData.adminLevel.."]^0",
             })
         end
 
         if pData.faction then
             local fData = pData.faction
             local factions = Core.GetFactions()
-            table.insert(tags, {
-                text = ""..factions[fData.name].color.."["..factions[fData.name].name.."]^0 ",
-            })
+            if factions[fData.name] then
+                table.insert(tags, {
+                    text = ""..factions[fData.name].color.."["..factions[fData.name].name.."]^0 ",
+                })
+            end
+            
         end
 
         for _, tag in ipairs(tags) do

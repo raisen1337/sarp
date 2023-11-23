@@ -27,6 +27,10 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
     rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Share+Tech+Mono">
+
+    <link rel="stylesheet" href="style/tuning.css">
   <title>Document</title>
 </head>
 
@@ -168,29 +172,29 @@
         <div class="items-menu-ndcnt" style="display: flex; flex-direction: row;">
           <span class="select-item">CLOTHES SELECTOR</span>
           <div class="items-menu">
-            <div class="cloth-item" onclick="selectItem('hats', 1); switchCam('head')" id="clothItem1">
+            <div class="cloth-item" onclick="selectItem('hat', 1); switchCam('head')" id="clothItem1">
               <i class="clothitem fa-solid fa-hat-cowboy-side"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('torsos', 2); switchCam('torso')" id="clothItem2">
+            <div class="cloth-item" onclick="selectItem('t-shirt', 2); switchCam('torso')" id="clothItem2">
               <i class="clothitem fa-solid fa-shirt"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('jackets', 3); switchCam('torso')" id="clothItem3">
+            <div class="cloth-item" onclick="selectItem('torso2', 3); switchCam('torso')" id="clothItem3">
               <i class="clothitem fa-solid fa-vest"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('hands', 4); switchCam('torso')" id="clothItem4">
+            <div class="cloth-item" onclick="selectItem('arms', 4); switchCam('torso')" id="clothItem4">
               <i class="clothitem fas fa-hands"></i>
             </div>
-            <div class="cloth-item" style="padding: 0; " onclick="selectItem('legs', 5); switchCam('leg')"
+            <div class="cloth-item" style="padding: 0; " onclick="selectItem('pants', 5); switchCam('leg')"
               id="clothItem5">
               <image class="clothitem" src="assets/pants.png" style='height: 54px; width: 60px;'></i>
             </div>
             <div class="cloth-item" onclick="selectItem('shoes', 6); switchCam('leg')" id="clothItem6">
               <i class="clothitem fas fa-shoe-prints"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('masks', 7); switchCam('head')" id="clothItem7">
+            <div class="cloth-item" onclick="selectItem('mask', 7); switchCam('head')" id="clothItem7">
               <i class="clothitem fas fa-mask"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('bags', 8); switchCam('torso', true)" id="clothItem8">
+            <div class="cloth-item" onclick="selectItem('bag', 8); switchCam('torso', true)" id="clothItem8">
               <i class="clothitem fas fa-backpack"></i>
             </div>
             <div class="cloth-item" onclick="selectItem('face', 9); switchCam('head')" id="clothItem9">
@@ -199,16 +203,16 @@
             <div class="cloth-item" onclick="selectItem('hair', 10); switchCam('head')" id="clothItem10">
               <i class="clothitem fas fa-scissors"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('glasses', 11); switchCam('head')" id="clothItem11">
+            <div class="cloth-item" onclick="selectItem('glass', 11); switchCam('head')" id="clothItem11">
               <i class="clothitem fas fa-glasses"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('earrings', 12); switchCam('head')" id="clothItem12">
+            <div class="cloth-item" onclick="selectItem('ear', 12); switchCam('head')" id="clothItem12">
               <i class="clothitem fas fa-ear"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('watches', 13); switchCam('torso')" id="clothItem13">
+            <div class="cloth-item" onclick="selectItem('watch', 13); switchCam('torso')" id="clothItem13">
               <i class="clothitem fas fa-watch"></i>
             </div>
-            <div class="cloth-item" onclick="selectItem('braclets', 14); switchCam('torso')" id="clothItem14">
+            <div class="cloth-item" onclick="selectItem('bracelet', 14); switchCam('torso')" id="clothItem14">
               <i class="clothitem fas fa-ring"></i>
             </div>
           </div>
@@ -466,6 +470,28 @@
       <span class="deathscreen-subtitle" style="position: absolute; bottom: .5rem; font-size: 1rem; letter-spacing: .2rem; color: gray;">Crezi ca ai fost omorat abuziv? Fa o reclamatie pe Discord.</span>
     </div>
   </div>
+  <div id="toggle">
+    <div class="wrapper">
+        <div id="title" class="titlebox">Car Tuning</div>
+        <div class="item-wrapper" id="item-wrapper"></div>
+        <div class="bottomwrapper">
+            <div class="total">Total: 0$</div>
+            <button class="finishbutton" id="finishbutton">FINISH</button>
+        </div>
+    </div>
+    <div class="freecam" id="freecam">Click <b>[Q]</b> to free up cam</div>
+    <img class="backbtn" src="back.svg" id="backbtn"></div>
+</div>
+<div id="popup">
+    <div id="finishpopup">
+        <div class="popuptitle">Apply the Modifications?</div>
+        <div class="secondline">
+            <div class="popupbtn" id="cancel">NO, CLOSE</div>
+    <div class="popupbtn" id="kinda">NO, RETURN</div>
+            <div class="popupbtn" id="confirm">YES, CONFIRM</div>
+        </div>
+    </div>
+</div>
   </div>
 
 
@@ -483,6 +509,9 @@
   <script src="js/banking.js"></script>
   <script src="js/market.js"></script>
   <script src="js/deathscreen.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js " type="text/javascript "></script>
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro/dist/iro.min.js" type="text/javascript "></script>
+  <script src="js/tuning.js " type="text/javascript "></script>
 </body>
 
 </html>

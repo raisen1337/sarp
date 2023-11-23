@@ -535,6 +535,9 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
     end
 end
 
+
+
+
 AddEventHandler("playerConnecting", OnPlayerConnecting)
 
 Core.CreateCallback("Players:GetCount", function(source, cb)
@@ -748,11 +751,12 @@ end)
 Core.CreateCallback('Police:Arrest', function(source, cb, id, time, reason)
     local tData = Core.GetPlayerData(id)
     local pData = Core.GetPlayerData(source)
-    
     if not tData.jail then
         tData.jail = true
     else
-        tData.jail = true
+        cb(false)
+        TriggerClientEvent('Notify:Send', source, "Politie", "Jucatorul nu deja in arest!", "error")
+        return
     end
 
     if not tData.jailTime then
@@ -788,6 +792,9 @@ Core.CreateCallback("Police:Free", function(source, cb, id)
         tData.jail = false
     else
         tData.jail = false
+        TriggerClientEvent('Notify:Send', source, "Politie", "Jucatorul nu este arestat!", "error")
+        cb(false)
+        return
     end
 
     if not tData.jailTime then
@@ -963,13 +970,9 @@ Core.CreateCallback('Player:Pay', function(source, cb, type, amount)
 end)
 Core.CreateCallback("Player:AddItem", function(source, cb, name, amount)
     ------print
-    print(name, amount)
     local pData = Core.GetPlayerData(source)
     local Inventory = pData.inventory
     local itemFound = false
-
-    -- Add logging statement to ----print the current name and amount
-    ------print
 
     if not table.empty(Inventory) then
         for _, item in pairs(Inventory) do
@@ -983,6 +986,8 @@ Core.CreateCallback("Player:AddItem", function(source, cb, name, amount)
                 break
             end
         end
+    else
+        itemFound = false
     end
 
     if not itemFound then
@@ -992,14 +997,11 @@ Core.CreateCallback("Player:AddItem", function(source, cb, name, amount)
     pData.inventory = Inventory
 
     -- Add logging statement to ----print the updated inventory
-    ----print("Updated inventory:", json.encode(pData.inventory))
-
-    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
-
-    -- Add logging statement to ----print the callback status
-    ------print
 
     cb(true)
+    Wait(2000)
+    local result = exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+
 end)
 
 Core.CreateCallback('Player:GetAmmo', function(source, cb, type)
@@ -1053,11 +1055,9 @@ Core.CreateCallback("Player:RemoveItem", function(source, cb, name, amount)
         for i, item in ipairs(Inventory) do
             if item.name == name then
                 if item.amount - amount <= 0 then
-                    ------print
                     table.remove(Inventory, i)
                 else
                     item.amount = item.amount - amount
-                    ------print
                 end
                 itemFound = true
                 break
@@ -1066,12 +1066,13 @@ Core.CreateCallback("Player:RemoveItem", function(source, cb, name, amount)
     end
 
     if not itemFound then
-        ------print
+      
     end
-
+    cb(true)
+    Wait(2000)
     pData.inventory = Inventory
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
-    cb(true)
+
 end)
 
 Core.GetPlayerData = function(source)

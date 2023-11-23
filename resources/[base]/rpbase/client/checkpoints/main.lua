@@ -82,3 +82,29 @@ Citizen.CreateThread(function ()
         Wait(wait)
     end
 end)
+
+Citizen.CreateThread(function ()
+    while true do
+        local wait = 3005
+        local closestCheckpoint = nil
+        local closestDistance = -1
+        
+        if not table.empty(checkpoints) then
+            for k, v in pairs(checkpoints) do
+                local pCoords = GetEntityCoords(PlayerPedId())
+                local dist = #(pCoords - vec3(v.coords.x, v.coords.y, v.coords.z))
+                
+                if closestCheckpoint == nil or dist < closestDistance then
+                    closestCheckpoint = v
+                    closestDistance = dist
+                end
+            end
+            
+            if closestCheckpoint ~= nil then
+                showSubtitle('Distance: ^3'..closestDistance, 5000, true)
+            end
+        end
+        
+        Wait(wait)
+    end
+end)

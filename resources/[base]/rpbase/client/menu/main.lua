@@ -16,7 +16,7 @@ local confirmIdentity = menu1:AddButton({
 
 Citizen.CreateThread(function()
     while true do
-        local scriptWait = 1000
+        local scriptwait = 3005
         Wait(scriptWait)
         if inDialog then
             scriptWait = 1
@@ -42,8 +42,8 @@ end)
 
 RegisterNetEvent("Identity:OpenSetup", function()
     Core.TriggerCallback("Identity:Check", function(hasIdentity)
+        print(hasIdentity)
         if not hasIdentity then
-            FreezeEntityPosition(PlayerPedId(), true)
             MenuV:OpenMenu(menu1)
         else
             sendNotification("Identitate", "Ai deja identitatea facuta.", 'error')
@@ -72,14 +72,28 @@ RegisterNetEvent("Identity:SetSurname", function(name)
     TriggerEvent("MissionPassed:Show", "Ti-ai setat identitatea cu success! Distractie placuta!")
 end)
 
+-- Citizen.CreateThread(function ()
+--     while true do
+--         wait = 3005
+--         if inDialog then
+--             wait = 1
+--             SetNuiFocus(true, true)
+--         else
+--             wait = 3005
+--         end
+--         Wait(wait)
+--     end
+-- end)
+
 RegisterNUICallback("dialogCallback", function(response)
     TriggerEvent('dialogHandler', response.eventName, response.type, response.response)
+    inDialog = false
     SetNuiFocus(false, false)
 end)
 
 function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, eventType)
+    Wait(500)
     inDialog = true
-    Wait(300)
     MenuV:CloseAll()
     SendNUIMessage({
         action = "openPrompt",
@@ -114,11 +128,8 @@ RegisterNetEvent('dialogHandler', function(event, type, response)
     else
         TriggerEvent(event, response)
     end
-   
-    SetNuiFocus(false, false)
 end)
 
 RegisterNUICallback('dialogClose', function()
   
-    SetNuiFocus(false, false)
 end)

@@ -87,8 +87,26 @@ Core.CreateCallback('Core:GetNearestPlayer', function (source, cb)
     end
     cb(false)
 end)
-
-
+local annoDelay = false
+Core.CreateCallback('Police:AnnounceShooting', function(source, cb, zone, crossing)
+    local players = GetPlayers()
+    for k, v in pairs(players) do
+        local pData = Core.GetPlayerData(v)
+        local fData = pData.faction
+        if factions[fData.name].type == 'lege' then
+            if not annoDelay then
+                annoDelay = true
+                SetTimeout(5000, function()
+                    annoDelay = false
+                end)
+            else
+                return
+            end
+            TriggerClientEvent('Notify:Send', v, "Politie", 'Shots fired in '..zone..' near '..crossing)
+            cb(true)
+        end
+    end
+end)
 
 Core.CreateCallback('AC:ReportAnomaly', function(source, cb, type)
     local src = source

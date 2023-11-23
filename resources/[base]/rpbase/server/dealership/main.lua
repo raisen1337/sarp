@@ -118,6 +118,19 @@ RegisterNetEvent("Vehicles:ChangePlate", function(oldplate, newplate)
     end
 end)
 
+Core.CreateCallback('Core:GetVehicleMods', function(source, cb, plate)
+    local mods = false
+    local result = exports.oxmysql:executeSync("SELECT * FROM vehicles WHERE plate = ?", {plate})
+    if result[1] then
+        local vData = json.decode(result[1].data)
+        if vData.mods then
+            mods = vData.mods
+        end
+    end
+  
+    cb(mods)
+end)
+
 GeneratePlate = function()
     local plate = 'LS '..math.random(10000, 99999)
     local result = exports.oxmysql:executeSync("SELECT * FROM vehicles WHERE plate = ?", {plate})

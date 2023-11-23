@@ -1,6 +1,5 @@
 Core.CreateCallback('Clothing:UpdateClothes', function(source, cb, data)
     local pData = Core.GetPlayerData(source)
-
     pData.clothing = data
 
     exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(pData), pData.identifier})

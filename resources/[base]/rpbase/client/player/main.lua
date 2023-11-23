@@ -68,12 +68,6 @@ SelectGender:On('close', function()
     end
 end)
 
-Citizen.CreateThread(function ()
-    while true do
-        Wait(4000)
-        --TriggerServerEvent('print', GetEntityCoords(PlayerPedId()))
-    end
-end)
 
 AddEventHandler('onResourceStart', function(resourceName)
   if (GetCurrentResourceName() ~= resourceName) then
@@ -112,7 +106,7 @@ comaTime = 300
 
 Citizen.CreateThread(function()
     while true do
-        local wait = 1000
+        local wait = 3005
         if inComa then
             wait = 1
             SetPedToRagdoll(PlayerPedId(), 1000, 1000, 0, 0, 0, 0)
@@ -127,7 +121,7 @@ Citizen.CreateThread(function()
             DisableControlAction(0, 25, true)  -- Disable aim control
             DisableControlAction(0, 140, true)  -- Disable aim control
         else
-            wait = 1000
+            wait = 3005
         end
         Wait(wait)
     end
@@ -135,7 +129,7 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        local wait = 1000
+        local wait = 3005
         if inComa then
             comaTime = comaTime - 1
             SendNUIMessage({
@@ -235,55 +229,87 @@ AddEventHandler('playerDied', PlayerDied)
 
 PlayerSpawned = function()
     SetEntityVisible(PlayerPedId(), false)
-    Core.TriggerCallback('Player:GetData', OnPlayerDataReceived)
-end
-
-function OnPlayerDataReceived(result)
-    PlayerData = result
-    ClientVehicles = GetVehicles()
-    TriggerServerEvent("Scoreboard:AddPlayer")
-    TriggerServerEvent("Scoreboard:SetScoreboard")
-    
-    if not PlayerData.position or table.empty(PlayerData.position) then
-        SetupCharacterCreation()
-    else
-        SetupExistingCharacter()
-    end
-end
-
-function SetupCharacterCreation()
     SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
     SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
     FreezeEntityPosition(PlayerPedId(), true)
     SetEntityVisible(PlayerPedId(), false)
-    MenuV:OpenMenu(SelectGender)
-    LoggedIn = true
+    Core.TriggerCallback('Player:GetData', function (result)
+        PlayerData = result
+
+
+        if not PlayerData.character['ped_model'] or not PlayerData.character.surname or not PlayerData.position or table.empty(PlayerData.position) then
+            SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
+            SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
+            FreezeEntityPosition(PlayerPedId(), true)
+            SetEntityVisible(PlayerPedId(), false)
+            MenuV:OpenMenu(SelectGender)
+            LoggedIn = true
+            ClientVehicles = GetVehicles()
+            TriggerServerEvent("Scoreboard:AddPlayer")
+            TriggerServerEvent("Scoreboard:SetScoreboard")
+
+            ExecuteCommand('loadbiz')
+            ExecuteCommand('loadhouses')
+        else
+
+            SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
+            FreezeEntityPosition(PlayerPedId(), true)
+            RequestCollisionAtCoord(PlayerData.position.x, PlayerData.position.y, PlayerData.position.z)
+            SetEntityVisible(PlayerPedId(), false)
+            FreezeEntityPosition(PlayerPedId(), false)
+
+
+            LoggedIn = true
+
+            
+            LoadPlayerModel()
+            LoadPlayerClothing()
+            BuildPlayerMenu()
+            BuildPlayerOptions()
+            if PlayerData.inHouseId ~= 0 then
+                Core.TriggerCallback("Houses:GetHouseById", EnterHouseCallback, PlayerData.inHouseId)
+            end
+            local Inventory = PlayerData.inventory
+            local playerAmmo = Core.GetPlayerAmmo()
+            
+            for k,v in pairs(Inventory) do
+                if v.type == 'weapon' then
+            
+                    for a, b in pairs(playerAmmo) do
+                        GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
+                        if checkWeaponPresence(v.name, a) then
+                            SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
+                        end
+                    end
+                end
+            end
+            ExecuteCommand('loadbiz')
+            ExecuteCommand('loadhouses')
+            Core.SavePlayer()
+            Core.startPayday()
+            ClientVehicles = GetVehicles()
+            TriggerServerEvent("Scoreboard:AddPlayer")
+            TriggerServerEvent("Scoreboard:SetScoreboard")
+            
+        end
+    end)
+end
+
+function OnPlayerDataReceived(result)
+
+end
+
+function SetupCharacterCreation()
+
 end
 
 function SetupExistingCharacter()
-    LoggedIn = true
-  
-    ExecuteCommand('loadbiz')
-    ExecuteCommand('loadhouses')
 
-    SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
-    FreezeEntityPosition(PlayerPedId(), true)
-    RequestCollisionAtCoord(PlayerData.position.x, PlayerData.position.y, PlayerData.position.z)
-    SetEntityVisible(PlayerPedId(), false)
-    FreezeEntityPosition(PlayerPedId(), false)
-    
-    LoadPlayerModel()
-    LoadPlayerClothing()
 
-    if PlayerData.inHouseId ~= 0 then
-        Core.TriggerCallback("Houses:GetHouseById", EnterHouseCallback, PlayerData.inHouseId)
-    end
-    
-    LoadPlayerWeapons()
-    Core.SavePlayer()
-    Core.startPayday()
-    
-   
+
+
+
+
 end
 
 function LoadPlayerModel()
@@ -301,9 +327,7 @@ function LoadPlayerModel()
 end
 
 function LoadPlayerClothing()
-    Core.TriggerCallback('Clothing:GetClothing', function(cb)
-        LoadPed(cb)
-    end)
+    SetPedClothes()
 end
 
 function EnterHouseCallback(house)
@@ -313,13 +337,14 @@ function EnterHouseCallback(house)
 end
 
 function LoadPlayerWeapons()
+    local PlayerData = Core.GetPlayerData()
     local Inventory = PlayerData.inventory
     local playerAmmo = Core.GetPlayerAmmo()
-    
+
     for k,v in pairs(Inventory) do
         if v.type == 'weapon' then
+            GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
             for a, b in pairs(playerAmmo) do
-                GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
                 if checkWeaponPresence(v.name, a) then
                     SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
                 end
@@ -354,16 +379,16 @@ Citizen.CreateThread(function()
     SetMapZoomDataLevel(4, 22.3, 0.9, 0.08, 0.0, 0.0)
 end)
 
-Citizen.CreateThread(function()
-    while true do
-		Citizen.Wait(1)
-		if IsPedOnFoot(GetPlayerPed(-1)) then 
-			SetRadarZoom(1100)
-		elseif IsPedInAnyVehicle(GetPlayerPed(-1), true) then
-			SetRadarZoom(1100)
-		end
-    end
-end)
+-- Citizen.CreateThread(function()
+--     while true do
+-- 		Citizen.Wait(1)
+-- 		if IsPedOnFoot(PlayerPedId()) then
+-- 			SetRadarZoom(1100)
+-- 		elseif IsPedInAnyVehicle(PlayerPedId(), true) then
+-- 			SetRadarZoom(1100)
+-- 		end
+--     end
+-- end)
 function GetNearestPlayer()
     local player = 0
     local callbackFinished = false
@@ -384,11 +409,12 @@ end
 
 Citizen.CreateThread(function()
     while true do
-        local wait = 1
+        local wait = 1000
         if not PlayerData then
             Citizen.Wait(1000)
         end
         if PlayerData.cuffed then
+            wait = 1
             DisableControlAction(0, 257, true)
             DisableControlAction(0, 25, true)
             DisableControlAction(0, 141, true)
@@ -409,6 +435,7 @@ Citizen.CreateThread(function()
                 SetCurrentPedWeapon(PlayerPedId(), unarmed, true)
             end
         else
+            wait = 1000
             if IsEntityPlayingAnim(PlayerPedId(), "mp_arresting", "idle", 3) then
                 print('called')
                 ClearPedTasksImmediately(PlayerPedId())
@@ -429,7 +456,7 @@ function SetCuffed()
     if not PlayerData.cuffed then
         local animation = {dict = "mp_arresting", name = "idle"}
         local unarmed = GetHashKey("WEAPON_UNARMED")
-        
+
         PlayAnim(PlayerPedId(), animation.dict, animation.name, 8.0, -8, -1, 49, 0, 0, 0, 0)
         Wait(100)
         PlayerData.cuffed = true
@@ -452,11 +479,10 @@ end)
 
 SetMillisecondsPerGameMinute(60000)
 Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(10)
-            SetCanAttackFriendly(PlayerPedId(), true, false)
-            NetworkSetFriendlyFireOption(true)
-    end
+   
+    SetCanAttackFriendly(PlayerPedId(), true, false)
+    NetworkSetFriendlyFireOption(true)
+   
 end)
 
 
@@ -520,7 +546,7 @@ local cam = nil
 
 selectedPed = 1
 
-local pedWait = 100000000
+local pedwait = 300500000
 
 function table.empty (self)
     for _, _ in pairs(self) do
@@ -536,7 +562,7 @@ missionPassed = function(missionText)
     })
 end
 
-  
+
 propertyBought = function(missionText)
     SendNUIMessage({
         action = 'propertyBought',
@@ -614,14 +640,14 @@ end
 
 Citizen.CreateThread(function()
     while true do
-        Wait(2000)
-        
+        Wait(3000)
+
         Core.TriggerCallback('Players:GetCount', function(count)
             showHud(count)
         end)
-        Core.TriggerCallback("Player:GetData", function(result)
-            PlayerData = result
-        end)
+        if not PlayerData then
+            PlayerData = Core.GetPlayerData()
+        end
         local coords = GetEntityCoords(PlayerPedId())
         PlayerData.position = coords
     end
@@ -651,7 +677,7 @@ Citizen.CreateThread(function ()
             armour = armour,
         })
     end
-    
+
 end)
 
 RegisterNetEvent("Scoreboard:AddPlayer", function(player)
@@ -818,7 +844,7 @@ end)
 
 RegisterNetEvent("Ped:Change", function(id)
     local pedId = tonumber(id)
-    
+
 
     local hash = GetHashKey(Peds[pedId])
     local n = 0
@@ -840,25 +866,18 @@ RegisterNetEvent("Ped:Change", function(id)
     end)
 end)
 local density = 0.0 -- Anything between 0.0 and 1.0 is a valid density, anything lower/higher is pointless
-Citizen.CreateThread(function()
-	while true do
-	    Citizen.Wait(0)
-	    SetVehicleDensityMultiplierThisFrame(density)
-	    SetPedDensityMultiplierThisFrame(0.4)
-	    SetRandomVehicleDensityMultiplierThisFrame(density)
-	    SetParkedVehicleDensityMultiplierThisFrame(0.4)
-	    SetScenarioPedDensityMultiplierThisFrame(0.4, 0.4)
-	end
-end)
+
 Citizen.CreateThread(function()
     while true do
-        Wait(1)
+        local wait = 3005
         local coords = GetEntityCoords(PlayerPedId())
         local distance = #(coords - vector3(1829.4066162109, 3681.0725097656, 34.334838867188))
         if distance < 3.0 then
+            wait = 1
             DrawMarker(0, 1829.4066162109, 3681.0725097656, 34.334838867188, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 255, 209, 82, 255, true, false, false, true, false, false, false)
             DrawText3D(1829.4066162109, 3681.0725097656, 34.334838867188, "~y~Identitate~n~~w~Aici iti poti seta identitatea caracterului.~n~~y~(~w~/identitate~y~)~w~")
         end
+        Wait(wait)
     end
 end)
 
@@ -888,3 +907,4 @@ RegisterCommand('getjob', function()
 end)
 
 AddEventHandler('playerSpawned', PlayerSpawned)
+

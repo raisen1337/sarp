@@ -353,9 +353,10 @@ RegisterCommand('faction', function()
                                     end)
                                 end
                             end, v.id)
+                            MenuV:OpenMenu(factionMembers)
                         end)
-                        MenuV:OpenMenu(factionMembers)
                     end
+                    
                     MenuV:OpenMenu(factionsMenu)
                 end
             end
@@ -365,7 +366,7 @@ end)
 
 Citizen.CreateThread(function ()
     while true do
-        wait = 2000
+        wait = 5000
         
         local pData = Core.GetPlayerData()
         local fData = pData.faction

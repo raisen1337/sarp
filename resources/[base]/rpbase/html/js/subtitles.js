@@ -75,14 +75,29 @@ window.addEventListener("message", function (event1) {
             subtitlesText.innerHTML = colorize(event.msg);
     
             const audio = new Audio('./assets/notify.mp3');
-            audio.volume = 0.3;
+            if(event.disablesound) {
+              audio.volume = 0;
+            }
             audio.play();
     
             setTimeout(() => {
-                hideSubtitles()
+                if(subtitleAlready) {
+                  hideSubtitles()
+                }
             }, event.time);
+        }else{
+            const subtitlesContainer = document.querySelector('.subtitles');
+            const subtitlesText = document.querySelector('.subtitle-text');
+          
+            subtitlesContainer.style.display = 'flex';
+            subtitlesText.innerHTML = colorize(event.msg);
+    
+            const audio = new Audio('./assets/notify.mp3');
+            if(event.disablesound) {
+              audio.volume = 0;
+            }
+            audio.play();
         }
-        
     }
     if(event.action == "hideSubtitle"){
         hideSubtitles()

@@ -7,6 +7,8 @@ games {'gta5'}
 
 this_is_a_map 'yes'
 
+shared_script {'/shared/structs/config.lua'}
+
 client_script {'/shared/structs/config.lua'}
 server_script {'/shared/structs/config.lua'}
 

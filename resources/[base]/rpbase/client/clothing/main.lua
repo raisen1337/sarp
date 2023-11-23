@@ -11,43 +11,8 @@ local currentCamPos
 local cam = false
 local customCam = false
 
-function GetDrawables()
-    drawables = {}
-    local model = GetEntityModel(PlayerPedId())
-    local mpPed = true
- 
-    for i = 0, #drawable_names-1 do
-        if mpPed and drawable_names[i+1] == "undershirts" and GetPedDrawableVariation(player, i) == -1 then
-            SetPedComponentVariation(player, i, 15, 0, 2)
-        end
-        drawables[i] = {drawable_names[i+1], GetPedDrawableVariation(player, i)}
-    end
-    return drawables
-end
 
-function GetProps()
-    props = {}
-    for i = 0, #prop_names-1 do
-        props[i] = {prop_names[i+1], GetPedPropIndex(player, i)}
-    end
-    return props
-end
 
-function GetDrawTextures()
-    textures = {}
-    for i = 0, #drawable_names-1 do
-        table.insert(textures, {drawable_names[i+1], GetPedTextureVariation(player, i)})
-    end
-    return textures
-end
-
-function GetPropTextures()
-    textures = {}
-    for i = 0, #prop_names-1 do
-        table.insert(textures, {prop_names[i+1], GetPedPropTextureIndex(player, i)})
-    end
-    return textures
-end
 
 function GetDrawablesTotal()
     drawables = {}
@@ -103,38 +68,6 @@ function GetPedHeadBlendData()
     }
 end
 
-function SetPedHeadBlend(data)
-    SetPedHeadBlendData(player,
-        tonumber(data['shapeFirst']),
-        tonumber(data['shapeSecond']),
-        tonumber(data['shapeThird']),
-        tonumber(data['skinFirst']),
-        tonumber(data['skinSecond']),
-        tonumber(data['skinThird']),
-        tonumber(data['shapeMix']),
-        tonumber(data['skinMix']),
-        tonumber(data['thirdMix']),
-        false)
-end
-
-function SetPedHeadBlend(data)
-    if not data then
-        data = GetCurrentPed()
-    end
-    
-    SetPedHeadBlendData(player,
-    tonumber(data['shapeFirst']),
-    tonumber(data['shapeSecond']),
-    tonumber(data['shapeThird']),
-    tonumber(data['skinFirst']),
-    tonumber(data['skinSecond']),
-    tonumber(data['skinThird']),
-    tonumber(data['shapeMix']),
-    tonumber(data['skinMix']),
-    tonumber(data['thirdMix']),
-    false)
- 
-end
 
 function GetHeadOverlayData()
     local headData = {}
@@ -222,7 +155,7 @@ function SetSkin(model, setDefault)
         player = PlayerPedId()
         FreezePedCameraRotation(player, true)
            
-        SetPedHeadBlendData(player, 0, 0, 0, 15, 0, 0, 0, 1.0, 0, false)
+        
         SetPedComponentVariation(player, 11, 0, 11, 0)
         SetPedComponentVariation(player, 8, 0, 1, 0)
         SetPedComponentVariation(player, 6, 1, 2, 0)
@@ -316,13 +249,30 @@ RegisterNUICallback('buyClothing', function(data)
         action = "fixShow",
     })
     local price = data.price
+    
     DisplayRadar(true)
     local pData = Core.GetPlayerData()
     if pData.cash >= price then
         pData.cash = pData.cash - price
+        local drawables = GetDrawables()
+        local props = GetProps()
+        local drawtextures = GetDrawTextures()
+        local proptextures = GetPropTextures()
+        local ped = PlayerPedId()
+        local skinData = {}
+        skinData.drawables = drawables
+        skinData.props = props
+        skinData.drawtextures = drawtextures
+        skinData.proptextures = proptextures
+        skinData.hairColor = GetPedHairColor(ped)
+        skinData.hairHighlightColor = GetPedHairHighlightColor(ped)
+        skinData.headBlend = GetPedHeadBlendData(ped)
+        skinData.headStructure = GetHeadStructureData(ped)
+        skinData.headOverlay = GetHeadOverlayData(ped)
+
         Core.TriggerCallback('Clothing:UpdateClothes', function(cb)
            
-        end, GetCurrentPed())
+        end, skinData)
         sendNotification('Haine', 'Ti-ai schimbat imbracamintea si ai platit $500')
         Core.SavePlayer()
     else
@@ -339,6 +289,31 @@ function Save(data)
     Core.TriggerCallback('Clothing:UpdateClothes', function(cb)
     end, data)
 end
+
+
+
+RegisterCommand('skintest', function()
+    local ped = PlayerPedId()
+    local drawables = GetDrawables()
+    local props = GetProps()
+    local drawtextures = GetDrawTextures()
+    local proptextures = GetPropTextures()
+    
+    local skinData = {}
+    skinData.drawables = drawables
+    skinData.props = props
+    skinData.drawtextures = drawtextures
+    skinData.proptextures = proptextures
+    skinData.hairColor = GetPedHairColor(ped)
+    skinData.hairHighlightColor = GetPedHairHighlightColor(ped)
+    skinData.headBlend = GetPedHeadBlendData(ped)
+    skinData.headStructure = GetHeadStructureData(ped)
+    skinData.headOverlay = GetHeadOverlayData(ped)
+    Save(skinData)
+
+    Wait(3000)
+    SetPedClothes()
+end)
 
 function CustomCamera()
     if customCam or position == "torso" then
@@ -486,6 +461,273 @@ function OpenClothing()
         }
     })
 end
+local clothingCategorys = {
+    ["arms"]        = {type = "variation",  id = 3},
+    ["t-shirt"]     = {type = "variation",  id = 8},
+    ["torso2"]      = {type = "variation",  id = 11},
+    ["pants"]       = {type = "variation",  id = 4},
+    ["vest"]        = {type = "variation",  id = 9},
+    ["shoes"]       = {type = "variation",  id = 6},
+    ["bag"]         = {type = "variation",  id = 5},
+    ["hair"]        = {type = "hair",       id = 2},
+    ["face"]        = {type = "face",       id = 0},
+    ["mask"]        = {type = "variation",       id = 1},
+    ["hat"]         = {type = "prop",       id = 0},
+    ["glass"]       = {type = "prop",       id = 1},
+    ["ear"]         = {type = "prop",       id = 2},
+    ["watch"]       = {type = "prop",       id = 6},
+    ["bracelet"]    = {type = "prop",       id = 7},
+    ["accessory"]   = {type = "variation",  id = 7},
+    ["decals"]      = {type = "variation",  id = 10},
+}
+
+function GetDrawables()
+    drawables = {}
+    local model = GetEntityModel(PlayerPedId())
+    local mpPed = true
+ 
+    for k,v in pairs(clothingCategorys) do
+        
+        if v.type == "variation"  then
+            drawables[v.id] = {v.id, GetPedDrawableVariation(player, v.id), type = v.type}
+        end
+
+        if v.type == 'hair' then
+            drawables[v.id] = {v.id, GetPedDrawableVariation(player, v.id), type = v.type}
+        end
+
+        if v.type == 'face' then
+            drawables[v.id] = {v.id, GetPedDrawableVariation(player, v.id), type = v.type}
+        end
+
+        if v.type == "ageing" then
+            drawables[v.id] = {v.id, GetPedHeadOverlayValue(player, v.id), type = v.type}
+        end
+
+        if v.type == "overlay" then
+            drawables[v.id] = {v.id, GetPedHeadOverlayValue(player, v.id), type = v.type}
+        end
+
+        if v.type == "eye_color" then
+            drawables[v.id] = {v.id, GetPedEyeColor(player), type = v.type}
+        end
+
+        if v.type == "moles" then
+            drawables[v.id] = {v.id, GetPedHeadOverlayValue(player, v.id), type = v.type}
+        end
+
+        if v.type == "nose" then
+            drawables[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+        end
+
+        if v.type == "cheek" then
+            drawables[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+        end
+
+        if v.type == "chin" then
+            drawables[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+        end
+
+    end
+
+
+    return drawables
+end
+
+function GetProps()
+    props = {}
+    for k,v in pairs(clothingCategorys) do
+        if v.type == "prop" then
+            props[v.id] = {v.id, GetPedPropIndex(player, v.id), type = 'prop'}
+        end
+    end
+    return props
+end
+
+function GetDrawTextures()
+    textures = {}
+    for k,v in pairs(clothingCategorys) do
+        if v.type == "variation" then
+            if v.type == 'arms' then
+                
+            end
+            textures[v.id] = {v.id, GetPedTextureVariation(player, v.id), type = v.type}
+        end
+
+        if v.type == 'hair' then
+            textures[v.id] = {v.id, GetPedTextureVariation(player, v.id), type = v.type}
+        end
+
+        if v.type == 'face' then
+            textures[v.id] = {v.id, GetPedTextureVariation(player, v.id), type = v.type}
+        end
+
+        if v.type == "ageing" then
+            textures[v.id] = {v.id, GetPedHeadOverlayData(player, v.id), type = v.type}
+        end
+
+        if v.type == "overlay" then
+            textures[v.id] = {v.id, GetPedHeadOverlayData(player, v.id), type = v.type}
+        end
+
+        if v.type == "eye_color" then
+            textures[v.id] = {v.id, GetPedEyeColor(player), type = v.type}
+        end
+
+        if v.type == "moles" then
+            textures[v.id] = {v.id, GetPedHeadOverlayData(player, v.id), type = v.type}
+        end
+
+        if v.type == "nose" then
+            textures[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+        end
+
+        if v.type == "cheek" then
+            textures[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+        end
+
+        if v.type == "chin" then
+            textures[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+        end
+
+    end
+    return textures
+end
+
+function GetPropTextures()
+    textures = {}
+    for k,v in pairs(clothingCategorys) do
+        if v.type == "prop" then
+            textures[v.id] = {v.id, GetPedPropTextureIndex(player, v.id), type = 'prop'}
+        end
+    end
+    return textures
+end
+
+function GetMaxValues()
+    maxModelValues = {
+        ["arms"]        = {type = "character", item = 0, texture = 0},
+        ["eye_color"]   = {type = "hair", item = 0, texture = 0},
+        ["t-shirt"]     = {type = "character", item = 0, texture = 0},
+        ["torso2"]      = {type = "character", item = 0, texture = 0},
+        ["pants"]       = {type = "character", item = 0, texture = 0},
+        ["shoes"]       = {type = "character", item = 0, texture = 0},
+        ["face"]        = {type = "hair", item = 0, texture = 0},
+        ["vest"]        = {type = "character", item = 0, texture = 0},
+        ["accessory"]   = {type = "character", item = 0, texture = 0},
+        ["decals"]      = {type = "character", item = 0, texture = 0},
+        ["bag"]         = {type = "character", item = 0, texture = 0},
+        ["moles"]       = {type = "hair", item = 0, texture = 0},
+        ["hair"]        = {type = "barber", item = 0, texture = 0},
+        ["eyebrows"]    = {type = "barber", item = 0, texture = 0},
+        ["beard"]       = {type = "barber", item = 0, texture = 0},
+        ["eye_opening"]   = {type = "hair",  id = 1},
+        ["jaw_bone_width"]       = {type = "hair", item = 0, texture = 0},
+        ["jaw_bone_back_lenght"]       = {type = "hair", item = 0, texture = 0},
+        ["lips_thickness"]       = {type = "hair", item = 0, texture = 0},
+        ["cheek_1"]       = {type = "hair", item = 0, texture = 0},
+        ["cheek_2"]       = {type = "hair", item = 0, texture = 0},
+        ["cheek_3"]       = {type = "hair", item = 0, texture = 0},
+        ["eyebrown_high"]       = {type = "hair", item = 0, texture = 0},
+        ["eyebrown_forward"]       = {type = "hair", item = 0, texture = 0},
+        ["nose_0"]       = {type = "hair", item = 0, texture = 0},
+        ["nose_1"]       = {type = "hair", item = 0, texture = 0},
+        ["nose_2"]       = {type = "hair", item = 0, texture = 0},
+        ["nose_3"]       = {type = "hair", item = 0, texture = 0},
+        ["nose_4"]       = {type = "hair", item = 0, texture = 0},
+        ["nose_5"]       = {type = "hair", item = 0, texture = 0},
+        ["chimp_bone_lowering"]       = {type = "hair", item = 0, texture = 0},
+        ["chimp_bone_lenght"]       = {type = "hair", item = 0, texture = 0},
+        ["chimp_bone_width"]       = {type = "hair", item = 0, texture = 0},
+        ["chimp_hole"]       = {type = "hair", item = 0, texture = 0},
+        ["neck_thikness"]       = {type = "hair", item = 0, texture = 0},
+        ["blush"]       = {type = "barber", item = 0, texture = 0},
+        ["lipstick"]    = {type = "barber", item = 0, texture = 0},
+        ["makeup"]      = {type = "barber", item = 0, texture = 0},
+        ["ageing"]      = {type = "hair", item = 0, texture = 0},
+        ["mask"]        = {type = "accessoires", item = 0, texture = 0},
+        ["hat"]         = {type = "accessoires", item = 0, texture = 0},
+        ["glass"]       = {type = "accessoires", item = 0, texture = 0},
+        ["ear"]         = {type = "accessoires", item = 0, texture = 0},
+        ["watch"]       = {type = "accessoires", item = 0, texture = 0},
+        ["bracelet"]    = {type = "accessoires", item = 0, texture = 0},
+        
+    }
+    local ped = PlayerPedId()
+    for k, v in pairs(clothingCategorys) do
+        if v.type == "variation" then
+            maxModelValues[k].item = GetNumberOfPedDrawableVariations(ped, v.id)
+            maxModelValues[k].texture = GetNumberOfPedTextureVariations(ped, v.id, GetPedDrawableVariation(ped, v.id)) -1
+        end
+
+        if v.type == "hair" then
+            maxModelValues[k].item = GetNumberOfPedDrawableVariations(ped, v.id)
+            maxModelValues[k].texture = 45
+        end
+
+        if v.type == "face" then
+            maxModelValues[k].item = 44
+            maxModelValues[k].texture = 15
+        end
+
+        if v.type == "ageing" then
+            maxModelValues[k].item = GetNumHeadOverlayValues(v.id)
+            maxModelValues[k].texture = 0
+        end
+
+        if v.type == "overlay" then
+            maxModelValues[k].item = GetNumHeadOverlayValues(v.id)
+            maxModelValues[k].texture = 45
+        end
+
+        if v.type == "prop" then
+            maxModelValues[k].item = GetNumberOfPedPropDrawableVariations(ped, v.id)
+            maxModelValues[k].texture = GetNumberOfPedPropTextureVariations(ped, v.id, GetPedPropIndex(ped, v.id))
+        end
+
+        if v.type == "eye_color" then
+            maxModelValues[k].item = 31
+            maxModelValues[k].texture = 0
+        end
+
+        if v.type == "moles" then
+            maxModelValues[k].item = GetNumHeadOverlayValues(9) -1
+            maxModelValues[k].texture = 10
+        end
+
+        if v.type == "nose" then
+            maxModelValues[k].item = 30
+            maxModelValues[k].texture = 0
+        end
+
+        if v.type == "cheek" then
+            maxModelValues[k].item = 30
+            maxModelValues[k].texture = 0
+        end
+
+        if v.type == "chin" then
+            maxModelValues[k].item = 30
+            maxModelValues[k].texture = 0
+        end
+
+    end
+    SendNUIMessage({
+        action = "getData",
+        data = clothingCategorys
+    })
+    SendNUIMessage({
+        action = "updateMax",
+        maxValues = maxModelValues
+    })
+end
+
+Citizen.CreateThread(function ()
+    Wait(5000)
+    GetMaxValues()
+end)
+
+
+
 
 RegisterCommand('fixskin', function()
     SetPedClothes()
@@ -493,91 +735,170 @@ RegisterCommand('fixskin', function()
 end)
 
 Citizen.CreateThread(function()
-    while true do 
-        Citizen.Wait(100)
-        DisableIdleCamera(true)
-    end
+   
+    DisableIdleCamera(true)
+  
 end)
 
 RegisterNUICallback('updateProps', function(data)
-    SendNUIMessage({
-        action = 'setData',
-        data = {
-            drawablesTotal = GetDrawablesTotal(),
-            propDrawablesTotal = GetPropDrawablesTotal(),
-            textureTotal = GetTextureTotals()
-        }
-    })
-    SetPedPropIndex(player, data.component, data.texture, data.variation, 1)
+    
+    for k,v in pairs(clothingCategorys) do
+        if v.type == 'prop' then
+            if v.id == data.component then
+                SetPedPropIndex(PlayerPedId(), data.component, data.texture, data.variation, 0)
+            end
+        end
+    end
 end)
 
 function SetPedClothes()
     Core.TriggerCallback('Clothing:GetClothing', function(cb)
-        LoadPed(cb)
+        local pclothes = cb
+        while not pclothes do
+            Wait(0)
+        end
+        LoadPed(pclothes)
     end)
 end
-function SetClothing(drawables, props, drawTextures, propTextures)
-    for i = 1, #drawable_names do
-        if drawables[0] == nil then
-            if drawable_names[i] == "undershirts" and drawables[tostring(i-1)][2] == -1 then
-                SetPedComponentVariation(player, i-1, 15, 0, 2)
-            else
-                if drawTextures[i] and drawables[tostring(i-1)] then
-                    SetPedComponentVariation(player, i-1, drawables[tostring(i-1)][2], drawTextures[i][2], 2)
+
+
+
+function LoadPed(data)
+  
+    local player = PlayerPedId()
+    local drawables = data.drawables
+    local props = data.props
+    local drawtextures = data.drawtextures
+    local proptextures = data.proptextures
+    local hairColor = data.hairColor
+    local headBlend = data.headBlend
+    local headOverlay = data.headOverlay
+    local headStructure = data.headStructure
+    local model = GetEntityModel(PlayerPedId())
+    
+
+    for k,v in pairs(drawables) do
+        local tn = tostring(k)
+     
+        if v.type == "variation" then
+            SetPedComponentVariation(player, v["1"], v["2"], drawtextures[k]["2"], 3)
+        end
+        
+        if v.type == "ageing" then
+            SetPedHeadOverlay(player, v["1"], v["2"], v["2"])
+        end
+        if v.type == "overlay" then
+            SetPedHeadOverlay(player, v["1"], v["2"], v["2"])
+        end
+        if v.type == "eye_color" then
+            SetPedEyeColor(player, v["1"])
+        end
+        if v.type == "moles" then
+            SetPedHeadOverlay(player, v["1"], v["2"], v["2"])
+        end
+        if v.type == "nose" then
+            SetPedFaceFeature(player, v["1"], v["2"])
+        end
+        if v.type == "cheek" then
+            SetPedFaceFeature(player, v["1"], v["2"])
+        end
+        if v.type == "chin" then
+            SetPedFaceFeature(player, v["1"], v["2"])
+        end
+
+        for a,b in pairs(drawtextures) do
+            if a == k then
+                
+                if tonumber(k) == 0 then
+                    
+                    SetPedComponentVariation(player, v["1"], v["2"], b["2"], 3)
+                    SetPedHeadBlendData(player, v["2"],  v["2"], b["2"], b["2"], b["2"], b["2"], 1.0, 1.0, 1.0, true)
+                elseif tonumber(k) == 2 then
+                    SetPedComponentVariation(player, v["1"], v["2"], b["2"], 3)
                 end
             end
-        else
-            if drawable_names[i] == "undershirts" and drawables[i-1][2] == -1 then
-                SetPedComponentVariation(player, i-1, 15, 0, 2)
-            else
-                SetPedComponentVariation(player, i-1, drawables[i-1][2], drawTextures[i][2], 2)
+        end
+       
+        -- if v.type == 'face' then
+        --     SetPedComponentVariation(player, v["1"], v["2"], drawtextures[k]["2"], 3)
+        --     SetPedHeadBlendData(player, v["2"],  v["2"], drawtextures[k]["2"], drawtextures[k]["2"], drawtextures[k]["2"], drawtextures[k]["2"], 1.0, 1.0, 1.0, true)
+        -- end
+
+        -- if v.type == 'hair' then
+        --     print(je(drawtextures))
+        --     SetPedComponentVariation(player, k, v["2"], drawtextures[k]["2"], 3)
+        -- end
+       
+    end
+
+    for k,v in pairs(props) do
+        
+        local tn = tostring(k)
+        if v.type == "prop" then
+            for a,b in pairs(proptextures) do
+                if a == k then
+                    if tonumber(k) == 0 then
+                        SetPedPropIndex(player, v["1"], v["2"], b["2"], 0)
+                    else
+                        SetPedPropIndex(player, v["1"], v["2"], b["2"], 0)
+                    end
+                end
             end
         end
     end
 
-    for i = 1, #prop_names do
-        local propZ = (drawables[0] == nil and props[tostring(i-1)][2] or props[i-1][2])
-        ClearPedProp(player, i-1)
-        SetPedPropIndex(
-            player,
-            i-1,
-            propZ,
-            propTextures[i][2], true)
-    end
-end
-function LoadPed(data)
-    if data then
-        UserLocation = GetEntityCoords(PlayerPedId())
-        if data.model == '1885233650' or tonumber(data.model) == 1885233650 then
-            SetSkin('mp_m_freemode_01', true)
-        elseif data.model == '-1667301416' or tonumber(data.model) == -1667301416 then
-            SetSkin('mp_f_freemode_01', true)
-        end
-        SetClothing(data.drawables, data.props, data.drawtextures, data.proptextures)
-        Citizen.Wait(500)
-        SetPedHairColor(player, tonumber(data.hairColor[1]), tonumber(data.hairColor[2]))
-        SetPedHeadBlend(data.headBlend)
-        SetHeadStructure(data.headStructure)
-        SetHeadOverlayData(data.headOverlay)
-    end
-    return
+    
 end
 
 
 RegisterNUICallback('updateClothing', function(data)
-    SendNUIMessage({
-        action = 'setData',
-        data = {
-            drawablesTotal = GetDrawablesTotal(),
-            propDrawablesTotal = GetPropDrawablesTotal(),
-            textureTotal = GetTextureTotals()
-        }
-    })
-    if data.component == 2 then 
-        local peddata = GetCurrentPed()
-        peddata.hairColor[1] = math.random(0, 255)
-        peddata.hairColor[2] = math.random(0, 255)
-        SetPedHairColor(PlayerPedId(), peddata.hairColor[1], peddata.hairColor[2])
+    for k,v in pairs(clothingCategorys) do
+        if v.id == data.component then
+            
+
+            if v.type == "variation" then
+                SetPedComponentVariation(player, data.component, data.texture, data.variation, 3)
+            end
+
+            if v.type == 'face' then
+                SetPedComponentVariation(player, data.component, data.texture, data.variation, 3)
+                SetPedHeadBlendData(player, data.texture,  data.texture, data.variation, data.variation, data.variation, data.variation, 1.0, 1.0, 1.0, true)
+            end
+
+            if v.type == 'hair' then
+                SetPedComponentVariation(player, data.component, data.texture, data.variation, 3)
+            end
+
+            if v.type == "ageing" then
+                SetPedHeadOverlay(player, data.component, data.texture, data.variation)
+            end
+
+            if v.type == "overlay" then
+                SetPedHeadOverlay(player, data.component, data.texture, data.variation)
+            end
+
+            
+
+            if v.type == "eye_color" then
+                SetPedEyeColor(player, data.component)
+            end
+
+            if v.type == "moles" then
+                SetPedHeadOverlay(player, data.component, data.texture, data.variation)
+            end
+
+            if v.type == "nose" then
+                SetPedFaceFeature(player, data.component, data.texture)
+            end
+
+            if v.type == "cheek" then
+                SetPedFaceFeature(player, data.component, data.texture)
+            end
+
+            if v.type == "chin" then
+                SetPedFaceFeature(player, data.component, data.texture)
+            end
+        end
     end
-    SetPedComponentVariation(player, data.component, data.texture, data.variation, 3)
+    
 end)

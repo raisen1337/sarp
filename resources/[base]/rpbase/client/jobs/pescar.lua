@@ -86,12 +86,12 @@ AddEventHandler('Jobs:Check', function ()
     end
 end)
 
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(0)
-        TaskSetBlockingOfNonTemporaryEvents(PlayerId(), true)
-    end
-end)
+-- Citizen.CreateThread(function()
+--     while true do
+--         Citizen.Wait(0)
+--         TaskSetBlockingOfNonTemporaryEvents(PlayerId(), true)
+--     end
+-- end)
 
 Citizen.CreateThread(function ()
     local model = JobInfo.ped
@@ -112,7 +112,7 @@ end)
 
 Citizen.CreateThread(function ()
     while true do
-        local fishWait = 2000
+        local fishWait = 5000
         
         if PlayerData.job then
             if PlayerData.job.name:lower() == 'fisherman' then

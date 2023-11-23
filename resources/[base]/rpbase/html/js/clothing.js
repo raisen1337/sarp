@@ -23,155 +23,11 @@ let selectedItem = 'none'
 const minTex = -2
 const minVar = -1
 
-let data = {
-    hair: {
-        id: 2,
-        maxdraws: 0,
-        maxtextures: 0,  
-    },
-    face: {
-        id: 0,
-        maxdraws: 0,
-        maxtextures: 0,  
-    },
-    hats: {
-        id: 0,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    masks: {
-        id: 1,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    torsos: {
-        id: 8,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    jackets: {
-        id: 11,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    legs: {
-        id: 4,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    shoes: {
-        id: 6,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    hands: {
-        id: 3,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    bags: {
-        id: 5,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    glasses: {
-        id: 1,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    earrings: {
-        id: 2,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    watches: {
-        id: 6,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-    bracelets: {
-        id: 7,
-        maxdraws: 0,
-        maxtextures: 0,
-    },
-};
-
-
-let currentClothing = {
-    hair: {
-        id: 2,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    face: {
-        id: 0,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    hats: {
-        id: 0,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    masks: {
-        id: 1,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    torsos: {
-        id: 8,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    jackets: {
-        id: 11,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    legs: {
-        id: 4,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    shoes: {
-        id: 6,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    hands: {
-        id: 3,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    bags: {
-        id: 5,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    glasses: {
-        id: 1,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    earrings: {
-        id: 2,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    watches: {
-        id: 6,
-        currentTex: 0,
-        currentVar: 0,
-    },
-    bracelets: {
-        id: 7,
-        currentTex: 0,
-        currentVar: 0,
-    },
-};
-
+let data = {}
 
 let prevElement = false
+let currentClothing = {}
+let savedClothing = {}
 
 function selectItem(item, element) {
     selectedItem = item;
@@ -188,13 +44,18 @@ function selectItem(item, element) {
       clothOptions.style.display = 'flex';
       clothOptions.classList.add('fadeIn');
       
-      // Handle other logic as needed for the selected item
-      if(currentClothing[selectedItem].currentTex){
-         textureNumber.valueAsNumber = currentClothing[selectedItem].currentTex
-      }
-      if(currentClothing[selectedItem].currentVar){
-        variationNumber.valueAsNumber = currentClothing[selectedItem].currentVar
-     }
+       if(currentClothing[selectedItem]){
+        if(currentClothing[selectedItem].currentTex){
+            textureNumber.valueAsNumber = currentClothing[selectedItem].currentTex
+         }
+         if(currentClothing[selectedItem].currentVar){
+           variationNumber.valueAsNumber = currentClothing[selectedItem].currentVar
+        }
+       }else{
+        textureNumber.valueAsNumber = 0
+        variationNumber.valueAsNumber = 0
+       }
+      
       
     currentTexture = textureNumber.valueAsNumber
     currentVariation = variationNumber.valueAsNumber
@@ -211,7 +72,8 @@ function selectItem(item, element) {
 
 buy = function(){
     $.post('http://rpbase/buyClothing', JSON.stringify({
-        price: 500
+        price: 500,
+        data: savedClothing
     }));
     closeClothing()
 } 
@@ -223,7 +85,7 @@ cancelbuy = function() {
     }));
 }
 updateClothing = function(component, texture, variation){
-    if(selectedItem == 'glasses'){
+    if(selectedItem == 'glass'){
         $.post('http://rpbase/updateProps', JSON.stringify({
             component: data[selectedItem].id,
             texture: currentTexture,
@@ -232,7 +94,7 @@ updateClothing = function(component, texture, variation){
         return
     }
 
-    if(selectedItem == 'earrings'){
+    if(selectedItem == 'ear'){
         $.post('http://rpbase/updateProps', JSON.stringify({
             component: data[selectedItem].id,
             texture: currentTexture,
@@ -241,7 +103,7 @@ updateClothing = function(component, texture, variation){
         return
     }
 
-    if(selectedItem == 'braclets'){
+    if(selectedItem == 'bracelet'){
         $.post('http://rpbase/updateProps', JSON.stringify({
             component: data[selectedItem].id,
             texture: currentTexture,
@@ -250,7 +112,7 @@ updateClothing = function(component, texture, variation){
         return
     }
 
-    if(selectedItem == 'watches'){
+    if(selectedItem == 'watch'){
         $.post('http://rpbase/updateProps', JSON.stringify({
             component: data[selectedItem].id,
             texture: currentTexture,
@@ -259,16 +121,9 @@ updateClothing = function(component, texture, variation){
         return
     }
 
-    if(selectedItem == 'braclets'){
-        $.post('http://rpbase/updateProps', JSON.stringify({
-            component: data[selectedItem].id,
-            texture: currentTexture,
-            variation: currentVariation,
-        }));
-        return
-    }
  
-    if(selectedItem == 'hats'){
+ 
+    if(selectedItem == 'hat'){
         $.post('http://rpbase/updateProps', JSON.stringify({
             component: data[selectedItem].id,
             texture: currentTexture,
@@ -302,6 +157,11 @@ texturePrev.addEventListener('click', () => {
         currentVariation = 0
         textureNumber.valueAsNumber = currentTexture
         
+        savedClothing[selectedItem] = data[selectedItem]
+
+        savedClothing[selectedItem].item = currentTexture
+       
+
         updateClothing(data[selectedItem].id, currentTexture, currentVariation)
     }
 })
@@ -313,6 +173,11 @@ textureNext.addEventListener('click', () => {
             variationNumber.valueAsNumber = 0
             currentVariation = 0
             textureNumber.valueAsNumber = currentTexture
+
+            savedClothing[selectedItem] = data[selectedItem]
+
+            savedClothing[selectedItem].item = currentTexture
+
             updateClothing(data[selectedItem].id, currentTexture, currentVariation)
         }
     }
@@ -321,6 +186,11 @@ textureNext.addEventListener('click', () => {
 textureNumber.addEventListener("change", function () {
   // When the input value changes, update the content of the output element
   currentTexture = textureNumber.valueAsNumber
+
+  savedClothing[selectedItem] = data[selectedItem]
+
+  savedClothing[selectedItem].item = currentTexture
+
   updateClothing(data[selectedItem].id, currentTexture, currentVariation)
 
 });
@@ -330,6 +200,10 @@ variationPrev.addEventListener('click', () => {
         currentVariation--;
         
         variationNumber.valueAsNumber = currentVariation
+
+        savedClothing[selectedItem] = data[selectedItem]
+
+        savedClothing[selectedItem].texture = currentVariation
         updateClothing(data[selectedItem].id, currentTexture, currentVariation)
     }
 })
@@ -338,6 +212,10 @@ variationNext.addEventListener('click', () => {
     if(currentVariation + 1 <= data[selectedItem].maxtextures){
         currentVariation++;
         variationNumber.valueAsNumber = currentVariation
+
+        savedClothing[selectedItem] = data[selectedItem]
+
+        savedClothing[selectedItem].texture = currentVariation
         updateClothing(data[selectedItem].id, currentTexture, currentVariation)
     }
 })
@@ -363,6 +241,17 @@ closeClothing = function(){
 
 window.addEventListener("message", function (event1) {
     let event = event1.data;
+    if(event.action == 'updateMax'){
+        for(var key in event.maxValues){
+            if (data[key]) {
+                data[key].maxdraws = event.maxValues[key].item
+                data[key].maxtextures = event.maxValues[key].texture
+            }
+        }
+    }
+    if(event.action == 'getData'){
+        data = event.data
+    }
     if (event.action == 'openClothing') {
         for(let key in event.data.drawables){
             for(k in currentClothing){
@@ -406,28 +295,7 @@ window.addEventListener("message", function (event1) {
         closeClothing()
     }
     if (event.action == "setData") {
-        for (let key in event.data.drawablesTotal) {
-            for (let k in data) {
-                if (event.data.drawablesTotal[key][0] == k) {
-                    data[k].maxdraws = event.data.drawablesTotal[key][1]
-                    data['hands'].maxdraws = event.data.textureTotal['torsos'] + 50
-                }
-            }
-        }
-        for (let key in event.data.textureTotal) {
-            if (data[key]) {
-                data[key].maxtextures = event.data.textureTotal[key]
-                data['jackets'].maxtextures = event.data.textureTotal['torsos'] + 12
-                data['hands'].maxtextures = event.data.textureTotal['torsos'] + 50
-            }
-        }
         
-        for (let key in event.data.propDrawablesTotal) {
-            if(data[event.data.propDrawablesTotal[key][0]]){
-                data[event.data.propDrawablesTotal[key][0]].maxdraws = event.data.propDrawablesTotal[key][1]
-                data[event.data.propDrawablesTotal[key][0]].maxtextures = event.data.propDrawablesTotal[key][1]
-            }
-        }
     }
 });
 

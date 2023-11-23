@@ -22,7 +22,7 @@ jailCP = {}
 
 Citizen.CreateThread(function()
     while true do
-        local wait = 1000
+        local wait = 3005
         if not PlayerData then
             Citizen.Wait(1000)
         end
@@ -41,7 +41,7 @@ Citizen.CreateThread(function()
             DisableControlAction(0, 35, true)
             DisableControlAction(0, 22, true)
         else
-            wait = 1
+            wait = 3005
         end
         Wait(wait)
     end
@@ -73,7 +73,7 @@ end
 
 Citizen.CreateThread(function()
     while true do
-        Wait(1000)
+        Wait(3000)
         if PlayerData and not table.empty(PlayerData) then
             if PlayerData.ajail and inJail then
                 local jailc = vec3(-3696.7248535156,-4046.2724609375,57.66869354248)
