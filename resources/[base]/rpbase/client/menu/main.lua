@@ -14,25 +14,25 @@ local confirmIdentity = menu1:AddButton({
     description = "Test description"
 })
 
-Citizen.CreateThread(function()
-    while true do
-        local scriptwait = 3005
-        Wait(scriptWait)
-        if inDialog then
-            scriptWait = 1
-            if IsControlJustPressed(0, 200) then
-                SetNuiFocus(false, false)
-                Wait(100)
-                SendNUIMessage({
-                    action = 'closethisshit'
-                })
+-- Citizen.CreateThread(function()
+--     while true do
+--         local scriptwait = 3005
+--         Wait(scriptWait)
+--         if inDialog then
+--             scriptWait = 1
+--             if IsControlJustPressed(0, 200) then
+--                 SetNuiFocus(false, false)
+--                 Wait(100)
+--                 SendNUIMessage({
+--                     action = 'closethisshit'
+--                 })
                 
-                Wait(100)
-                inDialog = false
-            end
-        end
-    end
-end)
+--                 Wait(100)
+--                 inDialog = false
+--             end
+--         end
+--     end
+-- end)
 
 
 confirmIdentity:On("select", function()

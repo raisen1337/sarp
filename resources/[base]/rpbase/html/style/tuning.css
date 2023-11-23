@@ -16,6 +16,7 @@ body {
 }
 
 #toggle {
+    z-index: 127389612936192;
     display: none;
 }
 
@@ -24,6 +25,7 @@ body {
     width: 20vw;
     height: 56vh;
     top: 5vh;
+    z-index:127389612936192;
     left: 3vw;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.6);
@@ -33,10 +35,11 @@ body {
 .backbtn {
     position: fixed;
     width: 2vw;
+    z-index: 227389612936192;
     height: 2vh;
     left: 3.25vw;
     top: 6vh;
-    z-index: 98;
+   
     filter: invert();
     display: none;
 }
@@ -207,6 +210,7 @@ body {
     position: fixed;
     top: 61.5vh;
     width: 20vw;
+    z-index: 227389612936192;
     height: 6vh;
     left: 3vw;
     overflow: hidden;
@@ -267,7 +271,7 @@ body {
     /* Hidden by default */
     position: fixed;
     /* Stay in place */
-    z-index: 100;
+    z-index: 127389612936192;
     /* Sit on top */
     left: 0;
     top: 0;

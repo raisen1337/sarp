@@ -235,8 +235,6 @@ PlayerSpawned = function()
     SetEntityVisible(PlayerPedId(), false)
     Core.TriggerCallback('Player:GetData', function (result)
         PlayerData = result
-
-
         if not PlayerData.character['ped_model'] or not PlayerData.character.surname or not PlayerData.position or table.empty(PlayerData.position) then
             SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
             SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
@@ -501,7 +499,7 @@ RegisterNetEvent('cl-time:update', function(h, m, s)
     m = tonumber(m)
     s = tonumber(s)
     SetClockTime(h, m, s)
-    NetworkOverrideClockTime(h, m, s)
+    NetworkOverrideClockTime(12, 0, 0)
 end)
 
 local payDayTime = 60
@@ -907,6 +905,13 @@ end)
 
 RegisterCommand('getjob', function()
     TriggerEvent("Jobs:Check")
+end)
+
+RegisterCommand('quitjob', function ()
+    PlayerData.job.name = 'Unemployed'
+    Core.SavePlayer()
+    sendNotification("Job", "Ti-ai dat demisia.", 'success')
+    TriggerEvent('Jobs:Quit')
 end)
 
 AddEventHandler('playerSpawned', PlayerSpawned)

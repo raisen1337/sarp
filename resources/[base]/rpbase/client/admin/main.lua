@@ -787,7 +787,7 @@ RegisterCommand('admin', function()
                                                     
                                                         local event
                                                         event = AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
-                                                            if string.len(plate) <= 6 then
+                                                            if string.len(plate) <= 7 then
                                                                 local oldplate = vData.plate
                                                                 vData.plate = plate
                                                                 vData.id = v.id
@@ -822,6 +822,7 @@ RegisterCommand('admin', function()
                                             sendNotification('Admin', 'Invalid input', 'error')
                                             return
                                         end
+                                        money = tonumber(money)
                                         Core.TriggerCallback('Admin:Give', function(cb)
                                             
                                                 Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a oferit lui '..v.name..'['..v.source..'] '..FormatNumber(money)..'$!')
@@ -844,6 +845,7 @@ RegisterCommand('admin', function()
                                             sendNotification('Admin', 'Invalid input', 'error')
                                             return
                                         end
+                                        money = tonumber(money)
                                         Core.TriggerCallback('Admin:Take', function(cb)
                                             if cb then
                                                 Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a retras lui '..v.name..'['..v.source..'] '..FormatNumber(money)..'$!')
@@ -866,6 +868,7 @@ RegisterCommand('admin', function()
                                             sendNotification('Admin', 'Invalid input', 'error')
                                             return
                                         end
+                                        money = tonumber(money)
                                         Core.TriggerCallback('Admin:Give', function(cb)
                                             Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a oferit lui '..v.name..' '..FormatNumber(money)..'PP!')
                                             sendNotification('Admin', 'I-ai oferit lui '..v.name..' '..FormatNumber(money)..'PP!')
@@ -886,6 +889,7 @@ RegisterCommand('admin', function()
                                             sendNotification('Admin', 'Invalid input', 'error')
                                             return
                                         end
+                                        money = tonumber(money)
                                         Core.TriggerCallback('Admin:Take', function(cb)
                                             if cb then
                                                 Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' i-a retras lui '..v.name..' '..FormatNumber(money)..'PP!')
@@ -1025,9 +1029,9 @@ RegisterCommand('admin', function()
                         MenuV:OpenMenu(playerOptions)
                     end)
                 end
-                MenuV:OpenMenu(playerList)
+                
            end)
-           
+           MenuV:OpenMenu(playerList)
         end)
 
         adminMenu:AddButton({
@@ -1755,7 +1759,7 @@ RegisterCommand('admin', function()
                                                 
                                 local event
                                 event = AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
-                                    if string.len(plate) <= 6 then
+                                    if string.len(plate) <= 7 then
                                         local oldplate = vData.plate
                                         vData.plate = plate
                                         vData.id = v.id

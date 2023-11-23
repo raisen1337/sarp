@@ -192,6 +192,7 @@ factions = {
                 type = 'heli',
             },
         }
-    }
+    },
+    
 }
 

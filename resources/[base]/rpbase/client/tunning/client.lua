@@ -11,6 +11,16 @@ local TunagensDefault = {}
 local preco = 0
 local multiplier = 1
 
+local inTuning = false
+
+Citizen.CreateThread(function ()
+	while true do
+		Wait(1000)
+		if inTuning then
+			SetNuiFocus(true, true)
+		end
+	end
+end)
 
 function GetNeons()
 	local r, g, b = GetVehicleNeonLightsColour(carroselected)
@@ -1242,7 +1252,7 @@ Config.Range = 5.0
 Wait(5000)
 
 Citizen.CreateThread(function()
-	SetNuiFocus(false, false)
+
 
 	while true do
 		local dormir = 2000
@@ -1306,6 +1316,7 @@ Citizen.CreateThread(function()
 										action = "openMenu",
 										menuTable = tabelainfo,
 									})
+									inTuning = true
 									SendNUIMessage({
 										action = "showFreeUpButton",
 									})
@@ -1343,6 +1354,7 @@ function ModelCancel(veh)
 	TunagensDefault = {}
 	preco = 0
 	FreezeEntityPosition(carroselected, false)
+	inTuning = false
 	SetNuiFocus(false, false)
 	focuson = false
 	camControl("close")
@@ -1960,6 +1972,7 @@ RegisterNUICallback("action", function(data)
 		TunagensDefault = {}
 		preco = 0
 		FreezeEntityPosition(carroselected, false)
+		inTuning = false
 		SetNuiFocus(false, false)
 		focuson = false
 		PlaySoundFrontend(-1, "NO", "HUD_FRONTEND_DEFAULT_SOUNDSET", 1)
@@ -1984,6 +1997,7 @@ RegisterNUICallback("action", function(data)
 		chegoupago = false
 		TunagensDefault = {}
 		FreezeEntityPosition(carroselected, false)
+		inTuning = false
 		SetNuiFocus(false, false)
 		focuson = false
 		PlaySoundFrontend(-1, "NO", "HUD_FRONTEND_DEFAULT_SOUNDSET", 1)
@@ -1998,7 +2012,8 @@ RegisterNUICallback("action", function(data)
 	elseif data.action == "camlivre" then -- quando acabar
 		if focuson then
 			camControl("close")
-			SetNuiFocus(false, false)
+		inTuning = false
+		SetNuiFocus(false, false)
 			SendNUIMessage({
 				action = "hideFreeUpButton",
 			})
@@ -2108,6 +2123,7 @@ AddEventHandler('TunningSystem3hu:PayAfter', function(pago)
 	end
 	chegoupago = true
 	nomidaberto = nil
+	inTuning = false
 	SetNuiFocus(false, false)
 end)
 
@@ -2126,7 +2142,6 @@ function DrawText3D(x, y, z, text, r, g, b, a)
 	SetDrawOrigin(x, y, z, 0)
 	DrawText(0.0, 0.0)
 	local factor = (string.len(text)) / 370
-	DrawRect(0.0, 0.0 + 0.0125, 0.017 + factor, 0.03, 0, 0, 0, 75)
 	ClearDrawOrigin()
 end
 

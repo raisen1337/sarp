@@ -18,27 +18,30 @@ RegisterNetEvent('chat:addMessage', function (message)
     SendNUIMessage({action = 'addChatMessage', message = chatMsg})
 end)
 
-
---use setinterval for watchforkeypress
 SetInterval(1, function()
-    if IsControlJustPressed(1, 245) then
-        if chatOn then
-            chatOn = false
-            SetNuiFocus(false)
-            SendNUIMessage({action = 'openChat'})
-        else
-            chatOn = true
-            SetNuiFocus(true, true)
-            SendNUIMessage({action = 'openChat'})
-            Core.TriggerCallback('Chat:GetSuggestions', function(suggestions)
-                for k,v in pairs(GetRegisteredCommands()) do
-                    table.insert(suggestions, {name = '/'..v.name, help = v.help})
-                end
-                SendNUIMessage({action = 'setSuggestions', suggestions = suggestions})
-            end)
-        end
+    if chatOn then
+        SetNuiFocus(true, true)
     end
 end)
+
+RegisterCommand('openchat', function()
+    if chatOn then
+        chatOn = false
+        SetNuiFocus(false)
+        SendNUIMessage({action = 'openChat'})
+    else
+        chatOn = true
+        SetNuiFocus(true, true)
+        SendNUIMessage({action = 'openChat'})
+        local suggestions = {}
+        for k,v in pairs(GetRegisteredCommands()) do
+            table.insert(suggestions, {name = '/'..v.name, help = v.help})
+        end
+        SendNUIMessage({action = 'setSuggestions', suggestions = suggestions})
+    end
+end)
+
+RegisterKeyMapping('openchat', 'Open Chat', 'keyboard', 'T')
 
 -- watchForKeyPress()
 
@@ -77,15 +80,9 @@ RegisterNUICallback('sendChatMessage', function(data)
             table.insert(args, word)
         end
         local command = string.gsub(args[1], '/', '')
-        for k,v in pairs(GetRegisteredCommands()) do
-            if v.name == command then
-                table.remove(args, 1)
-                ExecuteCommand(command, args)
-            else
-                TriggerEvent('chat:addMessage', { args = { "^3[^0SERVER^3]^0: Comanda nu exista." } })
-                return
-            end
-        end
+        table.remove(args, 1)
+        ExecuteCommand(command, args)
+        return
     end
     TriggerServerEvent('sv:chat:addMessage', data.message)
 end)

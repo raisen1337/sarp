@@ -232,6 +232,7 @@ BuildPlayerOptions = function()
                                                 end
                                                 closestPlayer = tonumber(closestPlayer)
                                                 id = tonumber(id)
+                                                print(id, closestPlayer)
                                                 if closestPlayer ~= id then
                                                     sendNotification("Arest",
                                                         'Nu poti aresta un jucator care nu e langa tine!', 'error')

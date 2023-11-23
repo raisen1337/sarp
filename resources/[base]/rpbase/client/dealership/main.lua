@@ -127,8 +127,8 @@ RegisterCommand('v', function()
 
                 fixCar:On("select", function()
                     for k,v in pairs(GetVehicles()) do
-                        if not DoesEntityExist(v) then
-                            DeleteCar(v)
+                        if not DoesEntityExist(v.localId) then
+                            DeleteCar(v.localId)
                             table.remove(ClientVehicles, k)
                             sendNotification("Masini personale", "Masina a fost rezolvata!", 'success')
                         end
@@ -175,7 +175,7 @@ RegisterCommand('v', function()
                         ShowDialog('Schimba numar inmatriculare', "Scrie mai jos noul numarul de inmatriculare al masinii: "..v.name..":", "Vehicle:ChangePlate", true, false, 'client')
                         local event
                         event = AddEventHandler("Vehicle:ChangePlate", function(plate)
-                            if string.len(plate) > 6 then
+                            if string.len(plate) > 7 then
                                 sendNotification("Masini personale", "Numarul poate avea maxim 6 caractere!", 'error')
                                 RemoveEventHandler(event)
                                 return

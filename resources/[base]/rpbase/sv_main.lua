@@ -3,6 +3,7 @@ Core.ServerCallbacks = {}
 ServerVehicles = {}
 
 function Core.CreateCallback(name, cb)
+   
     Core.ServerCallbacks[name] = cb
 end
 
@@ -63,7 +64,7 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
             exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
         end
     else
-        print('PlayerAmmo is empty')
+        --print('PlayerAmmo is empty')
     end
     
 end)
@@ -90,10 +91,11 @@ Core.CreateCallback('Core:GetNearestPlayer', function (source, cb)
         local targetped = GetPlayerPed(v)
         local targetPos = GetEntityCoords(targetped)
         local dist = #(pos - targetPos)
-        if dist < 3.0 then
+        if targetped ~= ped and dist < 3.0 then
             cb(v)
             return
         end
+       
         -- if GetPlayerPed(source) ~= targetped and dist < 3.0 then
         --     cb(v)
         --     return
@@ -151,6 +153,11 @@ Core.CreateCallback('Core:GetPlayerAmmo', function(source, cb)
         end
     end
     cb(pAmmo)
+end)
+
+RegisterNetEvent('s:Player:Update', function(data)
+    local src = source
+    TriggerClientEvent('Player:Update', src, data)
 end)
 
 RegisterNetEvent("showPlayerNametags", function()

@@ -91,19 +91,28 @@ function colorize(str) {
     let s = "<span>" + (str.replace(/\^([0-9])/g, (str, color) => `</span><span class="color-${color}">`)) + "</span>";
 
     const styleDict = {
-      '*': 'font-weight: bold;',
-      '_': 'text-decoration: underline;',
-      '~': 'text-decoration: line-through;',
-      '=': 'text-decoration: underline line-through;',
-      'r': 'text-decoration: none;font-weight: normal;',
+        '*': 'font-weight: bold;',
+        '_': 'text-decoration: underline;',
+        '~': 'text-decoration: line-through;',
+        '=': 'text-decoration: underline line-through;',
+        'r': 'text-decoration: none; font-weight: normal;',
+        'g': 'color: #00c851;', // Green
+        'b': 'color: #33b5e5;', // Blue
+        'y': 'color: #ffbb33;', // Yellow
+        'p': 'color: #aa66cc;', // Purple
+        'o': 'color: #ff8800;', // Orange
+        'c': 'color: #99cc00;', // Cyan
+        'm': 'color: #ff00dd;', // Magenta
+        'w': 'color: #ffffff;'  // White
     };
 
-    const styleRegex = /\^(\_|\*|\=|\~|\/|r)(.*?)(?=$|\^r|<\/em>)/;
-    while (s.match(styleRegex)) { //Any better solution would be appreciated :P
-      s = s.replace(styleRegex, (str, style, inner) => `<em style="${styleDict[style]}">${inner}</em>`)
+    const styleRegex = /\^(\_|\*|\=|\~|\/|r|g|b|y|p|o|c|m|w)(.*?)(?=$|\^r|<\/em>)/;
+    while (s.match(styleRegex)) {
+        s = s.replace(styleRegex, (str, style, inner) => `<em style="${styleDict[style]}">${inner}</em>`);
     }
     return s.replace(/<span[^>]*><\/span[^>]*>/g, '');
 }
+
 
 //disable tab switching when pressing tab in the chat input
 chatInputText.addEventListener('keydown', function(event) {
@@ -165,18 +174,20 @@ window.addEventListener("message", function (event1) {
 
 //close chat if T, Enter, Esc is pressed
 document.addEventListener('keydown', function(event) {
-    if(event.keyCode == 13 || event.keyCode == 27) {
-        hideChat();
-        chatOn = false;
-        $.post('http://rpbase/closeChat', JSON.stringify({}));
-    }
-    //add chat message if enter is pressed
-    if(event.keyCode == 13) {
-        if (chatInputText.value.length > 0 && chatInputText.value.length < 128) {
-            $.post('http://rpbase/sendChatMessage', JSON.stringify({
-                message: chatInputText.value
-            }));
-            chatInputText.value = '';
+    if(chatOn){
+        if(event.keyCode == 13 || event.keyCode == 27) {
+            hideChat();
+            chatOn = false;
+            $.post('http://rpbase/closeChat', JSON.stringify({}));
+        }
+        //add chat message if enter is pressed
+        if(event.keyCode == 13) {
+            if (chatInputText.value.length > 0 && chatInputText.value.length < 128) {
+                $.post('http://rpbase/sendChatMessage', JSON.stringify({
+                    message: chatInputText.value
+                }));
+                chatInputText.value = '';
+            }
         }
     }
 });

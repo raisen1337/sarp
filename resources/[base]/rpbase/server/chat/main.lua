@@ -22,14 +22,6 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
         end
         local command = string.gsub(args[1], '/', '')
         table.remove(args, 1)
-        for k,v in pairs(GetRegisteredCommands()) do
-            if v.name == command then
-                ExecuteCommand(command, src, args)
-            else
-                TriggerClientEvent('chat:addMessage', src, { args = { "^3[^0SERVER^0]: Comanda nu exista." } })
-                return
-            end
-        end
     end
     if pData.muted then
         TriggerClientEvent('chat:addMessage', src, { args = { "[^3SERVER^0]: Ai mute, nu poti vorbii." } })
@@ -77,9 +69,37 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
 end)
 
 Core.CreateCallback('Chat:GetSuggestions', function (source, cb)
-    local suggestions = {}
+    
     for k,v in pairs(GetRegisteredCommands()) do
         table.insert(suggestions, {name = '/'..v.name, help = v.help})
     end
     cb(suggestions)
+end)
+
+local function refreshCommands(player)
+    if GetRegisteredCommands then
+        local registeredCommands = GetRegisteredCommands()
+
+        local suggestions = {}
+
+        for _, command in ipairs(registeredCommands) do
+            if IsPlayerAceAllowed(player, ('command.%s'):format(command.name)) then
+                table.insert(suggestions, {
+                    name = '/' .. command.name,
+                    help = ''
+                })
+            end
+        end
+
+        TriggerClientEvent('chat:addSuggestions', player, suggestions)
+    end
+end
+
+
+AddEventHandler('onServerResourceStart', function(resName)
+    Wait(500)
+
+    for _, player in ipairs(GetPlayers()) do
+        refreshCommands(player)
+    end
 end)

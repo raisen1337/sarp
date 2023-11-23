@@ -843,7 +843,6 @@ Core.InsertPunishment = function(source, punishment)
 end
 
 Core.CreateCallback('Player:GetData', function(source, cb)
-
     local src = source
 
     local steamIdentifier = nil
@@ -859,68 +858,8 @@ Core.CreateCallback('Player:GetData', function(source, cb)
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {steamIdentifier})
 
     if result[1] then
-        cb(json.decode(result[1].data))
-    else
-        local name = GetPlayerName(src)
-        local PlayerStruct = {
-            user = "",
-            identifier = "",
-            adminLevel = 0,
-            cash = 3000,
-            bank = 0,
-            wantedLevel = 0,
-            level = 1,
-            respectPoints = 0,
-            premiumPoints = 0,
-            hours = 0,
-            banned = 0,
-            banId = 1,
-            bankId = generateBankId(),
-            transactions = {},
-            totalTransferred = 0,
-            totalWithdrawn = 0,
-            totalDeposited = 0,
-            banReason = "No reason",
-            inventory = {},
-            skills = {},
-            faction = {
-                id = 0,
-                name = "None",
-                rank = 0,
-                rankColor = 0,
-                rankName = "None",
-            },
-            character = {
-                ped_model = "",
-                name = "",
-                surname = "",
-                age = 0,
-                clothes = {},
-            },
-            position = {},
-            job = {
-                name = "Unemployed",
-                salary = 0,
-                rank = 0,
-            },
-            banIds = {
-                steamId = GetPlayerIds(src).steamId,
-                xbl = GetPlayerIds(src).xbl,
-                discord = GetPlayerIds(src).discord,
-                liveid = GetPlayerIds(src).liveid,
-                license = GetPlayerIds(src).license,
-                ip = GetPlayerIds(src).ip,
-                hwids = GetPlayerIds(src).hashValues,
-            }
-        }
-        
-        PlayerStruct.user = name
-        PlayerStruct.identifier = steamIdentifier
-        PlayerStruct = json.encode(PlayerStruct)
-
-        exports.oxmysql:query("INSERT INTO players(user, identifier, data) VALUES(?, ?, ?)", {name, steamIdentifier, PlayerStruct})
-        ------print
-        cb(json.decode(PlayerStruct))
+        local pData = json.decode(result[1].data)
+        cb(pData)
     end
 end)
 

@@ -11,14 +11,121 @@ AddEventHandler('onClientMapStart', function()
 end)
 
 function Core.GetPlayerData()
-  if not PlayerData or table.empty(PlayerData) then
-    Core.TriggerCallback("Player:GetData", function(data)
-      PlayerData = data
-      return data
-    end)
-  end
+	
+	Core.TriggerCallback("Player:GetData", function(data)
+		PlayerData = data
+		return data
+	end)
+  
   return PlayerData
 end
+
+progressBars = {}
+currentProgress = {}
+
+Core.ProgressBar = function(duration, percentage, canClose, animation, prop, freeze, cb)
+	local id = math.random(1, 9999999)
+	local this = {}
+	this.id = id
+	this.duration = duration
+	this.percentage = percentage
+	this.canClose = canClose
+	this.animation = animation
+
+	progressBars[id] = this
+
+	if freeze then
+		FreezeEntityPosition(PlayerPedId(), true)
+	end
+
+	if animation then
+		RequestAnimDict(animation.dict)
+		while not HasAnimDictLoaded(animation.dict) do
+			Citizen.Wait(0)
+		end
+		TaskPlayAnim(PlayerPedId(), animation.dict, animation.name, 8.0, -8.0, -1, 1, 0, false, false, false)
+	end
+
+	if prop then
+		RequestModel(prop.prop)
+		while not HasModelLoaded(prop.prop) do
+			Citizen.Wait(0)
+		end
+		prop.prop = CreateObject(prop.prop, GetEntityCoords(PlayerPedId()), true, false, false)
+		AttachEntityToEntity(prop.prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), prop.boneIndex), prop.x, prop.y, prop.z, prop.xR, prop.yR, prop.zR, false, false, false, false, 2, true)
+	end
+	
+	SendNUIMessage({
+		action = "setProgress",
+		duration = duration,
+		percentage = percentage,
+		canCancel = canClose,
+	})
+	currentProgress = this
+	if cb then
+		
+		SetTimeout(duration * 1000, function()
+			if animation then
+				ClearPedTasksImmediately(PlayerPedId())
+			end
+			if prop then
+				DeleteEntity(prop.prop)
+			end
+			FreezeEntityPosition(PlayerPedId(), false)
+			if freeze then
+				FreezeEntityPosition(PlayerPedId(), false)
+			end
+			
+			cb()
+		end)
+	end
+	return this
+end
+
+Core.CancelProgressBar = function()
+	if currentProgress.animation then
+		ClearPedTasksImmediately(PlayerPedId())
+		StopAnimTask(PlayerPedId(), currentProgress.animation.dict, currentProgress.animation.name, 1.0)
+	end
+
+	if currentProgress.prop then
+		DeleteEntity(currentProgress.prop.prop)
+	end
+	FreezeEntityPosition(PlayerPedId(), false)
+
+	if currentProgress.freeze then
+		FreezeEntityPosition(PlayerPedId(), false)
+	end
+
+	SendNUIMessage({
+		action = "cancelProgress"
+	})
+end
+
+RegisterCommand('testprogress', function()
+	--progress bar with hammering animation
+	Core.ProgressBar(3, 100, true, {dict = "melee@large_wpn@streamed_core", name = "ground_attack_on_spot"}, {prop = "prop_tool_pickaxe", boneIndex = 57005, x = 0.15, y = 0.0, z = 0.0, xR = 0.0, yR = 0.0, zR = 0.0}, function()
+		--callback
+		print("done")
+	end)
+end)
+
+Citizen.CreateThread(function ()
+	while true do
+		local wait = 1000
+		if not table.empty(currentProgress) then
+			if currentProgress.canClose then
+				wait = 1
+				if IsControlJustPressed(0, 200) then
+					Core.CancelProgressBar()
+				end
+			else
+				wait = 1000
+			end
+		end
+		Wait(wait)
+	end
+end)
 
 RegisterNetEvent("Player:UpdateData", function()
   Core.GetPlayerData()
@@ -676,14 +783,15 @@ Citizen.CreateThread(function()
           end
       end
       local unarmed = GetHashKey('WEAPON_UNARMED')
-      if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed then
+      if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed and GetSelectedPedWeapon(PlayerPedId()) ~= 966099553 then
         if not PlayerData then
           PlayerData = Core.GetPlayerData()
         end
           if PlayerData and not table.empty(PlayerData) then
             
             if table.empty(PlayerData.inventory) then
-              if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed then
+				
+              if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed and GetSelectedPedWeapon(PlayerPedId()) ~= 966099553 then
                 Core.TriggerCallback('AC:ReportAnomaly', function()
                 end, 'weapon')
                 RemoveAllPedWeapons(PlayerPedId(), true)
@@ -693,8 +801,11 @@ Citizen.CreateThread(function()
               for k, v in pairs(PlayerData.inventory) do
                   local currentgun = GetSelectedPedWeapon(PlayerPedId())
                   local invgun = GetHashKey(v.name)
-                  
-                  if currentgun == invgun then
+                  if currentgun == 966099553 then
+					gunFound = true
+					break
+				  end
+                  if currentgun == invgun and currentgun ~= 966099553 then
                     gunFound = true
                     -- local weaponAmmo = GetAmmoInPedWeapon(PlayerPedId(), currentgun)
                     -- local Inventory = PlayerData.inventory
@@ -732,6 +843,7 @@ Citizen.CreateThread(function()
               end
 
               if not gunFound then
+				
                   Core.TriggerCallback('AC:ReportAnomaly', function()
                   end, 'weapon')
                   RemoveAllPedWeapons(PlayerPedId(), true)
@@ -803,9 +915,10 @@ AddEventHandler('CEventGunShot', function()
   local crossingRoad = GetStreetNameFromHashKey(crossingRoad)
   local blip = false
   if not delayanno then
+	delayanno = true
 	Core.TriggerCallback('Police:AnnounceShooting', function(cb)
 		if cb then
-			delayanno = true
+			
 			blip = CreateBlip(pCoords, "Shots area", 161, 1)
 			SetBlipScale(blip, 2.0)
 			SetTimeout(60000, function ()
@@ -815,6 +928,7 @@ AddEventHandler('CEventGunShot', function()
 			end)
 		end
 	  end, streetName, crossingRoad)
+	  return
 	end
   
 end)
