@@ -819,24 +819,27 @@ end)
 
 Core.InsertPunishment = function(source, punishment)
     local src = source
-
     local pData = Core.GetPlayerData(src)
-    local PlayerPunishes = pData.punishHistory
-
-    table.insert(PlayerPunishes, punishment)
-
-    pData.punishHistory = PlayerPunishes
-
-    local jsonPData = json.encode(pData)
+  
+    if  pData.punishHistory then
+        if table.empty(pData.punishHistory) then
+            pData.punishHistory = {}
+            table.insert(pData.punishHistory, punishment)
+        end
+    else
+        pData.punishHistory = {}
+        table.insert(pData.punishHistory, punishment)
+    end
 
    
+
     local result = exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
 
-    if result.affectedRows > 0 then
-        --print("Update successful!")
-    else
-        --print("Update failed!")
-    end
+    -- if result.affectedRows > 0 then
+    --     print("Update successful!")
+    -- else
+    --     print("Update failed!")
+    -- end
 end
 
 Core.CreateCallback('Player:GetData', function(source, cb)

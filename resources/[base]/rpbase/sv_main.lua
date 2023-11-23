@@ -18,38 +18,52 @@ end)
 Core.GetFactions = function()
     return factions
 end
+function SetInterval(ms, cb)
+    local interval = ms
+    local nextTime = GetGameTimer() + interval
+    local active = true
+
+    local function update()
+        if not active then return end
+        local time = GetGameTimer()
+        if time >= nextTime then
+            nextTime = time + interval
+            cb()
+        end
+        SetTimeout(0, update)
+    end
+
+    SetTimeout(0, update)
+
+    return {
+        clear = function() active = false end
+    }
+end
 
 Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
     local PlayerAmmo = ammoTable
-
+    local pAmmo = {}
     if not table.empty(PlayerAmmo) then
+
         local pData = Core.GetPlayerData(source)
         local Inventory = pData.inventory
-
         if not table.empty(Inventory) then
             for k, v in pairs(Inventory) do
                 if v.type == 'ammo' then
-                    if v.name == 'pistol_ammo' then
-                        v.amount = ammoTable['pistol_ammo']
-                        pData.inventory = Inventory
-                        --print
-                    elseif v.name == 'smg_ammo' then
-                        v.amount = ammoTable['smg_ammo']
-                        pData.inventory = Inventory
-                        --print
-                    elseif v.name == 'rifle_ammo' then
-                        v.amount = ammoTable['rifle_ammo']
-                        pData.inventory = Inventory
-                        --print
-                    elseif v.name == 'shotgun_ammo' then
-                        v.amount = ammoTable['shotgun_ammo']
-                        pData.inventory = Inventory
-                        --print
+                    if PlayerAmmo[v.name] then
+                        table.insert(pAmmo, {name = v.name, amount = PlayerAmmo[v.name], type = 'ammo'})
+                        PlayerAmmo = pAmmo
+                    else
+                        table.insert(pAmmo, {name = v.name, amount = v.amount, type = 'ammo'})
+                        PlayerAmmo = pAmmo
                     end
                 end
             end
+            PlayerAmmo = pAmmo
             exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
         end
+    else
+        print('PlayerAmmo is empty')
     end
     
 end)

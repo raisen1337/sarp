@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+.color-0{color: rgb(255, 255, 255);}
+.color-1{color: #ff4444;}
+.color-2{color: #99cc00;}
+.color-3{color: #ffbb33;}
+.color-4{color: #0099cc;}
+.color-5{color: #33b5e5;}
+.color-6{color: #aa66cc;}
+.color-8{color: #cc0000;}
+.color-9{color: #cc0068;}
+
+.chat {
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-family: Poppins, sans-serif;
+    font-size: .9rem;
+    color: white;
+    padding: 2rem;
+    width: 60rem;
+    height: 20rem;
+}
+
+@keyframes appearFromBottom {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(100%);
+    }
+}
+
+/* Your existing styles */
+.message {
+    overflow: hidden;
+    margin-bottom: .3rem;
+    max-height: 40px;
+    margin-left: 1rem;
+    direction: ltr;
+    position: relative;
+}
+
+.messages {
+    display: none;
+    height: 15rem;
+    overflow-y: scroll;
+    scroll-behavior: smooth; /* Enable smooth scrolling (supported in some browsers) */
+    max-height: 15rem;
+    direction: rtl; /* Set direction to right-to-left */
+    writing-mode: horizontal-tb; /* Set writing mode */
+    margin-bottom: 1rem;
+}
+
+/* For WebKit-based browsers (Chrome, Safari, etc.) */
+.messages::-webkit-scrollbar {
+
+    width: 3px; /* Width of the scrollbar */
+}
+
+/* Style the scrollbar track */
+.messages::-webkit-scrollbar-track {
+    background-color: transparent; /* Transparent background */
+}
+
+/* Style the scrollbar thumb/dragger */
+.messages::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.321); /* Color of the scrollbar thumb */
+    border-radius: 3px; /* Border radius for a rounded thumb */
+}
+
+
+
+.message-text {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    font-weight: 500;
+    align-items: center;
+    
+    transform: translateY(100%); /* Start position, off the bottom */
+}
+
+.message-date {
+    text-align: center;
+    color: white;
+    font-weight: 600;
+    font-size: .65rem;
+    background: rgba(0, 0, 0, 0.5);
+    padding: .3rem;
+    width: 3rem;
+    margin-right: .5rem;
+    border-radius: 1rem;
+}
+
+.chat-suggestions {
+    display: none; /* Hidden by default - flex*/
+    gap: 1rem;
+    margin-top: .7rem;
+    width: 30rem;
+    height: 10rem;
+    max-height: 10rem;
+    overflow-y: scroll;
+    flex-direction: column;
+    border-radius: 1rem;
+    background: rgba(0, 0, 0, 0.511);
+    font-size: .8rem;
+    padding: .5rem;
+}
+
+.chat-suggestion > i {
+    font-size: 1rem;
+    border-radius: .5rem;
+    margin-right: .5rem;
+    background: rgba(3, 3, 3, 0.546);
+    padding: .8rem;
+}
+.chat-suggestions::-webkit-scrollbar {
+    display: none;
+    width: 3px; /* Width of the scrollbar */
+}
+
+/* Style the scrollbar track */
+.chat-suggestions::-webkit-scrollbar-track {
+    display: none;
+    background-color: transparent; /* Transparent background */
+}
+
+/* Style the scrollbar thumb/dragger */
+.chat-suggestions::-webkit-scrollbar-thumb {
+    display: none;
+    background-color: rgba(255, 255, 255, 0.321); /* Color of the scrollbar thumb */
+    border-radius: 3px; /* Border radius for a rounded thumb */
+}
+
+.chat-suggestion {
+    display: flex;
+    font-size: .8rem;
+    font-style: italic;
+    font-weight: light;
+    flex-direction: row;
+    align-items: center;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(100%); /* Start position, off the bottom */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* End position, visible */
+    }
+}
+
+.popIn {
+    animation: slideUp 0.5s forwards; /* Apply animation to slide up */
+    animation-fill-mode: forwards;
+    animation-delay: 0s;
+    animation-timing-function: ease-in-out;
+}
+
+.chat-input {
+    display: none; /* Hidden by default - flex*/
+    flex-direction: row;
+    align-items: center;
+    background: rgb(0,0,0);
+    background: linear-gradient(90deg, rgba(0,0,0,0.9379726890756303) -10%, rgba(255,255,255,0) 100%);
+    padding: .5rem;
+    max-width: 30rem;
+    position: relative;
+    border-radius: 1rem;
+}
+
+
+.chat-input > i {
+    margin-left: .5rem;
+    font-size: 1rem;
+}
+
+.message-characters {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: .4rem;
+    padding-bottom: .3rem;
+    font-size: .8rem;
+    border-radius: 1rem;
+    font-weight: light;
+    position: absolute;
+    right: 0rem;
+}
+
+.chat-input > input {
+    border: none;
+    outline: none;
+    background: none;
+    width: 55%;
+    margin-left: 1rem;
+    font-weight: 300;
+    font-family: Poppins;
+    color: white;
+}
+
+.chat-input > input::placeholder {
+    border: none;
+    outline: none;
+    background: none;
+    color: white;
+}

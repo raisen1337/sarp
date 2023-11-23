@@ -876,7 +876,7 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(3 * 60 * 1000)
+        Citizen.Wait(5 * 1000)
         if PlayerAmmo and not table.empty(PlayerAmmo) then
           Core.UpdateAmmo(PlayerAmmo)
         else
@@ -885,6 +885,27 @@ Citizen.CreateThread(function()
         end
     end
 end)
+function SetInterval(ms, cb)
+    local interval = ms
+    local nextTime = GetGameTimer() + interval
+    local active = true
+
+    local function update()
+        if not active then return end
+        local time = GetGameTimer()
+        if time >= nextTime then
+            nextTime = time + interval
+            cb()
+        end
+        SetTimeout(0, update)
+    end
+
+    SetTimeout(0, update)
+
+    return {
+        clear = function() active = false end
+    }
+end
 
 function Core.UpdateAmmo(ammo)
     Core.TriggerCallback('Core:UpdatePlayerAmmo', function(cb)

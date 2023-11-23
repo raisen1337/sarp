@@ -258,7 +258,7 @@ Core.CreateCallback('Admin:SendTicket', function(source, cb, data)
         if pData.adminLevel > 0 then
             TriggerClientEvent('chat:addMessage', v, {
                     multiline = true,
-                args = {'^3[^0TICKET^3] '..GetPlayerName(source)..'('..source..') a creat un ticket cu mesajul: ^0'..data..'!'}
+                    args = {'^3[^0TICKET^3] '..GetPlayerName(source)..'('..source..') a creat un ticket cu mesajul: ^0'..data..'!'}
             })
             table.insert(tickets, {
                 ticketId = #tickets + 1,

@@ -258,9 +258,10 @@ PlayerSpawned = function()
             SetEntityVisible(PlayerPedId(), false)
             FreezeEntityPosition(PlayerPedId(), false)
 
-
+           
             LoggedIn = true
-
+            ExecuteCommand('loadbiz')
+            ExecuteCommand('loadhouses')
             
             LoadPlayerModel()
             LoadPlayerClothing()
@@ -285,12 +286,14 @@ PlayerSpawned = function()
             end
             ExecuteCommand('loadbiz')
             ExecuteCommand('loadhouses')
+          
+
             Core.SavePlayer()
-            Core.startPayday()
+         
             ClientVehicles = GetVehicles()
             TriggerServerEvent("Scoreboard:AddPlayer")
             TriggerServerEvent("Scoreboard:SetScoreboard")
-            
+            Core.startPayday()
         end
     end)
 end
@@ -379,16 +382,16 @@ Citizen.CreateThread(function()
     SetMapZoomDataLevel(4, 22.3, 0.9, 0.08, 0.0, 0.0)
 end)
 
--- Citizen.CreateThread(function()
---     while true do
--- 		Citizen.Wait(1)
--- 		if IsPedOnFoot(PlayerPedId()) then
--- 			SetRadarZoom(1100)
--- 		elseif IsPedInAnyVehicle(PlayerPedId(), true) then
--- 			SetRadarZoom(1100)
--- 		end
---     end
--- end)
+Citizen.CreateThread(function()
+    while true do
+		Citizen.Wait(1)
+		if IsPedOnFoot(PlayerPedId()) then
+			SetRadarZoom(1100)
+		elseif IsPedInAnyVehicle(PlayerPedId(), true) then
+			SetRadarZoom(1100)
+		end
+    end
+end)
 function GetNearestPlayer()
     local player = 0
     local callbackFinished = false
