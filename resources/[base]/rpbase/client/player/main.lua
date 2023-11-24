@@ -25,16 +25,18 @@ SelectGender:AddButton({
     local model = 'mp_m_freemode_01'
     if LoadModel(model) then
         SetPlayerModel(PlayerId(), model)
-        SetPedDefaultComponentVariation(PlayerPedId())
-        SetModelAsNoLongerNeeded(model)
+        --SetPedDefaultComponentVariation(PlayerPedId())
+        --SetModelAsNoLongerNeeded(model)
     end
-
+    PlayerData.gender = 1 
     TriggerEvent('chat:clear')
     TriggerEvent('Identity:OpenSetup')
     PlayerData.character['ped_model'] = model
     Core.SavePlayer()
     LoggedIn = true
     Core.startPayday()
+    SetSkin(GetHashKey(model), true)
+    Save(GetCurrentPed())
 end)
 
 SelectGender:AddButton({
@@ -43,11 +45,12 @@ SelectGender:AddButton({
 }):On('select', function()
     SetEntityVisible(PlayerPedId(), true)
     FreezeEntityPosition(PlayerPedId(), false)
+    PlayerData.gender = 2 
     local model = 'mp_f_freemode_01'
     if LoadModel(model) then
         SetPlayerModel(PlayerId(), model)
-        SetPedDefaultComponentVariation(PlayerPedId())
-        SetModelAsNoLongerNeeded(model)
+        --SetPedDefaultComponentVariation(PlayerPedId())
+        --SetModelAsNoLongerNeeded(model)
     end
 
     TriggerEvent('chat:clear')
@@ -56,6 +59,8 @@ SelectGender:AddButton({
     Core.SavePlayer()
     LoggedIn = true
     Core.startPayday()
+    SetSkin(GetHashKey(model), true)
+    Save(GetCurrentPed())
 end)
 
 
@@ -73,7 +78,7 @@ AddEventHandler('onResourceStart', function(resourceName)
   if (GetCurrentResourceName() ~= resourceName) then
     return
   end
-  PlayerSpawned()
+ 
 end)
 
 PlayerCoords = function()
@@ -227,90 +232,158 @@ end
 AddEventHandler('playerKilled', PlayerKilled)
 AddEventHandler('playerDied', PlayerDied)
 
-PlayerSpawned = function()
-    SetEntityVisible(PlayerPedId(), false)
-    SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
-    SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
-    FreezeEntityPosition(PlayerPedId(), true)
-    SetEntityVisible(PlayerPedId(), false)
-    Core.TriggerCallback('Player:GetData', function (result)
-        PlayerData = result
-        if not PlayerData.character['ped_model'] or not PlayerData.character.surname or not PlayerData.position or table.empty(PlayerData.position) then
-            SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
-            SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
-            FreezeEntityPosition(PlayerPedId(), true)
-            SetEntityVisible(PlayerPedId(), false)
-            MenuV:OpenMenu(SelectGender)
-            LoggedIn = true
-            ClientVehicles = GetVehicles()
-            TriggerServerEvent("Scoreboard:AddPlayer")
-            TriggerServerEvent("Scoreboard:SetScoreboard")
-
-            ExecuteCommand('loadbiz')
-            ExecuteCommand('loadhouses')
-        else
-
-            SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
-            FreezeEntityPosition(PlayerPedId(), true)
-            RequestCollisionAtCoord(PlayerData.position.x, PlayerData.position.y, PlayerData.position.z)
-            SetEntityVisible(PlayerPedId(), false)
-            FreezeEntityPosition(PlayerPedId(), false)
-
-           
-            LoggedIn = true
-            ExecuteCommand('loadbiz')
-            ExecuteCommand('loadhouses')
-            
-            LoadPlayerModel()
-            LoadPlayerClothing()
-            BuildPlayerMenu()
-            BuildPlayerOptions()
-            if PlayerData.inHouseId ~= 0 then
-                Core.TriggerCallback("Houses:GetHouseById", EnterHouseCallback, PlayerData.inHouseId)
-            end
-            local Inventory = PlayerData.inventory
-            local playerAmmo = Core.GetPlayerAmmo()
-            
-            for k,v in pairs(Inventory) do
-                if v.type == 'weapon' then
-            
-                    for a, b in pairs(playerAmmo) do
-                        GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
-                        if checkWeaponPresence(v.name, a) then
-                            SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
-                        end
-                    end
-                end
-            end
-            ExecuteCommand('loadbiz')
-            ExecuteCommand('loadhouses')
-          
-
-            Core.SavePlayer()
-         
-            ClientVehicles = GetVehicles()
-            TriggerServerEvent("Scoreboard:AddPlayer")
-            TriggerServerEvent("Scoreboard:SetScoreboard")
-            Core.startPayday()
+Core.FixSkin = function()
+    PlayerData = Core.GetPlayerData()
+    local model = PlayerData.character['ped_model']
+  
+    if IsModelInCdimage(model) and IsModelValid(model) then
+        RequestModel(model)
+        while not HasModelLoaded(model) do
+          Wait(0)
         end
-    end)
+        SetPlayerModel(PlayerId(), model)
+        SetModelAsNoLongerNeeded(model)
+        SetPedDefaultComponentVariation(PlayerPedId())
+         --SetModelAsNoLongerNeeded(model)
+    end
+   
+    TriggerEvent('Player:LoadSkin')
 end
 
-function OnPlayerDataReceived(result)
+PlayerSpawned = function()
+    local mhash_female = GetHashKey("mp_f_freemode_01")
+    local mhash_male = GetHashKey("mp_m_freemode_01")
+    local i = 0
+    while not HasModelLoaded(mhash_male) and i < 10000 do
+        RequestModel(mhash_male)
+        Citizen.Wait(10)
+    end
+    while not HasModelLoaded(mhash_female) and i < 10000 do
+        RequestModel(mhash_female)
+        Citizen.Wait(10)
+    end
+    SetPlayerModel(PlayerId(), mhash_male)
+    local playerPed = GetPlayerPed(-1)
+	 --SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
+    SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
+    SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
+    SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
+    SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+    SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
+    while not PlayerData do
+        Wait(0)
+        PlayerData = Core.GetPlayerData()
+    end
 
-end
+    while not PlayerData.character do
+        Wait(0)
+        PlayerData = Core.GetPlayerData()
+    end
 
-function SetupCharacterCreation()
+    if not PlayerData.registered then
+        ClientVehicles = GetVehicles()
+        TriggerServerEvent("Scoreboard:AddPlayer")
+        TriggerServerEvent("Scoreboard:SetScoreboard")
 
-end
+        LoadBusinesses()
+        loadHouses()
+        LoadFactions()
+        SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
+        SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
+        FreezeEntityPosition(PlayerPedId(), true)
+        SetEntityVisible(PlayerPedId(), true)
+        MenuV:OpenMenu(SelectGender)
 
-function SetupExistingCharacter()
+        LoggedIn = true
+    else
+        PlayerData = Core.GetPlayerData()
+        local mhash_male = GetHashKey("mp_m_freemode_01")
+        local mhash_female = GetHashKey("mp_f_freemode_01")
+        local i = 0
+        while not HasModelLoaded(mhash_male) and i < 10000 do
+            RequestModel(mhash_male)
+            Citizen.Wait(10)
+        end
+        while not HasModelLoaded(mhash_female) and i < 10000 do
+            RequestModel(mhash_female)
+            Citizen.Wait(10)
+        end
+        Wait(1000)
+
+        if PlayerData.gender == 1 then
+            SetPlayerModel(PlayerId(), mhash_male)
+            -- spawnPlayer({
+            --     x = PlayerData.position.x,
+            --     y = PlayerData.position.y,
+            --     z =  PlayerData.position.z,
+            --     heading =  -30.0,
+            --     model = "mp_m_freemode_01",
+            -- });
+            local playerPed = PlayerPedId()
+            SetPedDefaultComponentVariation(PlayerPedId())
+            SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
+            SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
+            SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
+            SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+            SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
+        else
+            -- spawnPlayer({
+            --     x = PlayerData.position.x,
+            --     y = PlayerData.position.y,
+            --     z =  PlayerData.position.z,
+            --     heading =  -30.0,
+            --     model = "mp_f_freemode_01",
+            -- })
+            SetPlayerModel(PlayerId(), mhash_female)
+            local playerPed = PlayerPedId()
+            SetPedDefaultComponentVariation(PlayerPedId())
+            SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
+            SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
+            SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
+            SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+            SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
+        end
+        
+        SetEntityVisible(PlayerPedId(), true)
+        SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
+        FreezeEntityPosition(PlayerPedId(), false)
 
 
+        
+        TriggerEvent('Player:LoadSkin')
+        -- while not GetCurrentPed() ~= PlayerData.clothing do
+        --     Wait(0)
+        --     TriggerEvent('Player:LoadSkin')
+        -- end
 
+        BuildPlayerMenu()
+        BuildPlayerOptions()
 
+        LoadBusinesses()
+        loadHouses()
+        LoadFactions()
+        LoadPlayerWeapons()
 
+        ClientVehicles = GetVehicles()
 
+        TriggerServerEvent("Scoreboard:AddPlayer")
+        TriggerServerEvent("Scoreboard:SetScoreboard")
+
+        if PlayerData.inHouseId ~= 0 then
+            Core.TriggerCallback("Houses:GetHouseById", EnterHouseCallback, PlayerData.inHouseId)
+        end
+
+        Core.TriggerCallback('Clothing:GetClothing', function(cb)
+            if not table.empty(cb) then
+                LoadPed(cb)
+            end
+        end)
+
+        LoggedIn = true
+        Core.FixSkin()
+        Core.startPayday()
+        
+    end
 end
 
 function LoadPlayerModel()
@@ -321,8 +394,8 @@ function LoadPlayerModel()
             Wait(0)
         end
         SetPlayerModel(PlayerId(), model)
-        SetPedDefaultComponentVariation(PlayerPedId())
-        SetModelAsNoLongerNeeded(model)
+        --SetPedDefaultComponentVariation(PlayerPedId())
+        --SetModelAsNoLongerNeeded(model)
         SetEntityVisible(PlayerPedId(), true)
     end
 end
@@ -642,15 +715,16 @@ end
 Citizen.CreateThread(function()
     while true do
         Wait(3000)
-
-        Core.TriggerCallback('Players:GetCount', function(count)
-            showHud(count)
-        end)
-        if not PlayerData then
-            PlayerData = Core.GetPlayerData()
+        if LoggedIn then
+            Core.TriggerCallback('Players:GetCount', function(count)
+                showHud(count)
+            end)
+            if not PlayerData then
+                PlayerData = Core.GetPlayerData()
+            end
+            local coords = GetEntityCoords(PlayerPedId())
+            PlayerData.position = coords
         end
-        local coords = GetEntityCoords(PlayerPedId())
-        PlayerData.position = coords
     end
 end)
 
@@ -846,7 +920,6 @@ end)
 RegisterNetEvent("Ped:Change", function(id)
     local pedId = tonumber(id)
 
-
     local hash = GetHashKey(Peds[pedId])
     local n = 0
 
@@ -857,7 +930,7 @@ RegisterNetEvent("Ped:Change", function(id)
         Wait(0)
       end
       SetPlayerModel(PlayerId(), model)
-      SetModelAsNoLongerNeeded(model)
+      --SetModelAsNoLongerNeeded(model)
     end
     ExecuteCommand('fixskin')
     Core.TriggerCallback('Clothing:GetClothing', function(cb)
@@ -914,5 +987,18 @@ RegisterCommand('quitjob', function ()
     TriggerEvent('Jobs:Quit')
 end)
 
-AddEventHandler('playerSpawned', PlayerSpawned)
-
+AddEventHandler('playerSpawned', function()
+    FreezeEntityPosition(PlayerPedId(), true)
+    PlayerSpawned()
+end)
+AddEventHandler("playerSpawned", function(spawn)
+Citizen.CreateThread(function()
+     local playerPed = GetPlayerPed(-1)
+	 --SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
+	 SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
+	 SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
+	 SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
+	 SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+	 SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
+   end)
+end)

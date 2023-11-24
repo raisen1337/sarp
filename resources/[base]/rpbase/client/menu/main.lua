@@ -66,6 +66,9 @@ RegisterNetEvent("Identity:SetSurname", function(name)
     if not name then return end
     PlayerData = Core.GetPlayerData()
     PlayerData.character.surname = name
+    if not PlayerData.registered then
+        PlayerData.registered = true
+    end
     FreezeEntityPosition(PlayerPedId(), false)
     SetEntityVisible(PlayerPedId(), true)
     Core.SavePlayer()

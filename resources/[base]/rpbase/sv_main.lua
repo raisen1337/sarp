@@ -188,3 +188,24 @@ Core.CreateCallback('Vehicles:Get', function(source, cb)
     cb(ServerVehicles)
 end)
 
+Core.CreateCallback('Clothing:UpdateClothes', function(source, cb, data)
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {GetPlayerSteamId(source)})
+
+    local pData = json.decode(result[1].data)
+    pData.clothing = data
+
+    exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(pData), pData.identifier})
+    cb(true)
+end)
+
+Core.CreateCallback('Clothing:GetClothing', function(source, cb)
+    local data = exports.oxmysql:executeSync("SELECT data FROM players WHERE identifier = ?", {GetPlayerSteamId(source)})
+    
+    local pData = json.decode(data[1].data)
+
+    if not pData.clothing then
+        pData.clothing = {}
+    end
+    if type(pData.clothing) ~= 'table' then pData.clothing = {} end
+    cb(pData.clothing)
+end)

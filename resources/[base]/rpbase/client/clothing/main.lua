@@ -178,17 +178,23 @@ function SetHeadStructure(data)
 end
 
 function GetCurrentPed()
-    return {
-        model = GetEntityModel(PlayerPedId()),
-        hairColor = GetPedHair(),
-        headBlend = GetPedHeadBlendData(),
-        headOverlay = GetHeadOverlayData(),
-        headStructure = GetHeadStructure(),
-        drawables = GetDrawables(),
-        props = GetProps(),
-        drawtextures = GetDrawTextures(),
-        proptextures = GetPropTextures(),
-    }
+    local ped = PlayerPedId()
+    local drawables = GetDrawables()
+    local props = GetProps()
+    local drawtextures = GetDrawTextures()
+    local proptextures = GetPropTextures()
+    
+    local skinData = {}
+    skinData.drawables = drawables
+    skinData.props = props
+    skinData.drawtextures = drawtextures
+    skinData.proptextures = proptextures
+    skinData.hairColor = GetPedHairColor(ped)
+    skinData.hairHighlightColor = GetPedHairHighlightColor(ped)
+    skinData.headBlend = GetPedHeadBlendData(ped)
+    skinData.headStructure = GetHeadStructureData(ped)
+    skinData.headOverlay = GetHeadOverlayData(ped)
+    return skinData
 end
 
 
@@ -198,8 +204,9 @@ function rotation(dir)
 end
 
 RegisterNUICallback('closeClothing', function()
-    LoadPed(currentclothing)
-    Save(currentclothing)
+    SetSkin(GetEntityModel(PlayerPedId()), true)
+    Wait(500)
+    Save(GetCurrentPed())
     SetEntityInvincible(PlayerPedId(), false)
     FreezePedCameraRotation(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)
@@ -436,7 +443,7 @@ function OpenClothing()
     position = 'head'
     CustomCamera()
     currentclothing = GetCurrentPed()
-    
+    GetMaxValues()
     SendNUIMessage({
         action = 'openClothing',
         data = {
@@ -730,7 +737,7 @@ end)
 
 
 RegisterCommand('fixskin', function()
-    SetPedClothes()
+    Core.FixSkin()
  
 end)
 
@@ -751,20 +758,27 @@ RegisterNUICallback('updateProps', function(data)
     end
 end)
 
+RegisterNetEvent('Player:LoadSkin', function()
+    SetPedClothes()
+    FreezeEntityPosition(PlayerPedId(), false)
+    SetEntityVisible(PlayerPedId(), true)
+end)
+
 function SetPedClothes()
     Core.TriggerCallback('Clothing:GetClothing', function(cb)
-        local pclothes = cb
-        while not pclothes do
-            Wait(0)
+        if not table.empty(cb) then
+            LoadPed(cb)
+        else
+            
         end
-        LoadPed(pclothes)
+        
     end)
 end
 
 
 
 function LoadPed(data)
-  
+    
     local player = PlayerPedId()
     local drawables = data.drawables
     local props = data.props

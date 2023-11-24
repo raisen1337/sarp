@@ -132,6 +132,7 @@ RegisterNetEvent("Player:UpdateData", function()
 end)
 
 function Core.SavePlayer()
+	print('called save')
   PlayerData = PlayerData
   if PlayerData.user == nil then return end
   TriggerServerEvent("Player:Save", json.encode(PlayerData))
