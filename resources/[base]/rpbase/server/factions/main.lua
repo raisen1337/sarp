@@ -177,14 +177,16 @@ Core.CreateCallback('Factions:DemoteMember', function(source, cb, identifier)
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
     if result[1] then
         local pData = json.decode(result[1].data)
-        local fData = pData.faction
-        if factions[fData.name].ranks[fData.rank - 1] then
-            fData.rank = fData.rank - 1
-            fData.rankName = factions[fData.name].ranks[fData.rank].name
-            fData.salary = factions[fData.name].ranks[fData.rank].salary
-            fData.rankColor = factions[fData.name].ranks[fData.rank].color
-            pData.faction = fData
-
+        if factions[pData.faction.name].ranks[pData.faction.rank - 1] then
+            pData.faction.rank = pData.faction.rank - 1
+            pData.faction.rank = tonumber(pData.faction.rank)
+            for k,v in pairs(factions[pData.faction.name].ranks) do
+                if v.id == pData.faction.rank then
+                    pData.faction.rankName = v.rank
+                    pData.faction.salary = v.salary
+                    pData.faction.rankColor = v.color
+                end
+            end
             exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
             cb(true)
         else
@@ -203,9 +205,13 @@ Core.CreateCallback('Factions:PromoteMember', function(source, cb, identifier)
 
         if factions[fData.name].ranks[fData.rank + 1] then
             fData.rank = fData.rank + 1
-            fData.rankName = factions[fData.name].ranks[fData.rank].name
-            fData.salary = factions[fData.name].ranks[fData.rank].salary
-            fData.rankColor = factions[fData.name].ranks[fData.rank].color
+            for k,v in pairs(factions[fData.name].ranks) do
+                if v.id == fData.rank then
+                    fData.rankName = v.rank
+                    fData.salary = v.salary
+                    fData.rankColor = v.color
+                end
+            end
             pData.faction = fData
     
             exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})

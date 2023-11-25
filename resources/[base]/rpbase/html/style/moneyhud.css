@@ -4,10 +4,35 @@ body {
     background: url(/resources/[base]/rpbase/html/assets/demobg.jpg)
 }
 
+.current-weapon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: .5rem;
+    justify-content: center;
+    direction: ltr;
+    gap: 1rem;
+    margin-top: 4rem;
+}
+
+.currentweapon-ammodata {
+    color: white;
+    padding: .5rem;
+    border-radius: .5rem;
+    background: rgba(0, 0, 0, 0.5);
+    font-family: Poppins;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.currentweapon-img {
+    width: 10rem;
+}
+
 .moneyhud {
     position: absolute;
     right: 0;
-    opacity: 0;
+    /* opacity: 0; */
     
     display: flex;
     flex-direction: column;
@@ -20,7 +45,7 @@ body {
 }
 
 .money {
-    font-family: Akrobat;
+    font-family: Poppins;
     color: white;
     
     letter-spacing: 1px;
@@ -61,7 +86,7 @@ body {
 }
 
 .bank {
-    font-family: Akrobat;
+    font-family: Poppins;
     color: white;
     letter-spacing: 1px;
     font-weight: lighter;
@@ -70,13 +95,13 @@ body {
 }
 
 .hud-text {
-    font-family: Akrobat;
+    font-family: Poppins;
     font-size: 1.2rem;
     color: white;
 }
 
 .server-name {
-    font-family: Readex Pro;
+    font-family: Poppins;
     color: rgb(255, 255, 255);
     letter-spacing: 1px;
     font-weight: bolder;
@@ -97,12 +122,12 @@ body {
 }
 
 .wanted-star-active {
-    color: rgba(255, 235, 125, 0.932);
+    color: rgba(125, 203, 255, 0.932);
     font-size: 1.2rem;
 }
 
 .server-subname {
-    font-family: Readex Pro;
+    font-family: Poppins;
     color: rgb(255, 255, 255);
     font-weight: light;
     letter-spacing: 1px;

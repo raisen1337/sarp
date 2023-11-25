@@ -587,9 +587,9 @@ Core.GetPlayerLevel = function(s)
         end
         
     end
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {steamIdentifier})
+    local data = exports.oxmysql:executeSync("SELECT data FROM players WHERE identifier = ?", {steamIdentifier})
 
-    local pData = json.decode(result[1].data)
+    local pData = json.decode(data[1].data)
 
     return pData.level
 end
@@ -912,6 +912,7 @@ Core.CreateCallback('Player:Pay', function(source, cb, type, amount)
 end)
 Core.CreateCallback("Player:AddItem", function(source, cb, name, amount)
     ------print
+    print('da')
     local pData = Core.GetPlayerData(source)
     local Inventory = pData.inventory
     local itemFound = false
@@ -1023,14 +1024,11 @@ Core.GetPlayerData = function(source)
     local steamIdentifier = nil
     local identifiers = GetPlayerIdentifiers(src)
 
-    for k,v in pairs(GetPlayerIdentifiers(source))do
-    
+    for k,v in pairs(GetPlayerIdentifiers(src))do
         if string.sub(v, 1, string.len("steam:")) == "steam:" then
             steamIdentifier = v
         end
-        
     end
-
   
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {steamIdentifier})
     if result[1] then
@@ -1172,9 +1170,18 @@ end)
 
 RegisterNetEvent("Player:Save", function(pData)
     local src = source
-    pData = json.decode(pData)
-    exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
-    ------print
-    Wait(2000)
-    TriggerClientEvent("Player:UpdateData", src)
+    local identifier = ""
+    if type(pData) == 'table' then
+        identifier = pData.identifier
+        exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
+        Wait(2000)
+        TriggerClientEvent("Player:UpdateData", src)
+        return
+    else
+        pData = jd(pData)
+        exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
+        Wait(2000)
+        TriggerClientEvent("Player:UpdateData", src)
+        return
+    end
 end)

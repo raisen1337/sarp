@@ -204,9 +204,8 @@ function rotation(dir)
 end
 
 RegisterNUICallback('closeClothing', function()
-    SetSkin(GetEntityModel(PlayerPedId()), true)
-    Wait(500)
-    Save(GetCurrentPed())
+    TriggerEvent('Player:LoadSkin')
+  
     SetEntityInvincible(PlayerPedId(), false)
     FreezePedCameraRotation(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)

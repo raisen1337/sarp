@@ -42,7 +42,6 @@ end)
 
 RegisterNetEvent("Identity:OpenSetup", function()
     Core.TriggerCallback("Identity:Check", function(hasIdentity)
-        print(hasIdentity)
         if not hasIdentity then
             MenuV:OpenMenu(menu1)
         else

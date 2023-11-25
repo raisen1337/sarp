@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="style/deathscreen.css">
   <link rel="stylesheet" href="style/chat.css">
   <link rel="stylesheet" href="style/progressbar.css">
+
   <link rel="stylesheet" href="https://kit-pro.fontawesome.com/releases/v6.3.0/css/pro.min.css">
   <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@18657a9/css/all.min.css" rel="stylesheet"
     type="text/css" />
@@ -42,13 +43,13 @@
       <div class="server-subname" style='display: none;'>Jucatori online: <span id="onlineCount">2</span></div>
     </div>
     <div class="economy">
-      <div class="money"><span class="dsign" style="color: rgba(255, 235, 125, 0.932);">$</span>100.000.000</div>
-      <div class="bank"><span class="dsign" style="color: rgba(255, 235, 125, 0.932);">$</span>100.000.000</div>
+      <div class="money"><span class="dsign" style="color: rgba(125, 203, 255, 0.932);">$</span>100.000.000</div>
+      <div class="bank"><span class="dsign" style="color: rgba(125, 203, 255, 0.932);">$</span>100.000.000</div>
     </div>
     <div class="social">
-      <div class="hud-text">Job: <span id="jobName" style="color: rgba(255, 235, 125, 0.932);">Unemployed</span>
+      <div class="hud-text">Job: <span id="jobName" style="color: rgba(125, 203, 255, 0.932);">Unemployed</span>
       </div>
-      <div class="hud-text">Level: <span id="playerLevel" style="color: rgba(255, 235, 125, 0.932);">1</span>
+      <div class="hud-text">Level: <span id="playerLevel" style="color: rgba(125, 203, 255, 0.932);">1</span>
       </div>
     </div>
 
@@ -58,6 +59,13 @@
       <i class="fas fa-star wanted-star-inactive" id="wantedC"></i>
       <i class="fas fa-star wanted-star-inactive" id="wantedD"></i>
       <i class="fas fa-star wanted-star-inactive" id="wantedE"></i>
+    </div>
+    <div class="current-weapon">
+      <img src="https://vespura.com/fivem/weapons/images/WEAPON_ASSAULTRIFLE.png" alt="" class="currentweapon-img">
+      <div class="currentweapon-ammodata">
+        <span class="currentweapon-remaining">30</span>/
+        <span class="currentweapon-loaded">250</span>
+      </div>
     </div>
     <div class="survivalcontainer-wrapper">
       <div class="survivalcontainer">
@@ -73,11 +81,12 @@
         </div>
       </div>
     </div>
-    <div class="payday-container">
-      <span class="payday-title">Timp ramas pana la <span style="color:rgb(255, 217, 0);">PayDay</span></span>
-      <span class="payday-time">Inca nu a inceput</span>
-    </div>
-
+   
+  </div>
+  <div class="payday-container">
+    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/floating-blue-gift-box-6188315-5044416.png" alt="" class="da">
+    <span class="payday-title">payday</span>
+    <span class="payday-time">15:00</span>
   </div>
   <div class="dialog-container">
     <div class="dialog">
@@ -244,226 +253,7 @@
     </div>
   </div>
 
-  <div class="banking-container" id="bankingContainer">
-    <div class="banking-operations" style="display: none;">
-      <div class="banking-operation withdraw">
-        <span class="operation-title">Retrage</span>
-        <span class="operation-subtitle">Scrie mai jos suma pe care doresti sa o retragi</span>
-        <div class="operation-input1">
-          <span class="operation-input1-text">Suma dorita</span>
-          <input type="text" class="operation-input1-input red-operation" id="transactionAmount1"
-            placeholder="Introdu suma">
-        </div>
-        <div class="operation-button red-operation" onclick="confirmTransaction()">Confirma</div>
-      </div>
-
-      <div class="banking-operation deposit" style="display: none;">
-        <span class="operation-title">Depoziteaza</span>
-        <span class="operation-subtitle">Scrie mai jos suma pe care doresti sa o depozitezi</span>
-        <div class="operation-input1">
-          <span class="operation-input1-text">Suma dorita</span>
-          <input type="text" class="operation-input1-input green-operation" id="transactionAmount2"
-            placeholder="Introdu suma">
-        </div>
-        <div class="operation-button green-operation" onclick="confirmTransaction()">Confirma</div>
-      </div>
-
-      <div class="banking-operation transfer" style="display: none;">
-        <span class="operation-title">Transfera</span>
-        <span class="operation-subtitle">Completeaza formularul de mai jos pentru a transfera banii</span>
-        <div class="operation-input1">
-          <span class="operation-input1-text">Suma dorita</span>
-          <input type="text" class="operation-input1-input yellow-operation" id="transactionAmount3"
-            placeholder="Introdu suma">
-        </div>
-        <div class="operation-input1">
-          <span class="operation-input1-text">ID Recipient</span>
-          <input type="text" class="operation-input1-input yellow-operation" id="transactionId"
-            placeholder="Introdu id jucator">
-        </div>
-        <div class="operation-button yellow-operation" onclick="confirmTransaction()">Confirma</div>
-      </div>
-    </div>
-    <div class="banking-inneroutline">
-
-      <div class="banking-top-side">
-        <div class="banking-top-container">
-          <div class="bank-top">
-            <i class="fa-regular fa-building-columns"></i>
-            <div class="bank-title-container">
-              <span class="banking-title">GTA Roleplay</span>
-              <span class="banking-subtitle">Bank</span>
-            </div>
-          </div>
-          <div class="divide"></div>
-          <div class="user-info-container">
-            <span class="user-info" id="playerName">Raisen Developer</span>
-          </div>
-        </div>
-        <div class="banking-sidebar">
-          <div class="banking-sidebar-button">
-            <i class="fa-regular fa-grid-horizontal"></i>
-            <span class="banking-sidebar-button-text">Dashboard</span>
-          </div>
-          <div class="banking-sidebar-button" onclick="deposit()">
-            <i class="fa-solid fa-sack-dollar"></i>
-            <span class="banking-sidebar-button-text">Depoziteaza</span>
-          </div>
-          <div class="banking-sidebar-button" onclick="withdraw()">
-            <i class="fa-solid fa-money-simple-from-bracket"></i>
-            <span class="banking-sidebar-button-text">Retrage</span>
-          </div>
-          <div class="banking-sidebar-button" onclick="transfer()">
-            <i class="fa-solid fa-money-bill-transfer"></i>
-            <span class="banking-sidebar-button-text">Transfera</span>
-          </div>
-        </div>
-      </div>
-      <div class="banking-main-content">
-        <div class="banking-balances-container">
-          <div class="banking-balance-item1">
-            <div class="bank-dollar-icon-bg">
-              <i class="fa-regular fa-dollar-circle fa-spin"></i>
-            </div>
-            <span class="banking-balance-text">BALANTA</span>
-          </div>
-          <div class="banking-balance-item2">
-            <div class="banking-balance-items2">
-              <div class="banking-total-balance-item1">
-                <span class="banking-total-balance">BALANTA TOTALA</span>
-              </div>
-              <div class="banking-total-balance-item2">
-                <span class="banking-total-balance-value" id="playerTotalMoney">$450.000</span>
-              </div>
-            </div>
-          </div>
-          <div class="banking-balance-item3" style="margin-top: 1rem;">
-            <div class="banking-balance-item3-top">
-              <i class="fa-brands fa-cc-mastercard"></i>
-              <span class="user-info" id="playerName">Raisen Developer</span>
-            </div>
-            <div class="banking-balance-item4-mid">
-              <span class="banking-current-bank-balance-text">BALANTA CURENTA</span>
-              <span class="banking-current-bank-balance-value" id="playerBankBalance">$450.000</span>
-            </div>
-          </div>
-          <div class="banking-balance-item4">
-            <div class="banking-balance-item4-top">
-              <i class="fa-regular fa-money-bill"></i>
-              <span class="user-info" id="playerName">RAISEN DEVELOPER</span>
-            </div>
-            <div class="banking-balance-item4-mid">
-              <span class="banking-current-cash-balance-text">BALANTA CURENTA</span>
-              <span class="banking-current-cash-balance-value" id="playerCashBalance">$450.000</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="banking-balances-container">
-          <div class="banking-balance-item1">
-            <div class="bank-dollar-icon-bg">
-              <i class="fa-regular fa-money-from-bracket fa-spin"></i>
-            </div>
-            <span class="banking-balance-text">TRANZACTII</span>
-          </div>
-          <div class="banking-balance-item2">
-            <div class="banking-transactions-item1">
-              <!-- <div class="banking-transaction sent">
-                    <div class="banking-transaction-top">
-                      <i class="fa-solid fa-inbox-in"></i>
-                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
-                    </div>
-                    <div class="banking-transaction-details">
-                      <span class="banking-transaction-type">Trimise</span>
-                      <span class="banking-transaction-amount">$450.000</span>
-                    </div>
-                  </div> -->
-              <!-- <div class="banking-transaction received">
-                    <div class="banking-transaction-top">
-                      <i class="fa-solid fa-inbox-in"></i>
-                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
-                    </div>
-                    <div class="banking-transaction-details">
-                      <span class="banking-transaction-type">Trimise</span>
-                      <span class="banking-transaction-amount">$450.000</span>
-                    </div>
-                  </div>
-
-                  <div class="banking-transaction sent">
-                    <div class="banking-transaction-top">
-                      <i class="fa-solid fa-inbox-in"></i>
-                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
-                    </div>
-                    <div class="banking-transaction-details">
-                      <span class="banking-transaction-type">Trimise</span>
-                      <span class="banking-transaction-amount">$450.000</span>
-                    </div>
-                  </div>
-                  <div class="banking-transaction received">
-                    <div class="banking-transaction-top">
-                      <i class="fa-solid fa-inbox-in"></i>
-                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
-                    </div>
-                    <div class="banking-transaction-details">
-                      <span class="banking-transaction-type">Trimise</span>
-                      <span class="banking-transaction-amount">$450.000</span>
-                    </div>
-                  </div>
-                  <div class="banking-transaction sent">
-                    <div class="banking-transaction-top">
-                      <i class="fa-solid fa-inbox-in"></i>
-                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
-                    </div>
-                    <div class="banking-transaction-details">
-                      <span class="banking-transaction-type">Trimise</span>
-                      <span class="banking-transaction-amount">$450.000</span>
-                    </div>
-                  </div>
-                  <div class="banking-transaction received">
-                    <div class="banking-transaction-top">
-                      <i class="fa-solid fa-inbox-in"></i>
-                      <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
-                    </div>
-                    <div class="banking-transaction-details">
-                      <span class="banking-transaction-type">Trimise</span>
-                      <span class="banking-transaction-amount">$450.000</span>
-                    </div>
-                  </div> -->
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="banking-bottom-side">
-        <div class="banking-bottom-detail greened">
-          <i class="fa-solid fa-money-check-dollar"></i>
-          <div class="banking-line-divide"></div>
-          <div class="banking-detail-amount" id="totalDeposited">$1.337</div>
-          <div class="banking-bottom-detail-info">
-            <span class="banking-bottom-detail-text">DEPOZITATI</span>
-            <span class="banking-bottom-detail-subtext">IN CONT</span>
-          </div>
-        </div>
-        <div class="banking-bottom-detail orangeish">
-          <i class="fa-solid fa-money-bill-transfer"></i>
-          <div class="banking-line-divide"></div>
-          <div class="banking-detail-amount" id="totalTransferred">$1.337</div>
-          <div class="banking-bottom-detail-info">
-            <span class="banking-bottom-detail-text">TRANSFERATI</span>
-            <span class="banking-bottom-detail-subtext">IN ALTE CONTURI</span>
-          </div>
-        </div>
-        <div class="banking-bottom-detail redish">
-          <i class="fa-solid fa-money-simple-from-bracket"></i>
-          <div class="banking-line-divide"></div>
-          <div class="banking-detail-amount" id="totalWithdrawn">$1.337</div>
-          <div class="banking-bottom-detail-info">
-            <span class="banking-bottom-detail-text">RETRASI</span>
-            <span class="banking-bottom-detail-subtext">DIN CONT</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+ 
   <div class="deathscreen">
     <div class="deathscreen-container">
       <i class="fa-solid fa-skull-crossbones pulseB"
@@ -537,8 +327,227 @@
         <text class="progressbar-text" x="50%" y="50%" text-anchor="middle" alignment-baseline="middle">0%</text>
     </svg>
 </div>
+<div class="banking-container" id="bankingContainer">
+  <div class="banking-operations" style="display: none;">
+    <div class="banking-operation withdraw">
+      <span class="operation-title">Retrage</span>
+      <span class="operation-subtitle">Scrie mai jos suma pe care doresti sa o retragi</span>
+      <div class="operation-input1">
+        <span class="operation-input1-text">Suma dorita</span>
+        <input type="text" class="operation-input1-input red-operation" id="transactionAmount1"
+          placeholder="Introdu suma">
+      </div>
+      <div class="operation-button red-operation" onclick="confirmTransaction()">Confirma</div>
+    </div>
 
+    <div class="banking-operation deposit" style="display: none;">
+      <span class="operation-title">Depoziteaza</span>
+      <span class="operation-subtitle">Scrie mai jos suma pe care doresti sa o depozitezi</span>
+      <div class="operation-input1">
+        <span class="operation-input1-text">Suma dorita</span>
+        <input type="text" class="operation-input1-input green-operation" id="transactionAmount2"
+          placeholder="Introdu suma">
+      </div>
+      <div class="operation-button green-operation" onclick="confirmTransaction()">Confirma</div>
+    </div>
+
+    <div class="banking-operation transfer" style="display: none;">
+      <span class="operation-title">Transfera</span>
+      <span class="operation-subtitle">Completeaza formularul de mai jos pentru a transfera banii</span>
+      <div class="operation-input1">
+        <span class="operation-input1-text">Suma dorita</span>
+        <input type="text" class="operation-input1-input yellow-operation" id="transactionAmount3"
+          placeholder="Introdu suma">
+      </div>
+      <div class="operation-input1">
+        <span class="operation-input1-text">ID Recipient</span>
+        <input type="text" class="operation-input1-input yellow-operation" id="transactionId"
+          placeholder="Introdu id jucator">
+      </div>
+      <div class="operation-button yellow-operation" onclick="confirmTransaction()">Confirma</div>
+    </div>
   </div>
+  <div class="banking-inneroutline">
+
+    <div class="banking-top-side">
+      <div class="banking-top-container">
+        <div class="bank-top">
+          <i class="fa-regular fa-building-columns"></i>
+          <div class="bank-title-container">
+            <span class="banking-title">GTA Roleplay</span>
+            <span class="banking-subtitle">Bank</span>
+          </div>
+        </div>
+        <div class="divide"></div>
+        <div class="user-info-container">
+          <span class="user-info" id="playerName">Raisen Developer</span>
+        </div>
+      </div>
+      <div class="banking-sidebar">
+        <div class="banking-sidebar-button">
+          <i class="fa-regular fa-grid-horizontal"></i>
+          <span class="banking-sidebar-button-text">Dashboard</span>
+        </div>
+        <div class="banking-sidebar-button" onclick="deposit()">
+          <i class="fa-solid fa-sack-dollar"></i>
+          <span class="banking-sidebar-button-text">Depoziteaza</span>
+        </div>
+        <div class="banking-sidebar-button" onclick="withdraw()">
+          <i class="fa-solid fa-money-simple-from-bracket"></i>
+          <span class="banking-sidebar-button-text">Retrage</span>
+        </div>
+        <div class="banking-sidebar-button" onclick="transfer()">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+          <span class="banking-sidebar-button-text">Transfera</span>
+        </div>
+      </div>
+    </div>
+    <div class="banking-main-content">
+      <div class="banking-balances-container">
+        <div class="banking-balance-item1">
+          <div class="bank-dollar-icon-bg">
+            <i class="fa-regular fa-dollar-circle fa-spin"></i>
+          </div>
+          <span class="banking-balance-text">BALANTA</span>
+        </div>
+        <div class="banking-balance-item2">
+          <div class="banking-balance-items2">
+            <div class="banking-total-balance-item1">
+              <span class="banking-total-balance">BALANTA TOTALA</span>
+            </div>
+            <div class="banking-total-balance-item2">
+              <span class="banking-total-balance-value" id="playerTotalMoney">$450.000</span>
+            </div>
+          </div>
+        </div>
+        <div class="banking-balance-item3" style="margin-top: 1rem;">
+          <div class="banking-balance-item3-top">
+            <i class="fa-brands fa-cc-mastercard"></i>
+            <span class="user-info" id="playerName">Raisen Developer</span>
+          </div>
+          <div class="banking-balance-item4-mid">
+            <span class="banking-current-bank-balance-text">BALANTA CURENTA</span>
+            <span class="banking-current-bank-balance-value" id="playerBankBalance">$450.000</span>
+          </div>
+        </div>
+        <div class="banking-balance-item4">
+          <div class="banking-balance-item4-top">
+            <i class="fa-regular fa-money-bill"></i>
+            <span class="user-info" id="playerName">RAISEN DEVELOPER</span>
+          </div>
+          <div class="banking-balance-item4-mid">
+            <span class="banking-current-cash-balance-text">BALANTA CURENTA</span>
+            <span class="banking-current-cash-balance-value" id="playerCashBalance">$450.000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="banking-balances-container">
+        <div class="banking-balance-item1">
+          <div class="bank-dollar-icon-bg">
+            <i class="fa-regular fa-money-from-bracket fa-spin"></i>
+          </div>
+          <span class="banking-balance-text">TRANZACTII</span>
+        </div>
+        <div class="banking-balance-item2">
+          <div class="banking-transactions-item1">
+            <!-- <div class="banking-transaction sent">
+                  <div class="banking-transaction-top">
+                    <i class="fa-solid fa-inbox-in"></i>
+                    <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                  </div>
+                  <div class="banking-transaction-details">
+                    <span class="banking-transaction-type">Trimise</span>
+                    <span class="banking-transaction-amount">$450.000</span>
+                  </div>
+                </div> -->
+            <!-- <div class="banking-transaction received">
+                  <div class="banking-transaction-top">
+                    <i class="fa-solid fa-inbox-in"></i>
+                    <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                  </div>
+                  <div class="banking-transaction-details">
+                    <span class="banking-transaction-type">Trimise</span>
+                    <span class="banking-transaction-amount">$450.000</span>
+                  </div>
+                </div>
+
+                <div class="banking-transaction sent">
+                  <div class="banking-transaction-top">
+                    <i class="fa-solid fa-inbox-in"></i>
+                    <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                  </div>
+                  <div class="banking-transaction-details">
+                    <span class="banking-transaction-type">Trimise</span>
+                    <span class="banking-transaction-amount">$450.000</span>
+                  </div>
+                </div>
+                <div class="banking-transaction received">
+                  <div class="banking-transaction-top">
+                    <i class="fa-solid fa-inbox-in"></i>
+                    <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                  </div>
+                  <div class="banking-transaction-details">
+                    <span class="banking-transaction-type">Trimise</span>
+                    <span class="banking-transaction-amount">$450.000</span>
+                  </div>
+                </div>
+                <div class="banking-transaction sent">
+                  <div class="banking-transaction-top">
+                    <i class="fa-solid fa-inbox-in"></i>
+                    <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                  </div>
+                  <div class="banking-transaction-details">
+                    <span class="banking-transaction-type">Trimise</span>
+                    <span class="banking-transaction-amount">$450.000</span>
+                  </div>
+                </div>
+                <div class="banking-transaction received">
+                  <div class="banking-transaction-top">
+                    <i class="fa-solid fa-inbox-in"></i>
+                    <span class="banking-transaction-recipient">RAISEN DEVELOPER</span>
+                  </div>
+                  <div class="banking-transaction-details">
+                    <span class="banking-transaction-type">Trimise</span>
+                    <span class="banking-transaction-amount">$450.000</span>
+                  </div>
+                </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="banking-bottom-side">
+      <div class="banking-bottom-detail greened">
+        <i class="fa-solid fa-money-check-dollar"></i>
+        <div class="banking-line-divide"></div>
+        <div class="banking-detail-amount" id="totalDeposited">$1.337</div>
+        <div class="banking-bottom-detail-info">
+          <span class="banking-bottom-detail-text">DEPOZITATI</span>
+          <span class="banking-bottom-detail-subtext">IN CONT</span>
+        </div>
+      </div>
+      <div class="banking-bottom-detail orangeish">
+        <i class="fa-solid fa-money-bill-transfer"></i>
+        <div class="banking-line-divide"></div>
+        <div class="banking-detail-amount" id="totalTransferred">$1.337</div>
+        <div class="banking-bottom-detail-info">
+          <span class="banking-bottom-detail-text">TRANSFERATI</span>
+          <span class="banking-bottom-detail-subtext">IN ALTE CONTURI</span>
+        </div>
+      </div>
+      <div class="banking-bottom-detail redish">
+        <i class="fa-solid fa-money-simple-from-bracket"></i>
+        <div class="banking-line-divide"></div>
+        <div class="banking-detail-amount" id="totalWithdrawn">$1.337</div>
+        <div class="banking-bottom-detail-info">
+          <span class="banking-bottom-detail-text">RETRASI</span>
+          <span class="banking-bottom-detail-subtext">DIN CONT</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 
 
   <script src="js/hud.js"></script>

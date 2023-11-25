@@ -10,6 +10,8 @@ local JobInfo = {
     pedText = "~g~[~w~Fermier~g~]",
     places = {
         ['Pomi fructiferi'] = {
+            blip = 1,
+            blipColor = 2,
             {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2303.531, 4995.985, 42.45914), cb = function() collectFruits() end},
             {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2316.161, 4993.749, 42.06272), cb = function() collectFruits() end},
             {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2316.457, 4984.318, 41.80784), cb = function() collectFruits() end},
@@ -23,12 +25,26 @@ local JobInfo = {
             {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2356.453, 5021.042, 43.87039), cb = function() collectFruits() end}
         },
         ['Frunze'] = {
+            blip = 365,
+            blipColor = 2,
             {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2443.239, 4954.125, 45.41265), cb = function() blowLeaves() end},
             {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2452.724, 4959.479, 45.38784), cb = function() blowLeaves() end},
             {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2457.784, 4938.914, 45.18782), cb = function() blowLeaves() end},
             {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2437.48, 4940.375, 44.95733), cb = function() blowLeaves() end}
+        },
+        ['Tractor'] = {
+            blip = 477,
+            blipColor = 2,
+            {text = 'Apasa ~g~E~w~ pentru a incepe/oprii munca cu tractorul.', coords = vector3(2412.5222167969,4989.71875,46.242485046387), cb = function() spawnTractor() end}
+        },
+        ['Camp fermier'] = {
+            blip = 214,
+            blipColor = 5,
+            {text = '~y~Camp fermier', coords = vector3(2304.5747070313,5136.0615234375,51.361568450928), cb = function() spawnTractor() end},
+            {text = '~y~Camp fermier', coords = vector3(2148.5969238281,5166.6455078125,54.314525604248), cb = function() spawnTractor() end}
         }
-    }
+    },
+
 }
 
 Citizen.CreateThread(function()
@@ -41,6 +57,7 @@ Citizen.CreateThread(function()
         Wait(wait)
     end
 end)
+
 
 local fruit = false
 local alreadyBlowing = false
@@ -63,6 +80,105 @@ function blowLeaves()
         })
         Core.SavePlayer()
     end)
+end
+
+local workingWithTractor = false
+local tractor = false
+local inHarvestingField = false
+Citizen.CreateThread(function ()
+    while true do
+        wait = 3000
+        if workingWithTractor then
+            wait = 1
+            for _, i in ipairs(GetActivePlayers()) do
+                if i ~= PlayerId() then
+                  local closestPlayerPed = GetPlayerPed(i)
+                  local veh = GetVehiclePedIsIn(closestPlayerPed, false)
+                  SetEntityNoCollisionEntity(veh, GetVehiclePedIsIn(GetPlayerPed(-1), false), false)
+                end
+            end
+        end
+        Wait(3000)
+    end
+end)
+
+local workTime = 30
+local warnedPlayer = false
+local workedTimes = 0
+Citizen.CreateThread(function()
+    while true do
+        Wait(3000)
+        if not DoesEntityExist(tractor) and workingWithTractor then
+            workingWithTractor = false
+            workedTimes = 0
+            inHarvestingField = false
+            TriggerEvent('chat:addMessage', {
+                args = {'^*^gNicu Fermieru^0: Ai iesit din tractor. Du-te si ia-l inapoi.'}
+            })
+        end
+    end
+end)
+
+Citizen.CreateThread(function ()
+    while true do
+        local wait = 3000
+        if inHarvestingField then
+            if workingWithTractor then
+                if workedTimes < 5 then
+                    if IsPedInVehicle(PlayerPedId(), tractor) then
+                        if GetEntitySpeed(tractor) > 3.0 then
+                            wait = 1000
+                            warnedPlayer = false
+                            workTime = workTime - 1
+                            if workTime <= 0 then
+                                workTime = 30
+                                local payout = math.random(1000, 2000)
+                                workedTimes = workedTimes + 1
+                                PlayerData.cash = PlayerData.cash + payout
+                                TriggerEvent('chat:addMessage', {
+                                    args = {'^*^gNicu Fermieru^0: Ai primit '..FormatNumber(payout)..'$ pentru munca ta.'}
+                                })
+                                Core.SavePlayer()
+                            end
+                            showSubtitle('Munceste pentru inca ^g'..workTime..'^0 secunde.',900, true) 
+                        else
+                            if not warnedPlayer then
+                                warnedPlayer = true
+                                TriggerEvent('chat:addMessage', {
+                                    args = {'^*^gNicu Fermieru^0: Nu fi lenes, '..PlayerData.user..'! Mergi cu tractorul mai repede.'}
+                                })
+                                wait = 1000
+                            end
+                        end 
+                    end
+                else
+                    TriggerEvent('chat:addMessage', {
+                        args = {'^*^gNicu Fermieru^0: Ai terminat munca. Adu-mi tractorul inapoi.'}
+                    })
+                    workingWithTractor = false
+                end
+            end
+        else
+            workTime = 30
+        end
+        Wait(wait)
+    end
+end)
+
+function spawnTractor()
+    if not workingWithTractor then
+        workingWithTractor = true
+
+        tractor = CreateCar('tractor2', vector3(2409.5834960938,4987.3735351563,46.209720611572), 134.3875579834, true, true, true, 'FARMER')
+        SetVehicleOnGroundProperly(tractor)
+        SetEntityAlpha(tractor, 230)
+
+       
+        TriggerEvent('chat:addMessage', {
+            args = {'^*^gNicu Fermieru^0: Mergi cu tractorul pe unul din campurile noastre si lucreaza.'}
+        })
+        
+    end
 end
 
 function collectFruits()
@@ -146,7 +262,7 @@ Citizen.CreateThread(function ()
         local places = JobInfo.places
         for k,v in pairs(places) do
             for i = 1, #v do
-                local blip = CreateBlip(v[i].coords, k, 1, 2)
+                local blip = CreateBlip(v[i].coords, k, v.blip, v.blipColor)
                 table.insert(jobBlips, blip)
             end
         end
@@ -154,6 +270,8 @@ Citizen.CreateThread(function ()
 end)
 
 AddEventHandler('Jobs:Quit', function ()
+    if PlayerData.job.name ~= JobInfo.jobName then return end
+    if PlayerData.job.name == 'Unemployed' then return end
     PlayerData.job.name = 'Unemployed'
     for k,v in pairs(jobBlips) do
         RemoveBlip(v)
@@ -180,8 +298,8 @@ AddEventHandler('Jobs:Check', function ()
         local places = JobInfo.places
         for k,v in pairs(places) do
             for i = 1, #v do
-                print(v[i].coords)
-                local blip = CreateBlip(v[i].coords, k, 1, 2)
+                
+                local blip = CreateBlip(v[i].coords, k, v.blip, v.blipColor)
                 table.insert(jobBlips, blip)
             end
         end
@@ -202,15 +320,45 @@ Citizen.CreateThread(function ()
         local dist = #(JobInfo.pedCoords - pedCoords)
         for k, v in pairs(JobInfo.places) do
             for i = 1, #v do
-                local dist = #(v[i].coords - pedCoords)
-                if dist <= 5.0 then
-                    wait = 0
-                    if PlayerData.job then
-                        if PlayerData.job.name == JobInfo.jobName then
+                if PlayerData.job then
+                    if PlayerData.job.name == JobInfo.jobName then
+                        if k ~= 'Camp fermier' then
+                            local dist = #(v[i].coords - pedCoords)
                             if dist <= 2.0 then
-                                DrawText3D(v[i].coords.x, v[i].coords.y, v[i].coords.z, v[i].text)
-                                if IsControlJustPressed(0, 38) then
-                                    v[i].cb()
+                                wait = 0
+                                if k == 'Tractor' then
+                                    DrawText3D(v[i].coords.x, v[i].coords.y, v[i].coords.z, v[i].text)
+                                    if IsControlJustPressed(0, 38) then
+                                        if not DoesEntityExist(tractor) then
+                                            spawnTractor()
+                                        else
+                                            if workedTimes == 5 then
+                                                DeleteEntity(tractor)
+                                                workingWithTractor = false
+                                                workedTimes = 0
+                                                inHarvestingField = false
+                                            else
+                                                TriggerEvent('chat:addMessage', {
+                                                    args = {'^*^gNicu Fermieru^0: Mai ai de lucrat, termina si adu-mi tractorul inapoi.'}
+                                                })
+                                            end
+                                        end
+                                    end
+                                else
+                                    DrawText3D(v[i].coords.x, v[i].coords.y, v[i].coords.z, v[i].text)
+                                    if IsControlJustPressed(0, 38) then
+                                        v[i].cb()
+                                    end
+                                end
+                            end
+                        else
+                            if workingWithTractor then
+                                local dist = #(v[i].coords - pedCoords)
+                                inHarvestingField = false
+                                if dist < 40.0 then
+                                    wait = 0
+                                    inHarvestingField = true
+                                    DrawMarker(1, v[i].coords.x, v[i].coords.y, v[i].coords.z - 5, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 60.0, 60.0, 15.0, 50, 168, 84, 100, false, true, 2, false, false, false, false)
                                 end
                             end
                         end
@@ -226,16 +374,6 @@ Citizen.CreateThread(function ()
                         DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z, JobInfo.pedText.. '~n~Foloseste ~g~[~w~/getjob~g~] sau ~g~[~w~/quitjob~g~]')
                     end
                 else
-                    for k,v in pairs(JobInfo.places['Frunze']) do
-                        local dist2 = #(v.coords - pedCoords)
-                        if dist2 <= 4.0 then
-                            DrawMarker(1, v.coords.x, v.coords.y, v.coords.z, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 0, 255, 0, 255, false, false, false, false, false, false, false)
-                            DrawText3D(v.coords.x, v.coords.y, v.coords.z, v.text)
-                            if IsControlJustPressed(0, 38) then
-                                v.cb()
-                            end
-                        end
-                    end
                     if dist <= 2.0 then
                         if fruitsInHands then
                             local payout = math.random(500, 1000)
@@ -248,7 +386,7 @@ Citizen.CreateThread(function ()
                             DeleteObject(fruit)
                             Core.SavePlayer()
                         end
-                        DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z, JobInfo.pedText.."~w~~n~Esti angajat deja.")
+                        DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z, JobInfo.pedText.."~w~~n~~n~Esti angajat deja.")
                         if PlayerData.skills[1].fermier then
                             DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z - 0.1, "Nivel Skill: ~g~"..PlayerData.skills[1].fermier.level)
                         else

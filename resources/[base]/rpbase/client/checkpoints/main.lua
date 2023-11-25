@@ -27,7 +27,6 @@ ModifyCP = function(cp, type, coords, color, radius, visible)
     if not table.empty(checkpoints) then
         for k,v in pairs(checkpoints) do
             if v.id == cp.id then
-                print('CP modified with type: '..type..' and colors: '..json.encode(color)..' and coords '..json.encode(coords)..'!')
                 v.type = type
                 v.coords = coords
                 v.color = color
@@ -51,7 +50,6 @@ CreateCP = function(type, coords1, color, radius, visible, callback)
     end
     local blip = CreateBlip(coords1, "Destinatie", 1, 1)
     SetBlipAsShortRange(blip, false)
-    print('Cp created with type: '..type..' and colors: '..json.encode(color)..'!')
     local cp = {id= #checkpoints + 1, type = type, coords = coords1, color = color, visible = visible, radius = radius, callback = callback, blip = blip}
     table.insert(checkpoints, {id = #checkpoints + 1, type = type, coords = coords1, color = color, visible = visible, radius = radius, callback = callback, blip = blip})
     return cp

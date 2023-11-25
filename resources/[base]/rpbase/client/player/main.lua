@@ -25,8 +25,8 @@ SelectGender:AddButton({
     local model = 'mp_m_freemode_01'
     if LoadModel(model) then
         SetPlayerModel(PlayerId(), model)
-        --SetPedDefaultComponentVariation(PlayerPedId())
-        --SetModelAsNoLongerNeeded(model)
+        SetPedDefaultComponentVariation(PlayerPedId())
+        SetModelAsNoLongerNeeded(model)
     end
     PlayerData.gender = 1 
     TriggerEvent('chat:clear')
@@ -49,8 +49,8 @@ SelectGender:AddButton({
     local model = 'mp_f_freemode_01'
     if LoadModel(model) then
         SetPlayerModel(PlayerId(), model)
-        --SetPedDefaultComponentVariation(PlayerPedId())
-        --SetModelAsNoLongerNeeded(model)
+        SetPedDefaultComponentVariation(PlayerPedId())
+        SetModelAsNoLongerNeeded(model)
     end
 
     TriggerEvent('chat:clear')
@@ -78,7 +78,7 @@ AddEventHandler('onResourceStart', function(resourceName)
   if (GetCurrentResourceName() ~= resourceName) then
     return
   end
- 
+  PlayerSpawned()
 end)
 
 PlayerCoords = function()
@@ -348,13 +348,14 @@ PlayerSpawned = function()
         SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
         FreezeEntityPosition(PlayerPedId(), false)
 
-
+        LoggedIn = true
         
         TriggerEvent('Player:LoadSkin')
         -- while not GetCurrentPed() ~= PlayerData.clothing do
         --     Wait(0)
         --     TriggerEvent('Player:LoadSkin')
         -- end
+        Wait(2000)
 
         BuildPlayerMenu()
         BuildPlayerOptions()
@@ -365,7 +366,7 @@ PlayerSpawned = function()
         LoadPlayerWeapons()
 
         ClientVehicles = GetVehicles()
-
+      
         TriggerServerEvent("Scoreboard:AddPlayer")
         TriggerServerEvent("Scoreboard:SetScoreboard")
 
@@ -379,7 +380,7 @@ PlayerSpawned = function()
             end
         end)
 
-        LoggedIn = true
+   
         Core.FixSkin()
         Core.startPayday()
         
@@ -476,7 +477,6 @@ function GetNearestPlayer()
         Citizen.Wait(0)
     end
 
-    print(player)
     return player
 end
 
@@ -511,7 +511,6 @@ Citizen.CreateThread(function()
         else
             wait = 1000
             if IsEntityPlayingAnim(PlayerPedId(), "mp_arresting", "idle", 3) then
-                print('called')
                 ClearPedTasksImmediately(PlayerPedId())
             end
         end
@@ -981,10 +980,10 @@ RegisterCommand('getjob', function()
 end)
 
 RegisterCommand('quitjob', function ()
+    TriggerEvent('Jobs:Quit')
+    Wait(1000)
     PlayerData.job.name = 'Unemployed'
     Core.SavePlayer()
-    sendNotification("Job", "Ti-ai dat demisia.", 'success')
-    TriggerEvent('Jobs:Quit')
 end)
 
 AddEventHandler('playerSpawned', function()

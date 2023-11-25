@@ -14,7 +14,7 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
         chatMsg = message
     end
 
-    finalChatMsg = ' '..GetPlayerName(src)..': '..chatMsg
+    finalChatMsg = ' '..GetPlayerName(src)..'['..src..']: '..chatMsg
     if string.sub(chatMsg, 1, 1) == '/' then
         local args = {}
         for word in string.gmatch(chatMsg, '[^%s]+') do
@@ -29,7 +29,6 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
     end
 
     
-
     if pData.faction then
         local fData = pData.faction
         local factions = Core.GetFactions()
@@ -43,13 +42,18 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
     end
     local admTag = ''
     if pData.adminLevel > 0 then
-        for k,v in pairs(tags) do
-            if v.type == 'faction' then
-                admTag = "^1[^0A^1]^0 "
-            else
-                admTag = "^1[^0ADMIN^1]^0 "
-            end
+        if not table.empty(tags) then
+            for k,v in pairs(tags) do
+                if v.type == 'faction' then
+                    admTag = "^1[^0A^1]^0 "
+                else
+                    admTag = "^1[^0ADMIN^1]^0 "
+                end
+            end 
+        else
+            admTag = "^1[^0ADMIN^1]^0 "
         end
+       
     end
     
     table.insert(tags, {

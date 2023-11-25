@@ -116,7 +116,21 @@ Citizen.CreateThread(function ()
         
         if PlayerData.job then
             if PlayerData.job.name:lower() == 'fisherman' then
-                
+                if table.empty(PlayerData.skills) then
+                    local fish = 
+                    table.insert(PlayerData.skills, {
+                        ['fish'] = {
+                            level = 1,
+                            experience = 0,
+                        }
+                    })
+                end
+                if not JobInfo.skills[PlayerData.skills[1]['fish']] then
+                    PlayerData.skills[1]['fish'] = {
+                        level = 1,
+                        experience = 0,
+                    }
+                end
                 local skillData = JobInfo.skills[PlayerData.skills[1]['fish'].level]
                 local pCoords = GetEntityCoords(PlayerPedId())
                 local peddist = #(pCoords - JobInfo.pedCoords)

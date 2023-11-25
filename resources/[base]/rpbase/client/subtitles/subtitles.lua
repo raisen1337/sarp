@@ -3,7 +3,6 @@ RegisterNetEvent('showSubtitle', function (msg, time, sound)
 end)
 
 showSubtitle = function(msg, time, sound)
-    print(sound)
     SendNUIMessage({
         action = 'showSubtitle',
         msg = msg,

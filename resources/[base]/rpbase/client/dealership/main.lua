@@ -257,7 +257,6 @@ RegisterCommand('v', function()
                             return
                         else
                             for _, vehicle in pairs(GetVehicles()) do
-                                print(je(vehicle), vehicle.localId)
                                 vehicle = vehicle.localId
                                 if not GetVehicleNumberPlateText(vehicle) then
                                     if vData.addons.rainbow then

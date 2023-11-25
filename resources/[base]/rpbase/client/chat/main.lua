@@ -5,6 +5,8 @@ end)
 
 local chatOn = false
 
+local lastChatMsg = false
+
 RegisterNetEvent('chat:addMessage', function (message)
     local chatMsg = ''
     if type(message) == 'table' then
@@ -73,6 +75,20 @@ RegisterNUICallback('closeChat', function ()
     SetNuiFocus(false)
 end)
 
+local continuousMessagesSent = 0
+
+Citizen.CreateThread(function ()
+    while true do
+        Wait(5000)
+        if lastChatMsg then
+            lastChatMsg = false
+        end
+        if continuousMessagesSent == 5 then
+            continuousMessagesSent = 0
+        end
+    end
+end)
+
 RegisterNUICallback('sendChatMessage', function(data)
     if string.sub(data.message, 1, 1) == '/' then
         local args = {}
@@ -84,6 +100,17 @@ RegisterNUICallback('sendChatMessage', function(data)
         ExecuteCommand(command, args)
         return
     end
-    TriggerServerEvent('sv:chat:addMessage', data.message)
+    if lastChatMsg == data.message then
+        return
+    else
+        lastChatMsg = data.message
+        if continuousMessagesSent >= 5 then
+            TriggerEvent('chat:addMessage', { args = { "[^3SERVER^0]: Ai trimis prea multe mesaje, mai asteapta." } })
+            return
+        else
+            continuousMessagesSent = continuousMessagesSent + 1
+        end
+        TriggerServerEvent('sv:chat:addMessage', data.message)
+    end
 end)
 

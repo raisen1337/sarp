@@ -1114,7 +1114,6 @@ RegisterCommand('admin', function()
                                 if type == 'Normal' or type == 'Low' or type == 'Medium' then
                                     createHouseData.type = type
                                     Core.TriggerCallback('Houses:GetTypes', function(types)
-                                        print(je(types))
                                         --print
                                         local pCoords = PlayerCoords()
                                         local shell_data = types[createHouseData.type]

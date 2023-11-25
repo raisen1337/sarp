@@ -7,7 +7,12 @@ function formatMoneyInteger(money) {
 }
 
 let hudOff = false
-
+let weaponImg = document.querySelector('.currentweapon-img')
+let weaponAmmoContainer = document.querySelector('.currentweapon-ammodata')
+let weaponAmmo = document.querySelector('.currentweapon-remaining')
+let weaponAmmoMax = document.querySelector('.currentweapon-loaded')
+weaponAmmoContainer.style.display = 'none'
+weaponImg.src = 'https://vespura.com/fivem/weapons/images/' + 'WEAPON_UNARMED' + '.png'
 window.addEventListener("message", function(event1) {
     let event = event1['data'];
     if(event.action == 'copycoords') {
@@ -24,6 +29,24 @@ window.addEventListener("message", function(event1) {
       selection.removeAllRanges();
       document.body.removeChild(node);
     }
+    if(event.action == 'updateGun'){
+        console.log(event)
+        weaponAmmoContainer.style.display = 'flex'
+        event.gun = event.gun.toUpperCase()
+        weaponImg.src = 'https://vespura.com/fivem/weapons/images/' + event.gun + '.png'
+      if(event.gun == 'WEAPON_UNARMED'){
+        weaponAmmoContainer.style.display = 'none'
+        weaponImg.src = 'https://vespura.com/fivem/weapons/images/' + 'WEAPON_UNARMED' + '.png'
+        //check for event.gun if empty
+      }else if(!event.gun){
+        weaponAmmoContainer.style.display = 'none'
+        weaponImg.src = 'https://vespura.com/fivem/weapons/images/' + 'WEAPON_UNARMED' + '.png'
+      }else{
+        weaponAmmoContainer.style.display = 'flex'
+        weaponAmmo.textContent = event.ammo
+        weaponAmmoMax.textContent = event.ammoMax
+      }
+    }
     if (event.action == "showHud") {
         if(!hudOff){
           let hudMain = document.querySelector('.moneyhud')
@@ -38,10 +61,10 @@ window.addEventListener("message", function(event1) {
 
           let cashText = document.querySelector('.money')
 
-          cashText.innerHTML = '<span class="dsign" style="color: rgba(255, 235, 125, 0.932);">$</span>' + formatMoneyInteger(event.cash);
+          cashText.innerHTML = '<span class="dsign" style="color: rgba(125, 203, 255, 0.932);">$</span>' + formatMoneyInteger(event.cash);
 
           let bankText = document.querySelector('.bank')
-          bankText.innerHTML = '<span class="dsign" style="color: rgba(255, 235, 125, 0.932);">$</span>' + formatMoneyInteger(event.bank);
+          bankText.innerHTML = '<span class="dsign" style="color: rgba(125, 203, 255, 0.932);">$</span>' + formatMoneyInteger(event.bank);
 
           let playerJobText = document.querySelector("#jobName")
           playerJobText.textContent = event.playerJob

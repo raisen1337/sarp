@@ -1,17 +1,39 @@
 @import url('https://fonts.cdnfonts.com/css/bankgothic-md-bt');
 
 .payday-container {
-    color: white;
-    border-radius: 1rem;
-    font-family: 'BankGothic Md BT', sans-serif;
+    position: absolute;
     display: flex;
-    font-size: 1.3rem;
-    padding: 1rem;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: flex-end;
     align-items: center;
-    margin-top: 90%;
+    bottom: 0rem;
+    right: 10rem;
+    width: 10rem;
+    height: 10rem;
+    font-family: Poppins;
+    font-size: 2.8rem;
+    font-weight: bold;
     text-align: center;
-    text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.540302px 0.841471px 0px, rgb(0, 0, 0) -0.416147px 0.909297px 0px, rgb(0, 0, 0) -0.989992px 0.14112px 0px, rgb(0, 0, 0) -0.653644px -0.756802px 0px, rgb(0, 0, 0) 0.283662px -0.958924px 0px, rgb(0, 0, 0) 0.96017px -0.279415px 0px;
+    color: white;
+    background: linear-gradient(360deg, rgba(0,215,255,1) -20%, rgba(255,255,255,0) 100%);
 }
+
+.payday-title {
+    font-size: 2rem;
+
+    text-transform: uppercase;
+}
+
+.payday-container > img {
+    width: 80%;
+    filter: blur(2px);
+    z-index: -1;
+    margin-bottom: -7rem;
+}
+
+.payday-time {
+    font-size: 3rem;
+    transform: skew(-10deg);
+}
+
 

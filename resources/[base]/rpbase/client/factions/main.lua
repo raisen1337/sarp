@@ -19,11 +19,7 @@ LoadFactions = function()
     end)
 end
 
-Wait(2000)
 LoadFactions()
-
-
-
 
 local canSpawnVehicle = false
 
@@ -48,7 +44,6 @@ RegisterCommand('faction', function()
     if not table.empty(Factions) then
         local pData = Core.GetPlayerData()
         local fData = pData.faction
-
         if fData.id ~= 0 then
             factionsMenu:ClearItems()
             for k,v in pairs(Factions) do
@@ -66,6 +61,7 @@ RegisterCommand('faction', function()
                         icon = '👤',
                         disabled = true,
                     })
+                    
                     factionsMenu:AddButton({
                         label = "Rankul tau: "..fData.rankName.." ("..fData.rank..")",
                         icon = '💼',
@@ -155,6 +151,7 @@ RegisterCommand('faction', function()
                         }):On('select', function()
                             factionArmorySubmenu:ClearItems()
                             factionArmoryMenu:ClearItems()
+                           
                             for k,v in pairs(playerFaction.armory) do
                                 if fData.rank >= v.rank then
                                     factionArmorySubmenu:ClearItems()
@@ -213,6 +210,7 @@ RegisterCommand('faction', function()
                                                 MenuV:CloseAll()
                                                 --print
                                                 --print
+                                                print('da')
                                                 if pData.cash >= v.weaponCost then
                                                     pData.cash = pData.cash - v.weaponCost
                                                     Core.TriggerCallback('Player:AddItem', function(cb)
@@ -367,50 +365,53 @@ end)
 Citizen.CreateThread(function ()
     while true do
         wait = 5000
-        
-        local pData = Core.GetPlayerData()
-        local fData = pData.faction
-     
-        if not table.empty(Factions) then
-            for k,v in pairs(Factions) do
-                if fData.id == v.id then
-                    coords = v.coords
-                    local dist = {}
-                    local pCoords = PlayerCoords()
-                    dist[1] = #(pCoords - vec3(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z))
-                    if dist[1] < 15.0 then
-                        wait = 1
-                        DrawText3D(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z, "Vehicle Area - 15m radius.")
-                        DrawMarker(1, coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 15.0, 15.0, 1.0, 255, 255, 255, 50, false, true, 2, false, false, false, false)
-                        canSpawnVehicle = true
-                    else
-                        canSpawnVehicle = false
-                    end
-                    
-                    if coords.helicopter then
-                        dist[2] = #(pCoords - vec3(coords.helicopter.x, coords.helicopter.y, coords.helicopter.z))
-                        if dist[2] < 2.0 then
-                            wait = 1
-                            DrawText3D(coords.helicopter.x, coords.helicopter.y, coords.helicopter.z, "Helicopter")
-                            DrawMarker(1, coords.helicopter.x, coords.helicopter.y, coords.helicopter.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 2.0, 2.0, 2.0, 255, 255, 255, 100, false, true, 2, false, false, false, false)
-                            canSpawnHeli = true
-                        else
-                            canSpawnHeli = false
-                        end
-                    end
-                    
-                    if coords.armory then
-                        dist[3] = #(pCoords - vec3(coords.armory.x, coords.armory.y, coords.armory.z))
-                        if dist[3] < 10.0 then
-                            wait = 1
-                            DrawText3D(coords.armory.x, coords.armory.y, coords.armory.z, "Armory")
-                            canAccessArmory = true
-                        else
-                            canAccessArmory = false
+        if PlayerData then
+            local fData = PlayerData.faction
+            if fData then
+                if not table.empty(Factions) then
+                    for k,v in pairs(Factions) do
+                        if fData.id == v.id then
+                            coords = v.coords
+                            local dist = {}
+                            local pCoords = PlayerCoords()
+                            dist[1] = #(pCoords - vec3(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z))
+                            if dist[1] < 15.0 then
+                                wait = 1
+                                DrawText3D(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z, "Vehicle Area - 15m radius.")
+                                DrawMarker(1, coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 15.0, 15.0, 1.0, 255, 255, 255, 50, false, true, 2, false, false, false, false)
+                                canSpawnVehicle = true
+                            else
+                                canSpawnVehicle = false
+                            end
+                            
+                            if coords.helicopter then
+                                dist[2] = #(pCoords - vec3(coords.helicopter.x, coords.helicopter.y, coords.helicopter.z))
+                                if dist[2] < 2.0 then
+                                    wait = 1
+                                    DrawText3D(coords.helicopter.x, coords.helicopter.y, coords.helicopter.z, "Helicopter")
+                                    DrawMarker(1, coords.helicopter.x, coords.helicopter.y, coords.helicopter.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 2.0, 2.0, 2.0, 255, 255, 255, 100, false, true, 2, false, false, false, false)
+                                    canSpawnHeli = true
+                                else
+                                    canSpawnHeli = false
+                                end
+                            end
+                            
+                            if coords.armory then
+                                dist[3] = #(pCoords - vec3(coords.armory.x, coords.armory.y, coords.armory.z))
+                                if dist[3] < 10.0 then
+                                    wait = 1
+                                    DrawText3D(coords.armory.x, coords.armory.y, coords.armory.z, "Armory")
+                                    canAccessArmory = true
+                                else
+                                    canAccessArmory = false
+                                end
+                            end
                         end
                     end
                 end
             end
+        else
+            PlayerData = Core.GetPlayerData()
         end
         Wait(wait)
     end

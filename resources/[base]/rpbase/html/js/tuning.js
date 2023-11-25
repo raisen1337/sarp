@@ -2,6 +2,7 @@ var menuTable = []
 var mainMenu = true
 var cacheSS
 var colorPicker
+var opened = false
 var mainMenuScrollPosition
 var pode = false
 $(document).on('click', ".menu-item", function() {
@@ -334,6 +335,7 @@ function openSubSubPage(firstindex, index2) {
 window.addEventListener('message', function(event) {
     switch (event.data.action) {
         case 'openMenu':
+            opened = true;
 			$("#backbtn").hide();
             $("#title").text("Car Tuning");
             $("#item-wrapper").html('');
@@ -351,6 +353,7 @@ window.addEventListener('message', function(event) {
             $("#toggle").fadeIn(500);
         break
         case 'close':
+            opened = false;
             $("#toggle").fadeOut(500);
         break
         case 'updateTotal':
@@ -381,14 +384,17 @@ function tableToRgbString(tb) {
 
 $(document).ready(function(){
 	document.onkeyup = function (data) {
-		if (data.which == 27) {
-			$("#popup").show();
-		} else if (data.which == 81 & pode) {
-			console.log(pode);
-			$.post('https://rpbase/action', JSON.stringify({
-				action: "camlivre",
-			}));
-		}
+        if(opened){
+            if (data.which == 27) {
+                $("#popup").show();
+            } else if (data.which == 81 & pode) {
+                console.log(pode);
+                $.post('https://rpbase/action', JSON.stringify({
+                    action: "camlivre",
+                }));
+            }
+        }
+		
 	};
 });
 
