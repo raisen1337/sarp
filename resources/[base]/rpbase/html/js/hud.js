@@ -30,7 +30,6 @@ window.addEventListener("message", function(event1) {
       document.body.removeChild(node);
     }
     if(event.action == 'updateGun'){
-        console.log(event)
         weaponAmmoContainer.style.display = 'flex'
         event.gun = event.gun.toUpperCase()
         weaponImg.src = 'https://vespura.com/fivem/weapons/images/' + event.gun + '.png'

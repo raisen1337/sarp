@@ -64,7 +64,7 @@ function GetPlayerIds(source)
     return playerdata
 end
 
-RegisterNetEvent("Dealership:BuyCar", function(car)
+Core.CreateCallback("Dealership:BuyCar", function(source, cb, car)
     local src = source
 
     local steamIdentifier = nil
@@ -81,12 +81,13 @@ RegisterNetEvent("Dealership:BuyCar", function(car)
         spawncode = car.spawncode,
         plate = car.plate,
         owner = steamIdentifier,
-        mods = {},
+        mods = car.mods,
         addons = {}
     }
 
     carData = json.encode(carData)
     exports.oxmysql:query("INSERT INTO vehicles(name, owner, plate, data) VALUES(?, ?, ?, ?)",{ car.name, steamIdentifier, car.plate, carData })
+    cb(true)
 end)
 
 RegisterNetEvent('Vehicles:Save', function(vData)
@@ -97,6 +98,33 @@ Core.CreateCallback('Plates:Check', function(source, cb, plate)
     local exists = false
     local result = exports.oxmysql:executeSync("SELECT * FROM vehicles WHERE plate = ?", {plate})
     cb(#result)
+end)
+
+Core.CreateCallback('Server:AddSaleVehicle', function (source, cb, name, model, price)
+    local vehicle = {
+        name = name,
+        model = model,
+        price = price,
+    }
+    exports.oxmysql:query("INSERT INTO sale_vehicles(data) VALUES(?)", {je(vehicle)})
+    Wait(500)
+    cb(Core.GetSaleVehicles())
+end)
+
+Core.GetSaleVehicles = function()
+    local vehicles = {}
+    local result = exports.oxmysql:executeSync('SELECT * FROM sale_vehicles')
+    if result[1] then
+        for k, v in pairs(result) do
+            local data = json.decode(v.data)
+            table.insert(vehicles, data)
+        end
+    end
+    return vehicles
+end
+
+Core.CreateCallback('Server:GetSaleVehicles', function(source, cb)
+    cb(Core.GetSaleVehicles())
 end)
 
 

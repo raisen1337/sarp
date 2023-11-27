@@ -349,40 +349,51 @@ PlayerSpawned = function()
         FreezeEntityPosition(PlayerPedId(), false)
 
         LoggedIn = true
-        
+        local PlayerData = Core.GetPlayerData()
+    
         TriggerEvent('Player:LoadSkin')
         -- while not GetCurrentPed() ~= PlayerData.clothing do
         --     Wait(0)
         --     TriggerEvent('Player:LoadSkin')
         -- end
         Wait(2000)
+        local Inventory = PlayerData.inventory
+        local playerAmmo = Core.GetPlayerAmmo()
 
+        for k,v in pairs(Inventory) do
+            if v.type == 'weapon' then
+                GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
+                for a, b in pairs(playerAmmo) do
+                    if checkWeaponPresence(v.name, a) then
+                        SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
+                    end
+                end
+            end
+        end
         BuildPlayerMenu()
         BuildPlayerOptions()
 
         LoadBusinesses()
         loadHouses()
         LoadFactions()
-        LoadPlayerWeapons()
+ 
 
         ClientVehicles = GetVehicles()
       
         TriggerServerEvent("Scoreboard:AddPlayer")
         TriggerServerEvent("Scoreboard:SetScoreboard")
 
+
         if PlayerData.inHouseId ~= 0 then
             Core.TriggerCallback("Houses:GetHouseById", EnterHouseCallback, PlayerData.inHouseId)
         end
 
-        Core.TriggerCallback('Clothing:GetClothing', function(cb)
-            if not table.empty(cb) then
-                LoadPed(cb)
-            end
-        end)
+        
 
    
-        Core.FixSkin()
         Core.startPayday()
+
+       
         
     end
 end
@@ -571,7 +582,7 @@ RegisterNetEvent('cl-time:update', function(h, m, s)
     m = tonumber(m)
     s = tonumber(s)
     SetClockTime(h, m, s)
-    NetworkOverrideClockTime(12, 0, 0)
+    NetworkOverrideClockTime(h, m, s)
 end)
 
 local payDayTime = 60
@@ -989,6 +1000,7 @@ end)
 AddEventHandler('playerSpawned', function()
     FreezeEntityPosition(PlayerPedId(), true)
     PlayerSpawned()
+    
 end)
 AddEventHandler("playerSpawned", function(spawn)
 Citizen.CreateThread(function()

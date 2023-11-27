@@ -52,16 +52,19 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
             for k, v in pairs(Inventory) do
                 if v.type == 'ammo' then
                     if PlayerAmmo[v.name] then
-                        table.insert(pAmmo, {name = v.name, amount = PlayerAmmo[v.name], type = 'ammo'})
-                        PlayerAmmo = pAmmo
+                        if v.amount == PlayerAmmo[v.name] then return end
+                        print('[F]PlayerAmmo['..v.name..'] = '..PlayerAmmo[v.name])
+                        v.amount = PlayerAmmo[v.name]
+                        exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
+                        return
                     else
-                        table.insert(pAmmo, {name = v.name, amount = v.amount, type = 'ammo'})
-                        PlayerAmmo = pAmmo
+                        print('[NF]PlayerAmmo['..v.name..'] = '..v.amount)
+                        v.amount = PlayerAmmo[v.name]
+                        exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
+                        return
                     end
                 end
             end
-            PlayerAmmo = pAmmo
-            exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
         end
     else
         --print('PlayerAmmo is empty')
@@ -124,20 +127,139 @@ Core.CreateCallback('Police:AnnounceShooting', function(source, cb, zone, crossi
     end
 end)
 
+local playerACReports = {}
+function ACBan(source)
+    local src = source
+    local banData = {
+        banSource = src,
+        banReason = 'Cheating/weird behaviour detected by anticheat.',
+        banTime = 365,
+    }
+    local pData = Core.GetPlayerData(banData.banSource)
+    local banId = generateBanId()
+    
+    pData.banned = 1
+    pData.banId = banId
+    pData.banReason = banData.banReason
+    pData.banTime = banData.banTime
+    pData.banTimestamp = getTimestampAfterDays(banData.banTime)
+    pData.banAdmin = 'Anticheat'
+    pData.banIds = {
+        steamId = GetPlayerIds(banData.banSource).steamId,
+        xbl = GetPlayerIds(banData.banSource).xbl,
+        discord = GetPlayerIds(banData.banSource).discord,
+        liveid = GetPlayerIds(banData.banSource).liveid,
+        license = GetPlayerIds(banData.banSource).license,
+        ip = GetPlayerIds(banData.banSource).ip,
+        hwids = GetPlayerIds(banData.banSource).hashValues,
+    }
+
+    local punishment = {
+        type = 'Ban',
+        duration = banData.banTime,
+        reason = banData.banReason,
+        admin = GetPlayerName(source),
+    }
+    playerACReports[src] = nil
+
+    if  pData.punishHistory then
+        if table.empty(pData.punishHistory) then
+            pData.punishHistory = {}
+            table.insert(pData.punishHistory, punishment)
+        end
+    else
+        pData.punishHistory = {}
+        table.insert(pData.punishHistory, punishment)
+    end
+
+    
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+    Wait(1000)
+    DropPlayer(banData.banSource, "You have been banned from the server. Reason: "..banData.banReason..". Ban ID: "..banId..". Ban expires in: "..banData.banTime.." days.")
+end
+
+Core.CreateCallback('Server:UnsyncVehicle', function(source, cb, vehicle)
+    local src = source
+    local players = GetPlayers()
+    for k,v in pairs(players) do
+        TriggerClientEvent('Client:UnsyncVehicle', v, vehicle)
+    end
+end)
+-- SERVER script, requires OneSync!
+function checkPlayerReports(source)
+    local src = source
+    if not playerACReports[src] then return end
+    for k,v in pairs(playerACReports[src]) do
+        if v.count > 3 then
+            if os.time() < v.lastReport + 60 then
+                print('[AC]Player '..GetPlayerName(src)..'('..src..')'..' has been detected by anticheat. Detection type: '..k..'! Count: '..v.count)
+                local players = GetPlayers()
+                for a,b in pairs(players) do
+                    local pData = Core.GetPlayerData(b)
+                    if pData.adminLevel > 0 then
+                        TriggerClientEvent('chat:addMessage', b, {
+                            args = { '^1[AC]: ^0Jucatorul ^1'..GetPlayerName(src)..'('..src..') ^0a fost detectat de anticheat. Detection type: ^1'..k..'!' }
+                        })  
+                    end
+                end
+                ACBan(src)
+            end
+        end
+    end
+end
+
+AddEventHandler('explosionEvent', function(sender, ev)
+    local src = sender
+    print('[AC Explosion]Player '..GetPlayerName(src)..'('..src..')'..' has been detected by anticheat. Explosion type: '..ev.explosionType..'!')
+    if not playerACReports[src] then
+        playerACReports[src] = {}
+        playerACReports[src][ev.explosionType] = {}
+        playerACReports[src][ev.explosionType].count = 1
+        playerACReports[src][ev.explosionType].lastReport = os.time()
+    else
+        if not playerACReports[src][ev.explosionType] then
+            playerACReports[src][ev.explosionType] = {}
+            playerACReports[src][ev.explosionType].count = 1
+            playerACReports[src][ev.explosionType].lastReport = os.time()
+        else
+            playerACReports[src][ev.explosionType].count = playerACReports[src][ev.explosionType].count + 1
+            playerACReports[src][ev.explosionType].lastReport = os.time()
+        end
+    end
+    checkPlayerReports(src)
+    CancelEvent()
+end)
+
+Core.CreateCallback('Server:SyncWeather', function (source, cb, weather)
+    print('call')
+    local players = GetPlayers()
+    for k, v in pairs(players) do
+        TriggerClientEvent('Client:SyncWeather', v, weather)
+    end
+    cb(true)
+end)
+
+
+
 Core.CreateCallback('AC:ReportAnomaly', function(source, cb, type)
     local src = source
-    if type == 'vehicle' then
-        print('Player '..GetPlayerName(src)..'(' .. src .. ') has been detected in a unregistered vehicle! (Maybe hacker).')
+    print('[AC]Player '..GetPlayerName(src)..'('..src..')'..' has been detected by anticheat. Detection type: '..type..'!')
+    if not playerACReports[src] then
+        playerACReports[src] = {}
+        playerACReports[src][type] = {}
+        playerACReports[src][type].count = 1
+        playerACReports[src][type].lastReport = os.time()
+    else
+        if not playerACReports[src][type] then
+            playerACReports[src][type] = {}
+            playerACReports[src][type].count = 1
+            playerACReports[src][type].lastReport = os.time()
+        else
+            playerACReports[src][type].count = playerACReports[src][type].count + 1
+            playerACReports[src][type].lastReport = os.time()
+        end
     end
-    if type == 'weapon' then
-        print('Player '..GetPlayerName(src)..'(' .. src .. ') has been detected with an unregistered weapon! (Maybe hacker).')
-    end
-    if type == 'ammo' then
-        print('Player '..GetPlayerName(src)..'(' .. src .. ') has been detected with an more weapon ammo than it should! (Maybe hacker).')
-    end
-    if type == 'rstop' then
-        print('Player '..GetPlayerName(src)..'(' .. src .. ') has stopped a resource! (Maybe hacker).')
-    end
+    checkPlayerReports(src)
     cb(true)
 end)
 

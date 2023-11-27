@@ -434,99 +434,66 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                     deferrals.done("Server is accepting only whitelisted connections!")
                     return
                 end
-                local result2 = exports.oxmysql:executeSync('SELECT * FROM players')
-                local playerIds = GetPlayerIds(player)
-                local foundMatch = false -- Initialize a flag to track if any match is found
-                local foundData = {}
-                for k, v in pairs(result2) do
-                    local bpData = json.decode(v.data)
-                    local banIds = bpData.banIds
-                    deferrals.update("🔨 Checking if you are banned on other accounts..")
-                    if banIds then
-                        ------print
-                        for key, value in pairs(banIds) do
-                            if value ~= nil then
-                                if value == playerIds[key] and not foundMatch then
-                                    if bpData.banned == 1 then
-                                        Wait(0)
-                                        foundMatch = true
-                                        foundData = bpData
-                                        ----print('Id: '..key.." matched from account: "..bpData.user.." ("..value.." | "..playerIds[key]..")")
-                                    else
-                                        foundMatch = false
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-                if foundMatch then
-                    Wait(0)
-                    deferrals.done("You have been banned from this server for: "..foundData.banReason..". Please visit "..Discord.." to appeal your ban and obtain info about it. Your BanID is: ["..foundData.banId.."].")
-                end
-                if not foundMatch then
-                    Wait(0)
-                    local PlayerStruct = {
-                        user = "",
-                        identifier = "",
-                        adminLevel = 0,
-                        cash = 3000,
-                        bank = 0,
-                        wantedLevel = 0,
-                        level = 1,
-                        respectPoints = 0,
-                        premiumPoints = 0,
-                        hours = 0,
-                        banned = 0,
-                        banId = 1,
-                        bankId = generateBankId(),
-                        transactions = {},
-                        totalTransferred = 0,
-                        totalWithdrawn = 0,
-                        totalDeposited = 0,
-                        banReason = "No reason",
-                        inventory = {},
-                        skills = {},
-                        faction = {
-                            id = 0,
-                            name = "None",
-                            rank = 0,
-                            rankColor = 0,
-                            rankName = "None",
-                        },
-                        character = {
-                            ped_model = "",
-                            name = "",
-                            surname = "",
-                            age = 0,
-                            clothes = {},
-                        },
-                        position = {},
-                        job = {
-                            name = "Unemployed",
-                            salary = 0,
-                            rank = 0,
-                        },
-                        banIds = {
-                            steamId = GetPlayerIds(player).steamId,
-                            xbl = GetPlayerIds(player).xbl,
-                            discord = GetPlayerIds(player).discord,
-                            liveid = GetPlayerIds(player).liveid,
-                            license = GetPlayerIds(player).license,
-                            ip = GetPlayerIds(player).ip,
-                            hwids = GetPlayerIds(player).hashValues,
-                        }
+                local PlayerStruct = {
+                    user = "",
+                    identifier = "",
+                    adminLevel = 0,
+                    cash = 3000,
+                    bank = 0,
+                    wantedLevel = 0,
+                    level = 1,
+                    respectPoints = 0,
+                    premiumPoints = 0,
+                    hours = 0,
+                    banned = 0,
+                    banId = 1,
+                    bankId = generateBankId(),
+                    transactions = {},
+                    totalTransferred = 0,
+                    totalWithdrawn = 0,
+                    totalDeposited = 0,
+                    banReason = "No reason",
+                    inventory = {},
+                    skills = {},
+                    faction = {
+                        id = 0,
+                        name = "None",
+                        rank = 0,
+                        rankColor = 0,
+                        rankName = "None",
+                    },
+                    character = {
+                        ped_model = "",
+                        name = "",
+                        surname = "",
+                        age = 0,
+                        clothes = {},
+                    },
+                    position = {},
+                    job = {
+                        name = "Unemployed",
+                        salary = 0,
+                        rank = 0,
+                    },
+                    banIds = {
+                        steamId = GetPlayerIds(player).steamId,
+                        xbl = GetPlayerIds(player).xbl,
+                        discord = GetPlayerIds(player).discord,
+                        liveid = GetPlayerIds(player).liveid,
+                        license = GetPlayerIds(player).license,
+                        ip = GetPlayerIds(player).ip,
+                        hwids = GetPlayerIds(player).hashValues,
                     }
-                    
-                    PlayerStruct.user = name
-                    PlayerStruct.identifier = steamIdentifier
-                    PlayerStruct = json.encode(PlayerStruct)
-    
-                    exports.oxmysql:query("INSERT INTO players(user, identifier, data) VALUES(?, ?, ?)", {name, steamIdentifier, PlayerStruct})
-                    ------print
-                    deferrals.done()
-                end
-            
+                }
+                
+                PlayerStruct.user = name
+                PlayerStruct.identifier = steamIdentifier
+                PlayerStruct = json.encode(PlayerStruct)
+
+                exports.oxmysql:query("INSERT INTO players(user, identifier, data) VALUES(?, ?, ?)", {name, steamIdentifier, PlayerStruct})
+                ------print
+                deferrals.done()
+                return
             end
         end)
 
@@ -534,9 +501,6 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
 
     end
 end
-
-
-
 
 AddEventHandler("playerConnecting", OnPlayerConnecting)
 
@@ -557,8 +521,19 @@ end)
 RegisterNetEvent("sv-time:update", function()
     local src = source
     TriggerClientEvent("cl-time:update", src, os.date("%H"), os.date("%M"), os.date("%S"))
-    ----print("Updated time on "..GetPlayerName(source))
-    ----print(os.date("%H"), os.date("%M"), os.date("%S"))
+end)
+
+function onMeCommand(source, args)
+    local text = '"' .. "" .. table.concat(args, " ") .. '"'
+    TriggerClientEvent('3dme:shareDisplay', -1, text, source)
+end
+
+RegisterCommand('me', onMeCommand)
+
+AddEventHandler("playerConnecting", OnPlayerConnecting)
+
+Core.CreateCallback("Players:GetCount", function(source, cb)
+    cb(#GetPlayers())
 end)
 
 RegisterNetEvent("Scoreboard:SetScoreboard", function()

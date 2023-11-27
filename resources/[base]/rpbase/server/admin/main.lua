@@ -67,6 +67,71 @@ Core.CreateCallback('Core:GetPlayerCoords', function(source, cb, id)
     cb(GetEntityCoords(GetPlayerPed(id)))
 end)
 
+local posList = {}
+
+RegisterCommand('setpos', function(source, args, rawCommand)
+    local src = source
+    local pData = Core.GetPlayerData(src)
+    if pData.adminLevel < 1 then
+        return
+    end
+    local coords = GetEntityCoords(GetPlayerPed(src))
+    local heading = GetEntityHeading(GetPlayerPed(src))
+    --posname can be like "test pos", set posname local 
+    local posname = table.concat(args, " ")
+    if posList[posname] then
+        table.insert(posList[posname], vec4(coords.x, coords.y, coords.z, heading))
+        TriggerClientEvent('chat:addMessage', src, {
+            multiline = true,
+            args = {'^3[^0Admin^3] ^0Ai setat pozitia '..posname..' cu coordonatele: ^0'..coords.x..', '..coords.y..', '..coords.z..'!'}
+        })
+    else
+        posList[posname] = {}
+        table.insert(posList[posname], coords)
+        TriggerClientEvent('chat:addMessage', src, {
+            multiline = true,
+            args = {'^3[^0Admin^3] ^0Ai setat pozitia '..posname..' cu coordonatele: ^0'..coords.x..', '..coords.y..', '..coords.z..'!'}
+        })
+    end
+end)
+
+RegisterCommand('savepos', function(source, args, rawCommand)
+    local src = source
+    local pData = Core.GetPlayerData(src)
+    if pData.adminLevel < 1 then
+        return
+    end
+    local posname = table.concat(args, " ")
+    if posList[posname] then
+        local posListJson = json.encode(posList)
+        SaveResourceFile(GetCurrentResourceName(), "poslist.json", posListJson, -1)
+        TriggerClientEvent('chat:addMessage', src, {
+            multiline = true,
+            args = {'^3[^0Admin^3] ^0Ai salvat pozitia '..posname..'!'}
+        })
+    else
+        print("Pos "..posname.." doesn't exist!")
+    end
+end)
+
+RegisterCommand('clearpos', function(source, args, rawCommand)
+    local src = source
+    local pData = Core.GetPlayerData(src)
+    if pData.adminLevel < 1 then
+        return
+    end
+    local posname = table.concat(args, " ")
+    if posList[posname] then
+        posList[posname] = nil
+        TriggerClientEvent('chat:addMessage', src, {
+            multiline = true,
+            args = {'^3[^0Admin^3] ^0Ai sters pozitia '..posname..'!'}
+        })
+    else
+        print("Pos "..posname.." doesn't exist!")
+    end
+end)
+
 Core.CreateCallback('Admin:ChangeHouseData', function(source, cb, hData)
     exports.oxmysql:executeSync("UPDATE houses SET owner = ? WHERE id = ?", {hData.owner, hData.id})
     exports.oxmysql:executeSync("UPDATE houses SET data = ? WHERE id = ?", {json.encode(hData), hData.id})
@@ -326,10 +391,7 @@ Core.CreateCallback('Admin:HandleBan', function(source, cb, banData)
         reason = banData.banReason,
         admin = GetPlayerName(source),
     }
-
     
-   
-
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
     Wait(1000)
     Core.InsertPunishment(banData.banSource, punishment)

@@ -1,6 +1,5 @@
 RegisterNetEvent('Core:Server:TriggerCallback', function(name, ...)
     local src = source
-    print('Called '..name..' for player '..GetPlayerName(src)..'(' .. src .. ')')
     Core.TriggerCallback(name, src, function(...)
         TriggerClientEvent('Core:Client:TriggerCallback', src, name, ...)
     end, ...)

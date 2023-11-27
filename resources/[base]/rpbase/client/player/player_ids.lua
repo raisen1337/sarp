@@ -33,31 +33,22 @@ CreateThread(function()
 		Wait(500)
 	end
 end)
-
-function DrawText3D(x, y, z, text)
-	local onScreen, _x, _y = GetScreenCoordFromWorldCoord(x, y, z)
-	local dist = #(GetGameplayCamCoords() - vec(x, y, z))
-
-	local scale = (4.00001 / dist) * 0.3
-	if scale > 0.2 then
-		scale = 0.2
-	elseif scale < 0.15 then
-		scale = 0.15
+function DrawText3D(x, y, z, text, r, g, b, a)
+	SetTextScale(0.35, 0.35)
+	SetTextFont(4)
+	SetTextProportional(1)
+	if r and g and b and a then
+		SetTextColour(r, g, b, a)
+	else
+		SetTextColour(255, 255, 255, 215)
 	end
-
-	local fov = (1 / GetGameplayCamFov()) * 100
-	local scale = scale * fov
-
-	if onScreen then
-		SetTextFont(comicSans and fontId or 4)
-		SetTextScale(scale, scale)
-		SetTextProportional(true)
-		SetTextCentre(true)
-		SetTextOutline()
-		SetTextEntry("STRING")
-		AddTextComponentString(text)
-		DrawText(_x, _y - 0.025)
-	end
+	SetTextEntry("STRING")
+	SetTextCentre(true)
+	AddTextComponentString(text)
+	SetDrawOrigin(x, y, z, 0)
+	DrawText(0.0, 0.0)
+	local factor = (string.len(text)) / 370
+	ClearDrawOrigin()
 end
 local fivemGamerTagCompsEnum = {
     GamerName = 0,

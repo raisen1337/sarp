@@ -1,7 +1,7 @@
 fx_version 'adamant'
 
 author 'Raisen - notraisen on Discord 🎉'
-description 'Roleplay framework developed with LUA and MongoDB.'
+description 'Roleplay framework developed with LUA.'
 
 games {'gta5'}
 

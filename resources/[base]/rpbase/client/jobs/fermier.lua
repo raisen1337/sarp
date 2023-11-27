@@ -105,27 +105,28 @@ end)
 local workTime = 30
 local warnedPlayer = false
 local workedTimes = 0
-Citizen.CreateThread(function()
-    while true do
-        Wait(3000)
-        if not DoesEntityExist(tractor) and workingWithTractor then
-            workingWithTractor = false
-            workedTimes = 0
-            inHarvestingField = false
-            TriggerEvent('chat:addMessage', {
-                args = {'^*^gNicu Fermieru^0: Ai iesit din tractor. Du-te si ia-l inapoi.'}
-            })
-        end
-    end
-end)
+-- Citizen.CreateThread(function()
+--     while true do
+--         Wait(3000)
+--         if not DoesEntityExist(tractor) and workingWithTractor then
+--             workingWithTractor = false
+--             workedTimes = 0
+--             inHarvestingField = false
+--             TriggerEvent('chat:addMessage', {
+--                 args = {'^*^gNicu Fermieru^0: Ai iesit din tractor. Du-te si ia-l inapoi.'}
+--             })
+--         end
+--     end
+-- end)
 
 Citizen.CreateThread(function ()
     while true do
         local wait = 3000
+
         if inHarvestingField then
             if workingWithTractor then
                 if workedTimes < 5 then
-                    if IsPedInVehicle(PlayerPedId(), tractor) then
+                    if IsPedInAnyVehicle(PlayerPedId()) then
                         if GetEntitySpeed(tractor) > 3.0 then
                             wait = 1000
                             warnedPlayer = false
@@ -185,8 +186,9 @@ function collectFruits()
     if fruitsInHands then return end
     if collecting then return end
     if PlayerData.job.name ~= JobInfo.jobName then return end
-    for k,v in pairs(JobInfo.places['Pomi fructiferi']) do
-        local dist = #(v.coords - GetEntityCoords(PlayerPedId()))
+    for _, place in ipairs(JobInfo.places['Pomi fructiferi']) do
+        local dist = #(place.coords - GetEntityCoords(PlayerPedId()))
+    
         if dist <= 2.0 then
             local ped = PlayerPedId()
             local pedCoords = GetEntityCoords(ped)
@@ -205,22 +207,15 @@ function collectFruits()
                 SetEntityHeading(fruit, GetEntityHeading(ped))
                 SetEntityAsMissionEntity(fruit, true, true)
                 SetModelAsNoLongerNeeded(model)
-
-                local animdict = 'anim@heists@box_carry@'
-                local animname = 'idle'
-
-                RequestAnimDict(animdict)
-                while not HasAnimDictLoaded(animdict) do
+    
+                local animdict2 = 'anim@heists@box_carry@'
+                local animname2 = 'idle'
+    
+                RequestAnimDict(animdict2)
+                while not HasAnimDictLoaded(animdict2) do
                     Wait(0)
                 end
-                local animdict = 'anim@heists@box_carry@'
-                local animname = 'idle'
-
-                RequestAnimDict(animdict)
-                while not HasAnimDictLoaded(animdict) do
-                    Wait(0)
-                end
-
+    
                 -- Attach entity to look like it's holding a box with both hands
                 AttachEntityToEntity(fruit, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true) -- object is attached to right hand    
                 TriggerEvent('chat:addMessage', {
@@ -229,6 +224,7 @@ function collectFruits()
             end)
         end
     end
+    
 end
 
 
@@ -323,6 +319,7 @@ Citizen.CreateThread(function ()
                 if PlayerData.job then
                     if PlayerData.job.name == JobInfo.jobName then
                         if k ~= 'Camp fermier' then
+                            pedCoords = GetEntityCoords(ped)
                             local dist = #(v[i].coords - pedCoords)
                             if dist <= 2.0 then
                                 wait = 0
@@ -353,14 +350,31 @@ Citizen.CreateThread(function ()
                             end
                         else
                             if workingWithTractor then
-                                local dist = #(v[i].coords - pedCoords)
-                                inHarvestingField = false
-                                if dist < 40.0 then
-                                    wait = 0
-                                    inHarvestingField = true
-                                    DrawMarker(1, v[i].coords.x, v[i].coords.y, v[i].coords.z - 5, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 60.0, 60.0, 15.0, 50, 168, 84, 100, false, true, 2, false, false, false, false)
+                                local closestDist = 40.0 -- Initialize with a distance greater than the field range
+                                local closestField = nil -- Initialize the closest field variable
+                            
+                                for i = 1, #v do
+                                    local dist = #(v[i].coords - pedCoords)
+                            
+                                    if dist < 40.0 then
+                                        inHarvestingField = true
+                                        wait = 0
+                                        DrawMarker(1, v[i].coords.x, v[i].coords.y, v[i].coords.z - 5, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 60.0, 60.0, 15.0, 50, 168, 84, 100, false, true, 2, false, false, false, false)
+                                        
+                                        -- Update the closest field if this field is closer
+                                        if dist < closestDist then
+                                            closestDist = dist
+                                            closestField = v[i]
+                                        end
+                                    end
+                                end
+                            
+                                -- If the player is not in any field, set inHarvestingField to false
+                                if closestField == nil then
+                                    inHarvestingField = false
                                 end
                             end
+                            
                         end
                     end
                 end
