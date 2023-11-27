@@ -1,5 +1,5 @@
 RegisterNetEvent('sv:chat:addMessage', function(message)
-    print(message)
+    
     local src = source
     local pData = Core.GetPlayerData(src)
     local chatMsg = ''
@@ -68,6 +68,7 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
     for _, tag in ipairs(tags) do
         finalChatMsg = tag.text .. " "..finalChatMsg
     end
+    print(finalChatMsg)
 
     TriggerClientEvent('chat:addMessage', -1, { args = { finalChatMsg } })
 end)

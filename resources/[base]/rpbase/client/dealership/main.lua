@@ -221,123 +221,52 @@ RegisterCommand('v', function()
                 
 
                 spawnCar:On("select", function()
-              
-                    if GetVehicles() then
-                      
-                        if table.empty(GetVehicles()) then
-                            if not vData.pos then
-                               
-                                if vData.addons.rainbow then
-                                  
-                                    rainbowveh = true
-                                    rainbowplate = vData.plate
-                                end
-                                local veh = CreateCar(vData.spawncode, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false, false, vData.plate)
-                                Core.TriggerCallback("Core:GetVehicleMods", function(mods)
-                                    if mods then
-                                        Core.SetVehicleProperties(veh, mods)
-                                    end
-                                end, vData.plate)
-                                MenuV:CloseAll()
-                                return
-                            end
-                          
-                            local carCoords = vector3(vData.pos.x, vData.pos.y, vData.pos.z)
-                            local veh = CreateCar(vData.spawncode, carCoords, vData.pos.h, true, false, false, vData.plate)
-                            Core.TriggerCallback("Core:GetVehicleMods", function(mods)
-                                if mods then
-                                    Core.SetVehicleProperties(veh, mods)
-                                end
-                            end, vData.plate)
-                            if vData.addons.rainbow then
-                                rainbowveh = true
-                                rainbowplate = vData.plate
-                            end
-                            MenuV:CloseAll()
-                            return
-                        else
-                            for _, vehicle in pairs(GetVehicles()) do
-                                vehicle = vehicle.localId
-                                if not GetVehicleNumberPlateText(vehicle) then
-                                    if vData.addons.rainbow then
-                                        rainbowveh = true
-                                        rainbowplate = vData.plate
-                                    end
-                                    local veh = CreateCar(vData.spawncode, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false, false, vData.plate)
-                                    Core.TriggerCallback("Core:GetVehicleMods", function(mods)
-                                        if mods then
-                                            Core.SetVehicleProperties(veh, mods)
-                                        end
-                                    end, vData.plate)
-                                    MenuV:CloseAll()
-                                    return
-                                end
-                                if all_trim(GetVehicleNumberPlateText(vehicle)) == all_trim(vData.plate) then
-                                    sendNotification("Masini personale", "Aceasta masina este deja spawnata.", 'error')
-                                    return
-                                end
-                            end
-                            if not vData.pos then
-                                if vData.addons.rainbow then
-                                    rainbowveh = true
-                                    rainbowplate = vData.plate
-                                end
-                                local veh = CreateCar(vData.spawncode, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false, false, vData.plate)
-                                Core.TriggerCallback("Core:GetVehicleMods", function(mods)
-                                    if mods then
-                                        Core.SetVehicleProperties(veh, mods)
-                                    end
-                                end, vData.plate)
-                                MenuV:CloseAll()
-                                return
-                            end
-                            local carCoords = vector3(vData.pos.x, vData.pos.y, vData.pos.z)
-                            local veh = CreateCar(vData.spawncode, carCoords, vData.pos.h, true, false, false, vData.plate)
-                            if vData.addons.rainbow then
-                                rainbowveh = true
-                                rainbowplate = vData.plate
-                            end
-                            Core.TriggerCallback("Core:GetVehicleMods", function(mods)
-                                if mods then
-                                    Core.SetVehicleProperties(veh, mods)
-                                end
-                            end, vData.plate)
-                            MenuV:CloseAll()
-                        end
-                        for _, vehicle in pairs(GetVehicles()) do
-                            vehicle = vehicle.localId
-                            if GetVehicleNumberPlateText(vehicle) == v.plate then
-                                return
-                            end
-                        end
-                    else
-                        if not vData.pos then
-                            if vData.addons.rainbow then
-                                rainbowveh = true
-                                rainbowplate = vData.plate
-                            end
-                            local veh = CreateCar(vData.spawncode, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false, true, vData.plate)
-                            Core.TriggerCallback("Core:GetVehicleMods", function(mods)
-                                if mods then
-                                    Core.SetVehicleProperties(veh, mods)
-                                end
-                            end, vData.plate)
-                            MenuV:CloseAll()
-                        else
-                            local carCoords = vector3(vData.pos.x, vData.pos.y, vData.pos.z)
-                            local veh = CreateCar(vData.spawncode, carCoords, vData.pos.h, true, false, false, vData.plate)
-                            if vData.addons.rainbow then
-                                rainbowveh = true
-                                rainbowplate = vData.plate
-                            end
-                            Core.TriggerCallback("Core:GetVehicleMods", function(mods)
-                                if mods then
-                                    Core.SetVehicleProperties(veh, mods)
-                                end
-                            end, vData.plate)
-                            MenuV:CloseAll()
+                    local found = false
+                    local vehicles = GetAllVehicles()
+                    if IsPedInAnyVehicle(PlayerPedId()) then
+                        sendNotification("Masini personale", "Nu poti spawna masina daca esti deja in una.", 'error')
+                        return
+                    end
+                    for k,v in pairs(vehicles) do
+                        if all_trim(GetVehicleNumberPlateText(v)) == vData.plate then
+                            found = true
                         end
                     end
+
+                    if found then
+                        sendNotification("Masini personale", "Masina este deja spawna.", 'error')
+                        return
+                    else
+                        if vData.pos then
+                            local veh = CreateCar(vData.spawncode, vData.pos, vData.pos.h, true, true, false, vData.plate)
+                            Core.TriggerCallback("Core:GetVehicleMods", function(mods)
+                                if mods then
+                                    Core.SetVehicleProperties(veh, mods)
+                                end
+                            end, vData.plate)
+                            sendNotification("Masini personale", "Masina a fost spawnata.", 'success')
+
+                            local cp = CreateCP(1, vData.pos, {255, 0, 0, 255}, 5.0, 20.0, false)
+                            --chat message
+                            TriggerEvent("chat:addMessage", {
+                                args = {"^b[Masini personale]^0", "Masina "..v.name.."^b("..vData.plate..")^0 a fost spawnata! Un ^bcheckpoint^0 ti-a fost setat."}
+                            })
+
+                            return
+                        else
+                            local pCoords = GetEntityCoords(PlayerPedId())
+                            local veh = CreateCar(vData.spawncode, pCoords, 0, true, true, true, vData.plate)
+                            Core.TriggerCallback("Core:GetVehicleMods", function(mods)
+                                if mods then
+                                    Core.SetVehicleProperties(veh, mods)
+                                end
+                            end, vData.plate)
+                            TriggerEvent("chat:addMessage", {
+                                args = {"^b[Masini personale]^0", "Masina "..v.name.."^b("..vData.plate..")^0 a fost spawnata! Parcheaz-o ^bundeva^0!."}
+                            })
+                        end
+                    end
+                    
                 end)
 
                 teleportCar:On("select", function()
@@ -352,32 +281,33 @@ RegisterCommand('v', function()
                         return
                     end
 
-                    local foundMatch = false
+                  
            
-                    if GetVehicles() then
-                        for _, vehicle in pairs(GetVehicles()) do
-                            vehicle = vehicle.localId
-                            if table.empty(GetVehicles()) then
-                                sendNotification("Masini personale", "Nu ai masini spawnate.", 'error')
-                                MenuV:CloseAll()
-                                return
-                            else
-                                if  all_trim(GetVehicleNumberPlateText(vehicle)) == all_trim(vData.plate) then
-                                    SetEntityCoords(vehicle, GetEntityCoords(PlayerPedId()))
-                                    if IsVehicleSeatFree(vehicle, -1) then
-                                        SetPedIntoVehicle(PlayerPedId(), vehicle, -1)
-                                    end
-                                    MenuV:CloseAll()
-                                    return
-                                end
-                            end
+                    local sVehs = GetAllVehicles()
+                    local found = false
+
+                    for k,v in pairs(sVehs) do
+                        if all_trim(GetVehicleNumberPlateText(v)) == vData.plate then
+                            found = true
                         end
-                    else
-                        sendNotification("Masini personale", "Nu ai masini spawnate.", 'error')
-                        MenuV:CloseAll()
-                        return
+                        if found then
+                            local pos = GetEntityCoords(v)
+                            SetEntityCoords(v, GetEntityCoords(PlayerPedId()))
+                            TaskWarpPedIntoVehicle(PlayerPedId(), v, -1)
+                            sendNotification("Masini personale", "Masina a fost teleportata la tine.", 'success')
+                            return
+                        end
                     end
-                    
+
+                    if not found then
+                        --create vehicle at player coords
+                        local veh = CreateCar(vData.spawncode, GetEntityCoords(PlayerPedId()), 0, true, true, true, vData.plate)
+                        Core.TriggerCallback("Core:GetVehicleMods", function(mods)
+                            if mods then
+                                Core.SetVehicleProperties(veh, mods)
+                            end
+                        end, vData.plate)
+                    end
                 end)
 
                 parkCar:On("select", function()
@@ -389,7 +319,6 @@ RegisterCommand('v', function()
 
                     if IsPedInAnyVehicle(PlayerPedId()) then
                         if all_trim(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId()))) == all_trim(v.plate) then
-                            
                             vData.pos = {x = 0, y = 0, z = 0, h = 0}
                             vData.pos.x = GetEntityCoords(GetVehiclePedIsUsing(PlayerPedId())).x
                             vData.pos.y = GetEntityCoords(GetVehiclePedIsUsing(PlayerPedId())).y
@@ -397,6 +326,7 @@ RegisterCommand('v', function()
                             vData.pos.h = GetEntityHeading(GetVehiclePedIsIn(PlayerPedId()))
                             TriggerServerEvent("Vehicles:Save", vData)
                             MenuV:CloseAll()
+                            Core.DeleteAllCps()
                             rainbowveh = false
                             DeleteCar(GetVehiclePedIsUsing(PlayerPedId()))
                             return

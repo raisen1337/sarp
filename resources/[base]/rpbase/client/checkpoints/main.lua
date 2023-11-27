@@ -39,6 +39,30 @@ ModifyCP = function(cp, type, coords, color, radius, visible)
     end
 end
 
+Core.HasCheckpoint = function(cb)
+    if not table.empty(checkpoints) then
+        cb(true)
+    else
+        cb(false)
+    end
+end
+
+Core.GetActiveCheckpoint = function()
+    if not table.empty(checkpoints) then
+        return checkpoints[1]
+    end
+    return nil
+end
+
+Core.DeleteAllCps = function()
+    if not table.empty(checkpoints) then
+        for k,v in pairs(checkpoints) do
+            RemoveBlip(v.blip)
+            table.remove(checkpoints, k)
+        end
+    end
+end
+
 CreateCP = function(type, coords1, color, radius, visible, callback)
     if not table.empty(checkpoints) then
         for k,v in pairs(checkpoints) do

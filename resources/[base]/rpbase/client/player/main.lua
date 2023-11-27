@@ -67,7 +67,7 @@ end)
 SelectGender:On('close', function()
     PlayerData = Core.GetPlayerData()
     FreezeEntityPosition(PlayerPedId(), true)
-    print(PlayerData.character['ped_model'])
+    -- print(PlayerData.character['ped_model'])
     if string.len(PlayerData.character['ped_model']) <= 0 then
         MenuV:OpenMenu(SelectGender)
     end
@@ -582,7 +582,7 @@ RegisterNetEvent('cl-time:update', function(h, m, s)
     m = tonumber(m)
     s = tonumber(s)
     SetClockTime(h, m, s)
-    NetworkOverrideClockTime(h, m, s)
+    NetworkOverrideClockTime(12, m, s)
 end)
 
 local payDayTime = 60

@@ -1043,6 +1043,14 @@ RegisterCommand('admin', function()
             personalSettings:ClearItems()
             if HasAccess(1) then
                 personalSettings:AddButton({
+                    icon = '🔧',
+                    label = 'Fix',
+                }):On('select', function()
+                    SetVehicleFixed(GetVehiclePedIsIn(PlayerPedId()))
+                    sendNotification('Admin', 'Ai reparat masina in care te afli!')
+                    Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..pData.user..' a reparat masina in care se afla!')
+                end)
+                personalSettings:AddButton({
                     icon = "🚗",
                     label = 'Spawncar',
                     value = 0

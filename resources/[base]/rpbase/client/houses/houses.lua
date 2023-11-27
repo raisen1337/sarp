@@ -789,7 +789,7 @@ RegisterCommand('houses', function()
                         sendNotification("Casa", "Nu ai suficienti bani.", 'error')
                         return
                     end
-                    print(tablelength(housesTypes), hData.level)
+                    -- print(tablelength(housesTypes), hData.level)
                     if hData.level >= tablelength(housesTypes) then
                         sendNotification("Casa", "Nu mai poti upgrada interiorul.", 'error')
                         return

@@ -93,19 +93,37 @@ RegisterNUICallback("dialogCallback", function(response)
     SetNuiFocus(false, false)
 end)
 
-function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, eventType)
+function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, eventType, cb)
     Wait(500)
     inDialog = true
     MenuV:CloseAll()
-    SendNUIMessage({
-        action = "openPrompt",
-        dialogTitle = title,
-        dialogSubtitle = subtitle,
-        hasCancel = hasCancel,
-        dialogEvent = dialogEvent,
-        canCloseEmpty = canCloseEmpty,
-        eventType = eventType
-    })
+    if not cb then
+        SendNUIMessage({
+            action = "openPrompt",
+            dialogTitle = title,
+            dialogSubtitle = subtitle,
+            hasCancel = hasCancel,
+            dialogEvent = dialogEvent,
+            canCloseEmpty = canCloseEmpty,
+            eventType = eventType
+        })
+    else
+        SendNUIMessage({
+            action = "openPrompt",
+            dialogTitle = title,
+            dialogSubtitle = subtitle,
+            hasCancel = hasCancel,
+            dialogEvent = dialogEvent,
+            canCloseEmpty = canCloseEmpty,
+            eventType = eventType
+        })
+        RegisterNUICallback("dialogCallback", function(response)
+            SetNuiFocus(false, false)
+            inDialog = false
+            cb(response.response)
+        end)
+    end
+    
     SetNuiFocus(true, true)
 end
 
@@ -123,6 +141,30 @@ RegisterNetEvent('Dialog:Open', function(title, subtitle, dialogEvent, hasCancel
     })
     SetNuiFocus(true, true)
 end)
+
+Core.ShowDialogBox = function(title, subtitle, hasCancel, canCloseEmpty, cb)
+    inDialog = true
+    local dialogResponse = nil
+    SendNUIMessage({
+        action = "openPrompt",
+        dialogTitle = title,
+        dialogSubtitle = subtitle,
+        hasCancel = hasCancel,
+        dialogEvent = "",
+        canCloseEmpty = canCloseEmpty,
+        eventType = ""
+    })
+    SetNuiFocus(true, true)
+    RegisterNUICallback("dialogCallback", function(response)
+        SetNuiFocus(false, false)
+        inDialog = false
+        dialogResponse = response.response
+    end)
+    while dialogResponse == nil do
+        Wait(0)
+    end
+    cb(dialogResponse)
+end
 
 RegisterNetEvent('dialogHandler', function(event, type, response)
     if type == "server" then

@@ -210,7 +210,7 @@ RegisterCommand('faction', function()
                                                 MenuV:CloseAll()
                                                 --print
                                                 --print
-                                                print('da')
+                                                -- print('da')
                                                 if pData.cash >= v.weaponCost then
                                                     pData.cash = pData.cash - v.weaponCost
                                                     Core.TriggerCallback('Player:AddItem', function(cb)

@@ -20,14 +20,19 @@ function Core.GetPlayerData()
 end
 currentWeather = false
 function Core.GetWeather()
-	if not currentWeather then
-		return GetPrevWeatherTypeHashName()
-	end
-
+	Core.TriggerCallback('Server:GetWeather', function(weather)
+		if not weather then
+			weather = 'EXTRASUNNY'
+		end
+		currentWeather = weather
+		if currentWeather == 'snow_only' then
+			snowOn = true
+		else
+			snowOn = false
+		end
+	end)
 	return currentWeather
 end
-
-
 
 Citizen.CreateThread(function ()
 	while true do
@@ -36,18 +41,30 @@ Citizen.CreateThread(function ()
 			wait = 1
 			ForceSnowPass(snowOn)
 		else
-			ForceSnowPass(snowOn)
+			ForceSnowPass(false)
 		end
 		Wait(wait)
 	end
 end)
 
+Citizen.CreateThread(function()
+	while true do
+		Wait(3000)
+		Core.TriggerCallback('Server:SyncWeather', function()
+		end)
+	end
+end)
+
 function Core.SetWeather(weather)
+	if type(weather) == "boolean" then
+		weather = 'EXTRASUNNY'
+	end
 	if weather:lower() == 'snow_only' then
 		snowOn = true
-		return
 	end
-	weather = weather
+	if weather:lower() == 'snow_off' then
+		snowOn = false
+	end
 	currentWeather = weather
 	SetWeatherTypePersist(weather)
 	SetWeatherTypeNow(weather)
@@ -55,16 +72,31 @@ function Core.SetWeather(weather)
 end
 
 RegisterNetEvent('Client:SyncWeather', function(weather)
-	print(weather)
 	Core.SetWeather(weather)
+end)
+
+RegisterCommand('killcp', function ()
+	Core.HasCheckpoint(function(has)
+		if has then
+			Core.DeleteAllCps()
+		end
+	end)
+end)
+
+RegisterCommand('testbox', function()
+	Core.ShowDialogBox('Test', 'test', true, true, function (da)
+		-- print(da)
+	end)
 end)
 
 Citizen.CreateThread(function ()
     while true do
 		local wait = 1000
-        local weather = Core.GetWeather()
+        local weather = GetPrevWeatherTypeHashName()
+		if not weather then
+			weather = 'extrasunny'
+		end
 		weather = string.upper(weather)
-		print(weather)
 		if weather == 'XMAS' or weather == 'BLIZZARD' or weather == 'THUNDER' or weather == 'RAIN' or snowOn then
 			if IsPedInAnyVehicle(PlayerPedId(), false) then
 				local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
@@ -86,7 +118,7 @@ Citizen.CreateThread(function ()
 				wait = 1
 				local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
 				if IsControlPressed(0, 72) then
-					print('Braking')
+					-- print('Braking')
 					SetVehicleReduceGrip(vehicle, true)
 					Wait(1000)
 					SetVehicleReduceGrip(vehicle, false)
@@ -106,8 +138,8 @@ RegisterCommand('setw', function()
 	event = AddEventHandler('weather', function(data)
 		RemoveEventHandler(event)
 		if string.len(data) > 0 then
-			Core.SetWeather(string.upper(data))
-			Core.TriggerCallback('Server:SyncWeather', function()
+			
+			Core.TriggerCallback('Server:SetWeather', function()
 				Core.SetWeather(string.upper(data))
 			end, data)
 		end
@@ -701,14 +733,27 @@ end
 
 
 function GetVehicles()
+	local vehicles = false
 	if not ClientVehicles then
-		local a = false
-		return a
+		vehicles = false
+		return vehicles
 	end
-	return ClientVehicles
+	if table.empty(ClientVehicles) then
+		vehicles = false
+		return vehicles
+	end
+
+	if ClientVehicles and not table.empty(ClientVehicles) then
+		vehicles = ClientVehicles
+		return vehicles
+	end
+	return vehicles
 end
 
-function CreateCar(model, coords, heading, isnet, tsc, putin, plate)
+function CreateCar(model, coords, heading, isnet, tsc, putin, plate, ignore)
+	if not ignore then
+		ignore = true
+	end
 	local x = coords.x
 	local y = coords.y
 	local z = coords.z
@@ -742,19 +787,20 @@ function CreateCar(model, coords, heading, isnet, tsc, putin, plate)
 	if putin then
 		SetPedIntoVehicle(PlayerPedId(), veh, -1)
 	end
-	local netID = NetworkGetNetworkIdFromEntity(veh)
 
-	SetNetworkIdExistsOnAllMachines(netID, true)
-
+	if isnet then
+		local netID = NetworkGetNetworkIdFromEntity(veh)
+		SetNetworkIdExistsOnAllMachines(netID, true)
+	end
 
 	if not ClientVehicles then
 		ClientVehicles = {}
-		table.insert(ClientVehicles, { netID = netID, localId = veh })
+		table.insert(ClientVehicles, { localId = veh, netID = netID, ignore = ignore })
 	else
-		table.insert(ClientVehicles, { netID = netID, localId = veh })
+		table.insert(ClientVehicles, { localId = veh, netID = netID, ignore = ignore })
 	end
 
-	TriggerServerEvent("Vehicles:Insert", { netID = netID, localId = veh })
+	TriggerServerEvent("Vehicles:Insert", { netID = netID, localId = veh, ignore = ignore })
 
 	return veh
 end
@@ -841,27 +887,30 @@ end)
 local syncedAmmo = false
 
 function isVehicleRegistered(veh)
-	local found = false
-	if not ClientVehicles then
-		found = false
-		return found
-	end
-	if table.empty(ClientVehicles) then
-		found = false
-		return found
-	end
+	local pass = false
+
+	if not ClientVehicles or table.empty(ClientVehicles) then return false end
 	for k, v in pairs(ClientVehicles) do
-		if v.netID == NetworkGetNetworkIdFromEntity(veh) then
-			found = true
-			break
+		if v.localId == veh then
+			if v.ignore then
+				pass = true
+			end
+			if not v.netID then
+				if v.ignore then
+					pass = true
+				end
+			else
+				pass = true
+			end
 		end
 	end
-	return found
+	return pass
 end
+
 
 Citizen.CreateThread(function()
 	while true do
-		Wait(300)
+		Wait(1000)
 		while not LoggedIn do
 			Wait(1000)
 		end
@@ -873,29 +922,35 @@ Citizen.CreateThread(function()
 			pData = Core.GetPlayerData()
 			PlayerData = pData
 		end
-		vehs = GetAllVehicles()
-	
-		for k, v in pairs(vehs) do
-			if DoesEntityExist(v) then
-				if not isVehicleRegistered(v) then
-					if NetworkGetEntityOwner(v) == -1 then
-						Core.TriggerCallback('AC:ReportAnomaly', function()
-						end, 'vehicle')
+		
+		local vehs = GetAllVehicles()
+		local notRegistered = false
+		for k,v in pairs(vehs) do
+			if not isVehicleRegistered(v) then
+				print('not')
+				notRegistered = v
+			end
+		end
+
+		if notRegistered then
+			while DoesEntityExist(notRegistered) do
+				Wait(1)
+				DeleteEntity(notRegistered)
+				DeleteVehicle(notRegistered)
+				DeleteCar(notRegistered)
+			end
+		end
+
+		local unarmed = GetHashKey('WEAPON_UNARMED')
+		if GetVehicles() and not table.empty(GetVehicles()) then
+			for k,v in pairs(GetVehicles()) do
+				if not v.netID then
+					if not v.ignore then
+						DeleteCar(v.localId)
 					end
-					if IsPedInVehicle(PlayerPedId(), v) and pData.adminLevel == 0 then
-						Core.TriggerCallback('AC:ReportAnomaly', function()
-						end, 'vehicle-driving')
-					else
-						if NetworkGetEntityOwner(v) == PlayerId() then
-							Core.TriggerCallback('AC:ReportAnomaly', function()
-							end, 'vehicle')
-						end
-					end
-					DeleteCar(v)
 				end
 			end
 		end
-		local unarmed = GetHashKey('WEAPON_UNARMED')
 
 		if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed and GetSelectedPedWeapon(PlayerPedId()) ~= 966099553 then
 			-- print(GetSelectedPedWeapon(PlayerPedId()))
@@ -926,84 +981,6 @@ Citizen.CreateThread(function()
 			end
 		end
 
-		-- if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed and GetSelectedPedWeapon(PlayerPedId()) ~= 966099553 then
-		-- 	if not PlayerData then
-		-- 		PlayerData = Core.GetPlayerData()
-		-- 	end
-		-- 	if PlayerData and not table.empty(PlayerData) then
-		-- 		if table.empty(PlayerData.inventory) then
-		-- 			if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed and GetSelectedPedWeapon(PlayerPedId()) ~= 966099553 then
-		-- 				Core.TriggerCallback('AC:ReportAnomaly', function()
-		-- 				end, 'weapon')
-		-- 				RemoveAllPedWeapons(PlayerPedId(), true)
-		-- 			end
-		-- 		else
-		-- 			local gunFound = false
-		-- 			for k, v in pairs(PlayerData.inventory) do
-		-- 				local currentgun = GetSelectedPedWeapon(PlayerPedId())
-		-- 				local invgun = GetHashKey(v.name)
-		-- 				if currentgun == 966099553 then
-		-- 					gunFound = true
-		-- 					break
-		-- 				end
-		-- 				if currentgun == invgun and currentgun ~= 966099553 then
-		-- 					gunFound = true
-		-- 					-- local weaponAmmo = GetAmmoInPedWeapon(PlayerPedId(), currentgun)
-		-- 					-- local Inventory = PlayerData.inventory
-		-- 					-- local playerAmmo = Core.GetPlayerAmmo()
-
-		-- 					-- local ammoDifference = 10 -- Define the allowable ammo difference
-
-		-- 					-- for a, b in pairs(playerAmmo) do
-
-		-- 					--     if weaponAmmo ~= b and (b > weaponAmmo + ammoDifference or b < weaponAmmo - ammoDifference) then
-		-- 					--         -- Perform actions when the difference in ammo is greater than the defined threshold
-		-- 					--         Core.TriggerCallback('AC:ReportAnomaly', function()
-		-- 					--         end, 'ammo')
-		-- 					--         RemoveAllPedWeapons(PlayerPedId(), true)
-		-- 					--         Inventory = PlayerData.inventory
-		-- 					--         playerAmmo = Core.GetPlayerAmmo()
-		-- 					--         for k, v in pairs(Inventory) do
-		-- 					--             if v.type == 'weapon' then
-		-- 					--                 for a, b in pairs(playerAmmo) do
-		-- 					--                     if checkWeaponPresence(v.name, a) then
-		-- 					--                         GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), b, false, false)
-		-- 					--                     end
-		-- 					--                 end
-		-- 					--             end
-		-- 					--         end
-		-- 					--     else
-		-- 					--         -- If the difference is within the threshold, update and synchronize the ammo
-		-- 					--         syncedAmmo = true
-		-- 					--         Core.UpdateAmmo(Core.GetPlayerAmmo())
-		-- 					--     end
-		-- 					-- end
-		-- 					break -- Exit the loop since a match is found
-		-- 				end
-		-- 			end
-
-		-- 			if not gunFound then
-		-- 				Core.TriggerCallback('AC:ReportAnomaly', function()
-		-- 				end, 'weapon')
-		-- 				RemoveAllPedWeapons(PlayerPedId(), true)
-
-		-- 				local Inventory = PlayerData.inventory
-		-- 				local playerAmmo = Core.GetPlayerAmmo()
-
-		-- 				for k, v in pairs(Inventory) do
-		-- 					if v.type == 'weapon' then
-		-- 						for a, b in pairs(playerAmmo) do
-		-- 							GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
-		-- 							if checkWeaponPresence(v.name, a) then
-		-- 								SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
-		-- 							end
-		-- 						end
-		-- 					end
-		-- 				end
-		-- 			end
-		-- 		end
-		-- 	end
-		-- end
 		pData.adminLevel = pData.adminLevel or false
 		if not IsGameplayCamRendering() and pData.adminLevel == 0 then
 			Core.TriggerCallback('AC:ReportAnomaly', function()

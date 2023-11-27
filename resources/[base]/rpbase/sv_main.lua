@@ -53,12 +53,12 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
                 if v.type == 'ammo' then
                     if PlayerAmmo[v.name] then
                         if v.amount == PlayerAmmo[v.name] then return end
-                        print('[F]PlayerAmmo['..v.name..'] = '..PlayerAmmo[v.name])
+                        -- print('[F]PlayerAmmo['..v.name..'] = '..PlayerAmmo[v.name])
                         v.amount = PlayerAmmo[v.name]
                         exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
                         return
                     else
-                        print('[NF]PlayerAmmo['..v.name..'] = '..v.amount)
+                        -- print('[NF]PlayerAmmo['..v.name..'] = '..v.amount)
                         v.amount = PlayerAmmo[v.name]
                         exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
                         return
@@ -178,6 +178,11 @@ function ACBan(source)
     DropPlayer(banData.banSource, "You have been banned from the server. Reason: "..banData.banReason..". Ban ID: "..banId..". Ban expires in: "..banData.banTime.." days.")
 end
 
+local currentWeather = false
+Core.CreateCallback('Server:GetWeather', function(source, cb)
+    cb(currentWeather)
+end)
+
 Core.CreateCallback('Server:UnsyncVehicle', function(source, cb, vehicle)
     local src = source
     local players = GetPlayers()
@@ -230,8 +235,8 @@ AddEventHandler('explosionEvent', function(sender, ev)
     CancelEvent()
 end)
 
-Core.CreateCallback('Server:SyncWeather', function (source, cb, weather)
-    print('call')
+Core.CreateCallback('Server:SetWeather', function (source, cb, weather)
+    currentWeather = weather
     local players = GetPlayers()
     for k, v in pairs(players) do
         TriggerClientEvent('Client:SyncWeather', v, weather)
@@ -239,7 +244,16 @@ Core.CreateCallback('Server:SyncWeather', function (source, cb, weather)
     cb(true)
 end)
 
-
+Core.CreateCallback('Server:SyncWeather', function (source, cb)
+    local players = GetPlayers()
+    if not currentWeather then
+        currentWeather = 'EXTRASUNNY'
+    end
+    for k, v in pairs(players) do
+        TriggerClientEvent('Client:SyncWeather', v, currentWeather)
+    end
+    cb(currentWeather)
+end)
 
 Core.CreateCallback('AC:ReportAnomaly', function(source, cb, type)
     local src = source

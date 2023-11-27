@@ -41,7 +41,7 @@ RegisterNUICallback('keepFocus', function()
 end)
 
 RegisterNUICallback('tryTransaction', function(data)
-    print(je(data))
+    -- print(je(data))
     Core.TriggerCallback("Banking:TryTransaction", function(cb)
         if cb == true then
             Wait(300)

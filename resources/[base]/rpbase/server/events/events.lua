@@ -1,5 +1,6 @@
 RegisterNetEvent('Core:Server:TriggerCallback', function(name, ...)
     local src = source
+    -- print('Called callback: '..name..' from '..src)
     Core.TriggerCallback(name, src, function(...)
         TriggerClientEvent('Core:Client:TriggerCallback', src, name, ...)
     end, ...)

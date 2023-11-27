@@ -88,7 +88,7 @@ local function refreshSaleVehicles(vehicle)
             spawnPosition.model = vehicle.model
             spawnPosition.name = vehicle.name
             spawnPosition.price = vehicle.price
-            local spawnedVehicle = CreateCar(vehicle.model, pos, spawnPosition.w, true, true, false, "TGAUTO")
+            local spawnedVehicle = CreateCar(vehicle.model, pos, spawnPosition.w, false, true, false, "TGAUTO", true)
             SetVehicleDoorsLocked(spawnedVehicle, 2)
             SetVehicleDoorsLockedForAllPlayers(spawnedVehicle, true)
             SetVehicleDoorsLockedForPlayer(spawnedVehicle, PlayerId(), false)
@@ -154,20 +154,21 @@ Citizen.CreateThread(function ()
                         a[randomIndex].model = saleVehicles[count+1].model
                         a[randomIndex].name = saleVehicles[count+1].name
                         a[randomIndex].price = saleVehicles[count+1].price
-                        -- local vehicle = CreateCar(saleVehicles[count+1].model, pos, b.w, true, true, false, "TGAUTO")
-                        -- Wait(100)
-                        -- Core.TriggerCallback('Server:UnsyncVehicle', function(cb)
-                        -- end, vehicle)
-                        -- a[randomIndex].id = vehicle
-                        -- SetVehicleDoorsLocked(vehicle, 2)
-                        -- SetVehicleDoorsLockedForAllPlayers(vehicle, true)
-                        -- SetVehicleDoorsLockedForPlayer(vehicle, PlayerId(), false)
-                        -- SetVehicleEngineOn(vehicle, false, true, true)  
-                        -- SetVehicleUndriveable(vehicle, true)
-                        -- SetVehicleOnGroundProperly(vehicle)
+                        local vehicle = CreateCar(saleVehicles[count+1].model, pos, b.w, false, false, false, "TGAUTO", true)
+                        Wait(100)
+                       
+                        a[randomIndex].id = vehicle
+                        SetVehicleDoorsLocked(vehicle, 2)
+                        SetVehicleDoorsLockedForAllPlayers(vehicle, true)
+                        SetVehicleDoorsLockedForPlayer(vehicle, PlayerId(), false)
+                        SetVehicleEngineOn(vehicle, false, true, true)
+                        SetVehicleUndriveable(vehicle, true)
+                        FreezeEntityPosition(vehicle, true)
+
+                        SetVehicleOnGroundProperly(vehicle)
 
                         count = count + 1
-                        -- saleVehicles[count].id = vehicle
+                        saleVehicles[count].id = vehicle
                     end
                 end
             end
@@ -175,27 +176,6 @@ Citizen.CreateThread(function ()
     end
 end)
 
-local unsyncedVehs = {}
-
-Citizen.CreateThread(function()
-    while true do
-        Wait(1)
-        if not table.empty(unsyncedVehs) then
-            for k, v in pairs(unsyncedVehs) do
-                if DoesEntityExist(v) then
-                    DeleteCar(v)
-                    DeleteEntity(v)
-                    unsyncedVehs[k] = nil
-                end
-            end
-        end
-    end
-end)
-
-RegisterNetEvent('Client:UnsyncVehicle', function(veh)
-    print(veh)
-    table.insert(unsyncedVehs, veh)
-end)
 
 Citizen.CreateThread(function ()
     while true do
@@ -218,15 +198,16 @@ Citizen.CreateThread(function ()
                             local randomIndex = math.random(1, #saleVehicles)
                             local vehicle = saleVehicles[randomIndex]
                             local pos = vec3(v.x, v.y, v.z)
-                            -- local spawnedVehicle = CreateCar(vehicle.model, pos, v.w, true, true, false, "TGAUTO")
-                            Wait(100)
-                            -- Core.TriggerCallback('Server:UnsyncVehicle', function(cb)
-                            -- end, spawnedVehicle)
-                            -- SetVehicleDoorsLocked(spawnedVehicle, 2)
-                            -- SetVehicleDoorsLockedForAllPlayers(spawnedVehicle, true)
-                            -- SetVehicleDoorsLockedForPlayer(spawnedVehicle, PlayerId(), false)
-                            -- SetVehicleEngineOn(spawnedVehicle, false, true, true)
-                            -- SetVehicleUndriveable(spawnedVehicle, true)
+                            local spawnedVehicle = CreateCar(vehicle.model, pos, v.w, false, true, false, "TGAUTO", true)
+                            
+                            a[k].id = spawnedVehicle
+                            
+                            SetVehicleDoorsLocked(spawnedVehicle, 2)
+                            SetVehicleDoorsLockedForAllPlayers(spawnedVehicle, true)
+                            SetVehicleDoorsLockedForPlayer(spawnedVehicle, PlayerId(), false)
+                            SetVehicleEngineOn(spawnedVehicle, false, true, true)
+                            SetVehicleUndriveable(spawnedVehicle, true)
+                            FreezeEntityPosition(spawnedVehicle, true)
                       
                             v.model = vehicle.model
                             v.name = vehicle.name
