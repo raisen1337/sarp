@@ -10,8 +10,9 @@
     right: 25rem;
     width: 10rem;
     height: 10rem;
-    font-family: Poppins;
+    font-family: Akrobat;
     font-size: 2.8rem;
+    transform: skew(-10deg);
     font-weight: bold;
     text-align: center;
     color: white;
@@ -19,8 +20,8 @@
 }
 
 .payday-title {
-    font-size: 2rem;
-
+    font-size: 3rem;
+    margin-bottom: 2rem;
     text-transform: uppercase;
 }
 
@@ -28,11 +29,11 @@
     width: 80%;
     filter: blur(2px);
     z-index: -1;
-    margin-bottom: -7rem;
+    margin-bottom: -8rem;
 }
 
 .payday-time {
-    font-size: 3rem;
+    font-size: 2.4rem;
     transform: skew(-10deg);
 }
 

@@ -103,8 +103,8 @@ RegisterCommand('savepos', function(source, args, rawCommand)
     end
     local posname = table.concat(args, " ")
     if posList[posname] then
-        local posListJson = json.encode(posList)
-        SaveResourceFile(GetCurrentResourceName(), "poslist.json", posListJson, -1)
+        local posListTable = posList
+        SaveResourceFile(GetCurrentResourceName(), "poslist.lua", "posList = " .. tableToString(posListTable), -1)
         TriggerClientEvent('chat:addMessage', src, {
             multiline = true,
             args = {'^3[^0Admin^3] ^0Ai salvat pozitia '..posname..'!'}
@@ -114,6 +114,18 @@ RegisterCommand('savepos', function(source, args, rawCommand)
     end
 end)
 
+function tableToString(tbl)
+    local str = "{\n"
+    for k, v in pairs(tbl) do
+        if type(v) == "table" then
+            str = str .. k .. " = " .. tableToString(v) .. ",\n"
+        else
+            str = str .. k .. " = " .. tostring(v) .. ",\n"
+        end
+    end
+    str = str .. "}"
+    return str
+end
 RegisterCommand('clearpos', function(source, args, rawCommand)
     local src = source
     local pData = Core.GetPlayerData(src)

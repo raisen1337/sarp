@@ -256,6 +256,15 @@ local weathers = {
     'XMAS',
 }
 
+RegisterNetEvent('onPlayerDied', function ()
+   local src = source
+--    TriggerClientEvent('onPlayerDied', src)
+end)
+
+RegisterNetEvent('onPlayerKilled', function(killerid, data)
+    print(killerid, je(data))
+end)
+
 Citizen.CreateThread(function()
     --pick a random weather every 10 minutes
     while true do
@@ -304,6 +313,10 @@ GetRandomWeatherWithIncreasedChance = function(weathers, chance)
         return weathers[math.random(1, #weathers)]
     end
 end
+
+Core.CreateCallback('Server:GetObjects', function(source, cb)
+    cb(GetAllObjects())
+end)
 
 function SyncWeatherAndSeason()
     Wait(4000)

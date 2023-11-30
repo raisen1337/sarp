@@ -34,7 +34,7 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
         local factions = Core.GetFactions()
         if factions[fData.name] then
             table.insert(tags, {
-                text = ""..factions[fData.name].color.."[^0"..factions[fData.name].name..""..factions[fData.name].color.."]^0 ",
+                text = ""..factions[fData.name].color.."[^0"..factions[fData.name].name..""..factions[fData.name].color.."]^0",
                 type = 'faction',
                 index = 0
             })
@@ -45,13 +45,13 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
         if not table.empty(tags) then
             for k,v in pairs(tags) do
                 if v.type == 'faction' then
-                    admTag = "^1[^0A^1]^0 "
+                    admTag = "^1[^0A^1]^0"
                 else
-                    admTag = "^1[^0ADMIN^1]^0 "
+                    admTag = "^1[^0ADMIN^1]^0"
                 end
             end 
         else
-            admTag = "^1[^0ADMIN^1]^0 "
+            admTag = "^1[^0ADMIN^1]^0"
         end
        
     end
@@ -66,7 +66,7 @@ RegisterNetEvent('sv:chat:addMessage', function(message)
 
 
     for _, tag in ipairs(tags) do
-        finalChatMsg = tag.text .. " "..finalChatMsg
+        finalChatMsg = tag.text .. ""..finalChatMsg
     end
     print(finalChatMsg)
 

@@ -115,8 +115,8 @@ function unloadPay()
         if not playerInfo['unloadedTimes'] then
             playerInfo['unloadedTimes'] = 0
         end
-        if playerInfo['unloadedTimes'] + 1 >= 5 then
-            playerInfo['unloadedTimes'] = 5
+        if playerInfo['unloadedTimes'] + 1 >= 7 then
+            playerInfo['unloadedTimes'] = 7
             playerInfo['loadedRafined'] = false
             playerInfo['loadedUnrafined'] = false
 

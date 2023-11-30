@@ -46,7 +46,11 @@
     margin-bottom: .3rem;
     max-height: 40px;
     margin-left: 1rem;
-    direction: ltr;
+    /* Updated properties for better word spacing */
+    white-space: pre-wrap; /* Preserve white spaces and wrap text */
+    word-break: break-word; /* Break long words if needed */
+    direction: ltr; /* Set direction to left-to-right */
+    text-align: left; /* Align text to the left */
     position: relative;
 }
 

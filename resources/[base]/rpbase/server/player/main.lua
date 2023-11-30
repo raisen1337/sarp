@@ -1040,9 +1040,11 @@ Citizen.CreateThread(function()
 end)
 
 Core.CreateCallback('Core:GetPlayerById', function(source, cb, id)
+    id = tonumber(id)
     local players = GetPlayers()
     local player = {}
     for k, v in pairs(players) do
+        v = tonumber(v)
         if v == id then
             player = {
                 id = v,

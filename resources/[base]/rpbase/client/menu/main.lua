@@ -87,13 +87,16 @@ end)
 --     end
 -- end)
 
+
+
 RegisterNUICallback("dialogCallback", function(response)
+
     TriggerEvent('dialogHandler', response.eventName, response.type, response.response)
     inDialog = false
     SetNuiFocus(false, false)
 end)
 
-function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, eventType, cb)
+function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, eventType, cb, onClose)
     Wait(500)
     inDialog = true
     MenuV:CloseAll()
@@ -113,14 +116,24 @@ function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, even
             dialogTitle = title,
             dialogSubtitle = subtitle,
             hasCancel = hasCancel,
-            dialogEvent = dialogEvent,
+            dialogEvent = "",
             canCloseEmpty = canCloseEmpty,
-            eventType = eventType
+            eventType = ""
         })
         RegisterNUICallback("dialogCallback", function(response)
             SetNuiFocus(false, false)
             inDialog = false
+            
             cb(response.response)
+        end)
+    end
+
+    if onClose then
+        RegisterNUICallback("dialogClose", function()
+            SetNuiFocus(false, false)
+            inDialog = false
+            onClose()
+            Core.ClearEvents()
         end)
     end
     
@@ -175,5 +188,5 @@ RegisterNetEvent('dialogHandler', function(event, type, response)
 end)
 
 RegisterNUICallback('dialogClose', function()
-  
+    Core.ClearEvents()
 end)

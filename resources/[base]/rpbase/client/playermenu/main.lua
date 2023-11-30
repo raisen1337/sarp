@@ -48,6 +48,38 @@ BuildPlayerOptions = function()
                 value = 0,
                 disabled = true
             })
+            if factions[fData.name].type == 'ems' then
+                playerOptions:AddButton({
+                    label = 'Trateaza jucator',
+                    icon = '💊',
+                    value = 0,
+                    disabled = false
+                }):On('select', function()
+                    local nearestPed = GetPedInFront()
+
+                    local healPlayer
+
+                    if nearestPed then
+                        healPlayer = GetNearestPlayer()
+                        
+                        if IsPedInAnyVehicle(PlayerPedId(), false) then
+                            sendNotification('Tratament', 'Nu poti trata un jucator dintr-o masina.', 'error')
+                            return
+                        end
+                        if healPlayer then
+                            Core.TriggerCallback('EMS:Heal', function(healed)
+                                if healed then
+                                    sendNotification('Tratament', 'L-ai tratat pe ' .. GetPlayerName(healPlayer).. '!', 'success')
+                                else
+                                    SetEntityHealth(nearestPed, 200)
+                                end
+                            end, healPlayer)
+                        else
+                            sendNotification('Tratament', 'Nu exista jucatori in apropiere.', 'error')
+                        end
+                    end
+                end)
+            end
             if factions[fData.name].type == 'lege' or factions[fData.name].type == 'mafie' then
                 playerOptions:AddButton({
                     label = 'Incatuseaza jucator',
@@ -143,13 +175,13 @@ BuildPlayerOptions = function()
                                     }):On('select', function()
                                         ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true,
                                             false, 'c')
-                                        event = AddEventHandler('wanted', function(level)
+                                        event = Core.AddEventHandler('wanted', function(level)
                                             RemoveEventHandler(event)
                                             if tonumber(level) then
                                                 level = tonumber(level)
                                                 ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.', 'wanted',
                                                     true, false, 'c')
-                                                event = AddEventHandler('wanted', function(reason)
+                                                event = Core.AddEventHandler('wanted', function(reason)
                                                     RemoveEventHandler(event)
                                                     if string.len(reason) > 0 then
                                                         Core.TriggerCallback('Police:SetWanted', function()
@@ -210,18 +242,18 @@ BuildPlayerOptions = function()
                     ShowDialog("Aresteaza", 'Scrie mai jos ID-ul jucatorului caruia vrei sa-l arestezi.', 'arest', true,
                         false, 'c')
                     local event
-                    event = AddEventHandler('arest', function(id)
+                    event = Core.AddEventHandler('arest', function(id)
                         RemoveEventHandler(event)
                         if tonumber(id) then
                             id = tonumber(id)
                             if IsPlayerConnected(id) then
                                 ShowDialog("Aresteaza", 'Scrie mai jos timpul de arestare.', 'arest', true, false, 'c')
-                                event = AddEventHandler('arest', function(time)
+                                event = Core.AddEventHandler('arest', function(time)
                                     RemoveEventHandler(event)
                                     if tonumber(time) then
                                         time = tonumber(time)
                                         ShowDialog("Aresteaza", 'Scrie motivul arestarii mai jos.', 'arest', true, false, 'c')
-                                        event = AddEventHandler('arest', function(reason)
+                                        event = Core.AddEventHandler('arest', function(reason)
                                             RemoveEventHandler(event)
                                             if string.len(reason) > 0 then
                                                 Core.TriggerCallback("Core:GetNearestPlayer", function(closestPlayer)
@@ -272,7 +304,7 @@ BuildPlayerOptions = function()
                     ShowDialog("Scoate din arest", 'Scrie mai jos ID-ul jucatorului caruia vrei sa-l scoti din arest.',
                         'unarest', true, false, 'c')
                     local event
-                    event = AddEventHandler('unarest', function(id)
+                    event = Core.AddEventHandler('unarest', function(id)
                         RemoveEventHandler(event)
                         if tonumber(id) then
                             id = tonumber(id)
@@ -298,19 +330,19 @@ BuildPlayerOptions = function()
                     ShowDialog("Seteaza wanted", 'Scrie mai jos ID-ul jucatorului caruia vrei sa-i dai wanted.', 'wanted',
                         true, false, 'c')
                     local event
-                    event = AddEventHandler('wanted', function(id)
+                    event = Core.AddEventHandler('wanted', function(id)
                         RemoveEventHandler(event)
                         if tonumber(id) then
                             id = tonumber(id)
                             if IsPlayerConnected(id) then
                                 ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true, false, 'c')
-                                event = AddEventHandler('wanted', function(level)
+                                event = Core.AddEventHandler('wanted', function(level)
                                     RemoveEventHandler(event)
                                     if tonumber(level) then
                                         level = tonumber(level)
                                         ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.', 'wanted', true,
                                             false, 'c')
-                                        event = AddEventHandler('wanted', function(reason)
+                                        event = Core.AddEventHandler('wanted', function(reason)
                                             RemoveEventHandler(event)
                                             if string.len(reason) > 0 then
                                                 Core.TriggerCallback('Police:SetWanted', function()
@@ -481,6 +513,7 @@ RegisterCommand('pmenu', function()
         if closedTimes >= 4 then
             return
         end
+        Core.ClearEvents()
         BuildPlayerMenu()
         MenuV:OpenMenu(playerMenu)
     end

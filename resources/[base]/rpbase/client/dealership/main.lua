@@ -174,7 +174,7 @@ RegisterCommand('v', function()
                         
                         ShowDialog('Schimba numar inmatriculare', "Scrie mai jos noul numarul de inmatriculare al masinii: "..v.name..":", "Vehicle:ChangePlate", true, false, 'client')
                         local event
-                        event = AddEventHandler("Vehicle:ChangePlate", function(plate)
+                        event = Core.AddEventHandler("Vehicle:ChangePlate", function(plate)
                             if string.len(plate) > 7 then
                                 sendNotification("Masini personale", "Numarul poate avea maxim 6 caractere!", 'error')
                                 RemoveEventHandler(event)
@@ -292,8 +292,10 @@ RegisterCommand('v', function()
                     local found = false
 
                     for k,v in pairs(sVehs) do
-                        if all_trim(GetVehicleNumberPlateText(v)) == vData.plate then
-                            found = true
+                        if GetVehicleNumberPlateText(v) then
+                            if all_trim(GetVehicleNumberPlateText(v)) == vData.plate then
+                                found = true
+                            end
                         end
                         if found then
                             local pos = GetEntityCoords(v)

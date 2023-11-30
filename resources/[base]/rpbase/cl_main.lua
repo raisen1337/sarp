@@ -10,6 +10,33 @@ AddEventHandler('onClientMapStart', function()
 	forceRespawn()
 end)
 
+local eventHandlers = {}
+
+Core.AddEventHandler = function(eventName, cb)
+	local event = AddEventHandler(eventName, cb)
+	table.insert(eventHandlers, { event = event, name = eventName })
+	SetTimeout(6000, function()
+		RemoveEventHandler(event)
+	end)
+	return event
+end
+
+Core.ClearEvents = function()
+	for k,v in pairs(eventHandlers) do
+		RemoveEventHandler(v.event)
+	end
+	eventHandlers = {}
+end
+
+Core.ClearEvent = function(eventName)
+	for k,v in pairs(eventHandlers) do
+		if v.name == eventName then
+			RemoveEventHandler(v.event)
+			table.remove(eventHandlers, k)
+		end
+	end
+end
+
 local requireUpdate = false
 
 Citizen.CreateThread(function()
@@ -187,25 +214,23 @@ Core.TeleportToCp = function (cp)
 end
 
 RegisterCommand('setw', function()
-	ShowDialog('Set weather', 'Type the weather name', 'weather', true, false, 'c')
-	local event
-	event = AddEventHandler('weather', function(data)
-		RemoveEventHandler(event)
+	ShowDialog('Set weather', 'Type the weather name', 'weather', true, false, 'c', function(data)
 		if string.len(data) > 0 then
 			
 			Core.TriggerCallback('Server:SetWeather', function()
 				Core.SetWeather(string.upper(data))
 			end, data)
+			Core.ClearEvent('weather')
 		end
 	end)
-	
 end)
 
 
 progressBars = {}
-currentProgress = {}
+currentProgress = false
 
 Core.ProgressBar = function(duration, percentage, canClose, animation, prop, freeze, cb, closecb)
+	
 	local id = math.random(1, 9999999)
 	local this = {}
 	this.id = id
@@ -280,6 +305,7 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 						if IsControlJustPressed(0, 200) then
 							closecb()
 							Wait(300)
+							currentProgress = false
 							this = false
 							
 						end
@@ -1430,6 +1456,26 @@ Citizen.CreateThread(function()
 		Citizen.Wait(waitg)
 	end
 end)
+
+playerObjects = {}
+
+Core.RequestModel = function(model)
+	if not HasModelLoaded(model) then
+        RequestModel(model)
+        while not HasModelLoaded(model) do
+            Citizen.Wait(1)
+        end
+    end
+end
+
+Core.CreateObject = function(model, coords, isNet, tsc, dynamic)
+	Core.RequestModel(model)
+	local obj = CreateObject(GetHashKey(model), coords.x, coords.y, coords.z, isNet, tsc, dynamic)
+	table.insert(playerObjects, obj)
+	SetModelAsNoLongerNeeded(model)
+	SetModelAsNoLongerNeeded(GetHashKey(model))
+	return obj
+end
 
 Citizen.CreateThread(function()
 	while true do

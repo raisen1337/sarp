@@ -233,7 +233,7 @@ RegisterCommand('createticket', function()
         if pData.adminLevel >= 7 then
             ShowDialog('Ticket', 'Scrie mai jos motivul pentru care ai nevoie de asistenta!', 'ticket', true, false, 'c')
             local event
-            event = AddEventHandler('ticket', function(ticketMsg)
+            event = Core.AddEventHandler('ticket', function(ticketMsg)
                 RemoveEventHandler(event)
                 Core.TriggerCallback('Admin:SendTicket', function(ticket)
                     if ticket then
@@ -252,7 +252,7 @@ RegisterCommand('createticket', function()
     else
         ShowDialog('Ticket', 'Scrie mai jos motivul pentru care ai nevoie de asistenta!', 'ticket', true, false, 'c')
         local event
-        event = AddEventHandler('ticket', function(ticketMsg)
+        event = Core.AddEventHandler('ticket', function(ticketMsg)
             RemoveEventHandler(event)
             Core.TriggerCallback('Admin:SendTicket', function(ticket)
                 if ticket then
@@ -307,7 +307,7 @@ RegisterCommand('admin', function()
                                     }):On("select", function()
                                         local event, aBanReason, aBanTime
                                         ShowDialog('Baneaza jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul interdictiei.", 'Admin:HandleBanReason', true, false, 'c')
-                                        event = AddEventHandler("Admin:HandleBanReason", function(banReason)
+                                        event = Core.AddEventHandler("Admin:HandleBanReason", function(banReason)
                                             if string.len(banReason) == 0 then
                                                 banReason = "Nedeterminata."
                                                 aBanReason = banReason
@@ -316,7 +316,7 @@ RegisterCommand('admin', function()
                                             --print
                                             ShowDialog('Baneaza jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in zile a interdictiei!", 'Admin:HandleBanTime', true, false, 'c')
                                             RemoveEventHandler(event)
-                                            event = AddEventHandler('Admin:HandleBanTime', function(banTime)
+                                            event = Core.AddEventHandler('Admin:HandleBanTime', function(banTime)
                                                 if not tonumber(banTime) or containsSpaces(banTime) then
                                                     sendNotification("Eroare", "Nu ai introdus un timp valid.")
                                                     return
@@ -367,7 +367,7 @@ RegisterCommand('admin', function()
                                     }):On('select', function()
                                         local event, aMuteReason, aMuteTime
                                         ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul mute-ului.", 'Admin:HandleMuteReason', true, false, 'c')
-                                        event = AddEventHandler("Admin:HandleMuteReason", function(muteReason)
+                                        event = Core.AddEventHandler("Admin:HandleMuteReason", function(muteReason)
                                             if string.len(muteReason) == 0 then
                                                 muteReason = "Nedeterminata."
                                                 aMuteReason = muteReason
@@ -376,7 +376,7 @@ RegisterCommand('admin', function()
                                             --print
                                             ShowDialog('Mute jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a mute-ului!", 'Admin:HandleMuteTime', true, false, 'c')
                                             RemoveEventHandler(event)
-                                            event = AddEventHandler('Admin:HandleMuteTime', function(muteTime)
+                                            event = Core.AddEventHandler('Admin:HandleMuteTime', function(muteTime)
                                                 if not tonumber(muteTime) or containsSpaces(muteTime) then
                                                     sendNotification("Eroare", "Nu ai introdus un timp valid.")
                                                     return
@@ -430,7 +430,7 @@ RegisterCommand('admin', function()
                                     }):On('select', function()
                                         local event, aJailReason, aJailTime
                                         ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai jos motivul inchisorii.", 'Admin:HandleJailReason', true, false, 'c')
-                                        event = AddEventHandler("Admin:HandleJailReason", function(jailReason)
+                                        event = Core.AddEventHandler("Admin:HandleJailReason", function(jailReason)
                                             if string.len(jailReason) == 0 then
                                                 jailReason = "Nedeterminata."
                                                 aJailReason = jailReason
@@ -439,7 +439,7 @@ RegisterCommand('admin', function()
                                             --print
                                             ShowDialog('Inchide jucatorul '..v.name..'['..v.source..']', "Scrie mai durata in minute a inchisorii!", 'Admin:HandleJailTime', true, false, 'c')
                                             RemoveEventHandler(event)
-                                            event = AddEventHandler('Admin:HandleJailTime', function(jailTime)
+                                            event = Core.AddEventHandler('Admin:HandleJailTime', function(jailTime)
                                                 if not tonumber(jailTime) or containsSpaces(jailTime) then
                                                     sendNotification("Eroare", "Nu ai introdus un timp valid.")
                                                     return
@@ -476,7 +476,7 @@ RegisterCommand('admin', function()
                                     }):On("select", function()
                                         local event
                                         ShowDialog("Kick "..v.name.."["..v.source.."]", 'Scrie mai jos motivul kickului.', 'Admin:HandleKickReason', false, false, 'c')
-                                        event = AddEventHandler('Admin:HandleKickReason', function(reason)
+                                        event = Core.AddEventHandler('Admin:HandleKickReason', function(reason)
                                             kickData = {
                                                 kickSource = v.source,
                                                 kickReason = reason
@@ -652,7 +652,7 @@ RegisterCommand('admin', function()
                                                     MenuV:CloseAll()
                                                     ShowDialog('Schimba pretul chiriei pentru casa: '..hData.name..'!', 'Scrie mai jos noul pret al chiriei pentru casa '..hData.name..' detinuta de '..hData.owner..'!', 'Admin:HandleChangeHouseRentAmount', false, true, 'c')
                                                     local event 
-                                                    event = AddEventHandler("Admin:HandleChangeHouseRentAmount", function(price)
+                                                    event = Core.AddEventHandler("Admin:HandleChangeHouseRentAmount", function(price)
                                                         hData.rent = price
                                                         Core.TriggerCallback('Admin:ChangeHouseData', function(cb)
                                                             --print
@@ -786,7 +786,7 @@ RegisterCommand('admin', function()
                                                         ShowDialog('Schimba numarul de inmatriculare', 'Scrie mai jos noul numar de inmatriculare:', 'Admin:HandleChangeVehiclePlate', true, true, 'c')
                                                     
                                                         local event
-                                                        event = AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
+                                                        event = Core.AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
                                                             if string.len(plate) <= 7 then
                                                                 local oldplate = vData.plate
                                                                 vData.plate = plate
@@ -816,7 +816,7 @@ RegisterCommand('admin', function()
                                 }):On('select', function()
                                     ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
                                     local event
-                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    event = Core.AddEventHandler('Admin:HandleGiveMoney', function(money)
                                         RemoveEventHandler(event)
                                         if not tonumber(money) then
                                             sendNotification('Admin', 'Invalid input', 'error')
@@ -839,7 +839,7 @@ RegisterCommand('admin', function()
                                 }):On('select', function()
                                     ShowDialog('Ofera bani', 'Scrie suma de bani pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
                                     local event
-                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    event = Core.AddEventHandler('Admin:HandleGiveMoney', function(money)
                                         RemoveEventHandler(event)
                                         if not tonumber(money) then
                                             sendNotification('Admin', 'Invalid input', 'error')
@@ -862,7 +862,7 @@ RegisterCommand('admin', function()
                                 }):On('select', function()
                                     ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o oferi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
                                     local event
-                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    event = Core.AddEventHandler('Admin:HandleGiveMoney', function(money)
                                         RemoveEventHandler(event)
                                         if not tonumber(money) then
                                             sendNotification('Admin', 'Invalid input', 'error')
@@ -883,7 +883,7 @@ RegisterCommand('admin', function()
                                 }):On('select', function()
                                     ShowDialog('Ofera bani', 'Scrie suma de puncte premium pe care vrei sa o retragi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleGiveMoney', true, true, 'c')
                                     local event
-                                    event = AddEventHandler('Admin:HandleGiveMoney', function(money)
+                                    event = Core.AddEventHandler('Admin:HandleGiveMoney', function(money)
                                         RemoveEventHandler(event)
                                         if not tonumber(money) then
                                             sendNotification('Admin', 'Invalid input', 'error')
@@ -969,7 +969,7 @@ RegisterCommand('admin', function()
                                     }):On('select', function()
                                         ShowDialog('Admin', 'Seteaza nivel admin al jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleAdminLevelChange', true, true, 'c')
                                         local event
-                                        event = AddEventHandler('Admin:HandleAdminLevelChange', function(admin)
+                                        event = Core.AddEventHandler('Admin:HandleAdminLevelChange', function(admin)
                                             RemoveEventHandler(event)
                                             if not tonumber(admin) then
                                                 sendNotification('Admin', 'Invalid input', 'error')
@@ -994,14 +994,14 @@ RegisterCommand('admin', function()
                                     }):On('select', function()
                                         ShowDialog('Seteaza factiune', 'Scrie factiunea pe care vrei sa o setezi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
                                         local event
-                                        event = AddEventHandler('Admin:HandleSetFaction', function(faction)
+                                        event = Core.AddEventHandler('Admin:HandleSetFaction', function(faction)
                                             RemoveEventHandler(event)
                                             if string.len(faction) == 0 then
                                                 sendNotification('Admin', 'Invalid input', 'error')
                                                 return
                                             end
                                             ShowDialog('Seteaza factiune', 'Scrie rankul pe care vrei sa il aiba: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
-                                            event = AddEventHandler('Admin:HandleSetFaction', function(rank)
+                                            event = Core.AddEventHandler('Admin:HandleSetFaction', function(rank)
                                                 RemoveEventHandler(event)
                                                 if not tonumber(rank) then
                                                     sendNotification('Admin', 'Invalid input', 'error')
@@ -1083,7 +1083,7 @@ RegisterCommand('admin', function()
                 }):On('select', function()
                     ShowDialog('Spawncar', 'Scrie mai jos numele masinii pe care vrei sa o creezi.', 'Admin:HandleCreateCar', true, true, 'c')
                     local event
-                    event = AddEventHandler('Admin:HandleCreateCar', function(carName)
+                    event = Core.AddEventHandler('Admin:HandleCreateCar', function(carName)
                         if string.len(carName) == 0 then
                             sendNotification('Eroare', 'Nu ai introdus un nume valid.')
                             return
@@ -1137,13 +1137,13 @@ RegisterCommand('admin', function()
                     MenuV:CloseAll()
                     ShowDialog('Creeaza casa 1/2', 'Seteaza pretul pe care-l doresti casei.', 'admin-createhouse', true, false, 'c')
                     local event;
-                    event = AddEventHandler('admin-createhouse', function(price)
+                    event = Core.AddEventHandler('admin-createhouse', function(price)
                         RemoveEventHandler(event)
                         if tonumber(price) then
                             price = tonumber(price)
                             createHouseData.price = price
                             ShowDialog('Creeaza casa 2/2', 'Seteaza tipul pe care-l doresti casei.<br><br>Tipuri case:<br>- Low<br>- Medium<br>- Normal', 'admin-createhouse', true, false, 'c')
-                            event = AddEventHandler('admin-createhouse', function (type)
+                            event = Core.AddEventHandler('admin-createhouse', function (type)
                                 RemoveEventHandler(event)
                                 if type == 'Normal' or type == 'Low' or type == 'Medium' then
                                     createHouseData.type = type
@@ -1299,7 +1299,7 @@ RegisterCommand('admin', function()
                                         }):On('select', function()
                                             local event
                                             ShowDialog("Schimba pretul casei #"..hData.id.."", 'Scrie mai jos noul pret pentru casa cu numarul '..hData.id..'!', 'Admin:HandleHousePriceAmount', true, false, 'c')
-                                            event = AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
+                                            event = Core.AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
                                                 amount = tonumber(amount)
                                                 if amount < 0 then
                                                     return
@@ -1321,7 +1321,7 @@ RegisterCommand('admin', function()
                                         }):On('select', function()
                                             local event
                                             ShowDialog("Schimba pretul chiriei casei #"..hData.id.."", 'Scrie mai jos noul pret al chiriei pentru casa cu numarul '..hData.id..'!', 'Admin:HandleHousePriceAmount', true, false, 'c')
-                                            event = AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
+                                            event = Core.AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
                                                 amount = tonumber(amount)
                                                 if amount < 0 then
                                                     return
@@ -1459,7 +1459,7 @@ RegisterCommand('admin', function()
                                         }):On('select', function()
                                             local event
                                             ShowDialog("Schimba pretul casei #"..hData.id.."", 'Scrie mai jos noul pret pentru casa cu numarul '..hData.id..'!', 'Admin:HandleHousePriceAmount', true, false, 'c')
-                                            event = AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
+                                            event = Core.AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
                                                 amount = tonumber(amount)
                                                 if amount < 0 then
                                                     return
@@ -1481,7 +1481,7 @@ RegisterCommand('admin', function()
                                         }):On('select', function()
                                             local event
                                             ShowDialog("Schimba pretul chiriei casei #"..hData.id.."", 'Scrie mai jos noul pret al chiriei pentru casa cu numarul '..hData.id..'!', 'Admin:HandleHousePriceAmount', true, false, 'c')
-                                            event = AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
+                                            event = Core.AddEventHandler('Admin:HandleHousePriceAmount', function(amount)
                                                 amount = tonumber(amount)
                                                 if amount < 0 then
                                                     return
@@ -1555,24 +1555,24 @@ RegisterCommand('admin', function()
                     MenuV:CloseAll()
                     ShowDialog('Creeaza afacere 1/4', 'Scrie mai jos numele dorit pentru afacere.', 'admin-createbiz', true, false, "c")
                     local event;
-                    event = AddEventHandler('admin-createbiz', function(bizname)
+                    event = Core.AddEventHandler('admin-createbiz', function(bizname)
                         if string.len(bizname) > 3 then
                             createBizData.name = bizname
                             RemoveEventHandler(event)
                             ShowDialog('Creeaza afacere 2/4', 'Scrie mai jos pretul dorit pentru afacere.', 'admin-createbiz', true, false, 'c')
-                            event = AddEventHandler('admin-createbiz', function(bizprice)
+                            event = Core.AddEventHandler('admin-createbiz', function(bizprice)
                                 if tonumber(bizprice) then
                                     createBizData.price = tonumber(bizprice)
                                     RemoveEventHandler(event)
                                     ShowDialog('Creeaza afacere 3/4', 'Scrie mai jos pretul tipul afacerii\n\nTipuri afaceri:\n1 - 24/7\n2 - Clothing', 'admin-createbiz', true, false, 'c')
-                                    event = AddEventHandler('admin-createbiz', function(biztype)
+                                    event = Core.AddEventHandler('admin-createbiz', function(biztype)
                                         if tonumber(biztype) then
                                             biztype = tonumber(biztype)
                                             if biztype > 0 then
                                                 createBizData.type = tonumber(biztype)
                                                 RemoveEventHandler(event)
                                                 ShowDialog('Creeaza afacere 4/4', 'Scrie mai jos blip-id-ul afacerii.', 'admin-createbiz', true, false, 'c')
-                                                event = AddEventHandler('admin-createbiz', function(bizblip)
+                                                event = Core.AddEventHandler('admin-createbiz', function(bizblip)
                                                     RemoveEventHandler(event)
 
                                                     if tonumber(bizblip) then
@@ -1686,7 +1686,7 @@ RegisterCommand('admin', function()
 
                                         ShowDialog('Editare afacere', 'Scrie mai jos numele dorit pentru afacere.', 'admin-createbiz', true, false, 'c')
                                         local event;
-                                        event = AddEventHandler('admin-createbiz', function(bizname)
+                                        event = Core.AddEventHandler('admin-createbiz', function(bizname)
                                             RemoveEventHandler(event)
                                             if string.len(bizname) > 3 then
                                                 Core.TriggerCallback('Business:EditBusiness', function(cb)
@@ -1711,7 +1711,7 @@ RegisterCommand('admin', function()
 
                                         ShowDialog('Editare afacere', 'Scrie mai jos pretul dorit pentru afacere.', 'admin-createbiz', true, false, 'c')
                                         local event;
-                                        event = AddEventHandler('admin-createbiz', function(bizprice)
+                                        event = Core.AddEventHandler('admin-createbiz', function(bizprice)
                                             RemoveEventHandler(event)
                                             if tonumber(bizprice) then
                                                 Core.TriggerCallback('Business:EditBusiness', function(cb)
@@ -1791,7 +1791,7 @@ RegisterCommand('admin', function()
                                 ShowDialog('Schimba numarul de inmatriculare', 'Scrie mai jos noul numar de inmatriculare:', 'Admin:HandleChangeVehiclePlate', true, true, 'c')
                                                 
                                 local event
-                                event = AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
+                                event = Core.AddEventHandler('Admin:HandleChangeVehiclePlate', function(plate)
                                     if string.len(plate) <= 7 then
                                         local oldplate = vData.plate
                                         vData.plate = plate
@@ -1879,7 +1879,7 @@ RegisterCommand('admin', function()
                end)
             end)
         end
-        
+        Core.ClearEvents()
         MenuV:OpenMenu(adminMenu)
     else
         sendNotification("Admin", Lang[Language]['NoAccessToCMD'])

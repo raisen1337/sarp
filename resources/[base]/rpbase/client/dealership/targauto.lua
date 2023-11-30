@@ -175,9 +175,9 @@ Citizen.CreateThread(function ()
                         a[randomIndex].model = saleVehicles[count+1].model
                         a[randomIndex].name = saleVehicles[count+1].name
                         a[randomIndex].price = saleVehicles[count+1].price
-                        local vehicle = CreateCar(saleVehicles[count+1].model, pos, b.w, false, false, false, "TGAUTO", true)
+                        local vehicle = CreateCar(saleVehicles[count+1].model, vec3(pos.x, pos.y, pos.z - 1), b.w, false, false, false, "TGAUTO", true)
                         Wait(100)
-                       
+                        CreateBlip(pos, 'Masina de vanzare', 326, 11)
                         a[randomIndex].id = vehicle
                         SetVehicleDoorsLocked(vehicle, 2)
                         SetVehicleDoorsLockedForAllPlayers(vehicle, true)
@@ -285,17 +285,17 @@ end)
 RegisterCommand('addsalevehicle', function()
     ShowDialog('Adauga masina la targul auto', "Scrie mai jos modelul masinii pe care vrei sa o adaugi.", 'targauto', true, false, 'c')
     local event
-    event = AddEventHandler('targauto', function (result)
+    event = Core.AddEventHandler('targauto', function (result)
         RemoveEventHandler(event)
         local model = result
         if model then
             ShowDialog('Adauga masina la targul auto', "Scrie mai jos numele masinii pe care vrei sa o adaugi.", 'targauto', true, false, 'c')
-            event = AddEventHandler('targauto', function (result)
+            event = Core.AddEventHandler('targauto', function (result)
                 RemoveEventHandler(event)
                 local name = result
                 if name then
                     ShowDialog('Adauga masina la targul auto', "Scrie mai jos pretul masinii pe care vrei sa o adaugi.", 'targauto', true, false, 'c')
-                    event = AddEventHandler('targauto', function (result)
+                    event = Core.AddEventHandler('targauto', function (result)
                         RemoveEventHandler(event)
                         local price = tonumber(result)
                         if price then

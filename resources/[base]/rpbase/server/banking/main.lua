@@ -158,6 +158,8 @@ Core.CreateCallback('Banking:TryTransaction', function(source, cb, transaction)
     end
 end)
 
+
+
 Core.GetPlayerByBankId = function(bid)
     bid = tonumber(bid)
     local result = exports.oxmysql:executeSync("SELECT * FROM players")

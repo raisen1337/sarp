@@ -154,6 +154,21 @@ Core.CreateCallback('Factions:AddMemberWithRank', function(source, cb, fName, ra
     end
 end)
 
+Core.CreateCallback('EMS:Heal', function(source, cb, player)
+    local Player = Core.GetPlayerData(player)
+
+    if Player.dead then
+        Player.dead = false
+        TriggerClientEvent("Notify:Send", player, "EMS", "Ai fost tratat de catre un medic!", "success")
+        TriggerClientEvent('Player:UpdateData', player, Player)
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(Player), Player.identifier})
+
+        cb(true)
+    else
+        cb(true)
+    end
+end)
+
 Core.CreateCallback('Factions:RemoveMember', function(source, cb, identifier)
     local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
     if result[1] then

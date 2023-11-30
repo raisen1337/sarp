@@ -287,7 +287,9 @@ PlayerSpawned = function()
         TriggerServerEvent("Scoreboard:SetScoreboard")
 
         LoadBusinesses()
-        loadHouses()
+        Core.TriggerCallback("Houses:Get", function (data)
+            loadHouses(data)
+        end)
         LoadFactions()
         SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
         SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
@@ -375,7 +377,9 @@ PlayerSpawned = function()
         BuildPlayerOptions()
 
         LoadBusinesses()
-        loadHouses()
+        Core.TriggerCallback("Houses:Get", function (data)
+            loadHouses(data)
+        end)
         LoadFactions()
 
 
@@ -605,6 +609,10 @@ RegisterNetEvent('cl-time:update', function(h, m, s)
     NetworkOverrideClockTime(12, m, s)
 end)
 
+RegisterCommand('testobj', function()
+    Core.CreateObject('vms_gift', GetEntityCoords(PlayerPedId()), false, true, true)
+end)
+
 local payDayTime = 60
 
 RegisterCommand('savedata', function()
@@ -614,11 +622,13 @@ RegisterCommand('savedata', function()
     Core.SavePlayer()
 end)
 
+local paydayStarted = false
 function Core.startPayday()
     SendNUIMessage({
         action = 'startPayday',
         time = payDayTime,
     })
+    paydayStarted = true
     Wait(payDayTime * (60 * 1000))
     Core.TriggerCallback('PayDay:Finish', function(total)
         SendNUIMessage({
@@ -630,6 +640,18 @@ function Core.startPayday()
     end)
     Core.startPayday()
 end
+
+Citizen.CreateThread(function()
+    while true do
+        local wait = 3000
+        if not paydayStarted then
+            Core.startPayday()
+        end
+        Wait(wait)
+    end
+end)
+
+
 
 function GetPlayerCoords()
     return GetEntityCoords(PlayerPedId())

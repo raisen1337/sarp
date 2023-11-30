@@ -193,6 +193,73 @@ factions = {
             },
         }
     },
+    ['SMURD'] = {
+        name = 'SMURD',
+        id = 2,
+        type = 'ems',
+        coords = {
+            main = vec4(1765.5462646484,3639.3991699219,34.857925415039,50.552772521973),
+            vehicleArea = vec4(1763.9921875,3623.4985351563,34.694450378418,154.63455200195),
+            armory = vec4(1784.9593505859,3652.8095703125,34.852588653564, 0),
+            helicopter = vec4(1713.1351318359,3596.31640625,35.372833251953,201.89512634277),
+        },
+        blipName = 'Smurd HQ',
+        blip = 61,
+        color = "^1",
+        blipColor = 49,
+        ranks = {
+            [1] = {
+                id = 1,
+                rank = 'Medic',
+                salary = 5000,
+                color = '^4'
+            },
+            [2] = {
+                id = 2,
+                rank = 'Medic Legist',
+                salary = 10000,
+                color = '^4'
+            },
+            [3] = {
+                id = 3,
+                rank = 'Medic Sef',
+                salary = 20000,
+                color = '^4'
+            }
+        },
+        armory = {
+            [1] = {
+                model = "weapon_stungun_mp",
+                name = "Taser",
+                ammoName = 'taser_ammo',
+                weaponCost = 0,
+                ammoCost = 0,
+                rank = 1,
+            },
+            [2] = {
+                model = 'medkit',
+                name = "Medkit",
+                weaponCost = 300,
+                ammoName = 'medkit',
+                ammoCost = 300,
+                rank = 1,
+            },
+        },
+        vehicles = {
+            [1] = {
+                name = 'Ambulance',
+                model = 'ambulance',
+                rank = 1,
+                type = 'car',
+            },
+            [2] = {
+                name = 'Helicopter',
+                model = 'polmav',
+                rank = 1,
+                type = 'heli',
+            }
+        }
+    },
     
 }
 

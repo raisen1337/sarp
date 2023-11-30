@@ -4,3 +4,4 @@ RegisterNetEvent('Core:Client:TriggerCallback', function(name, ...)
         Core.ServerCallbacks[name] = nil
     end
 end)
+

@@ -71,3 +71,11 @@ function GetPlayerByEntityID(id)
 	end
 	return nil
 end
+
+RegisterNetEvent('onPlayerDied', function()
+    
+end)
+
+RegisterNetEvent('onPlayerKilled', function(killerid, data)
+    print(killerid, je(data))
+end)

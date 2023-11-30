@@ -19,7 +19,7 @@ LoadFactions = function()
     end)
 end
 
-LoadFactions()
+
 
 local canSpawnVehicle = false
 
@@ -236,7 +236,7 @@ RegisterCommand('faction', function()
                                                 
                                                 ShowDialog('Cumpara munitie', 'Scrie mai jos cata munitie ai nevoie! (Ex: 150).', 'buyammo', true, false, 'c')
                                                 local event;
-                                                event = AddEventHandler('buyammo', function(ammo)
+                                                event = Core.AddEventHandler('buyammo', function(ammo)
                                                     RemoveEventHandler(event)
                                                     if tonumber(ammo) then
                                                         if pData.cash >= tonumber(ammo) * v.ammoCost then
@@ -272,6 +272,30 @@ RegisterCommand('faction', function()
                         end)
                     end
                     if fData.rank == 3 then
+                        factionsMenu:AddButton({
+                            label = 'Invita un membru',
+                            icon = '📝',
+                            value = 'invite',
+                        }):On('select', function()
+                            ShowDialog('Invita un membru', 'Scrie mai jos ID-ul jucatorului pe care vrei sa-l inviti', 'invite', true, true, 'c', function(result)
+                                if tonumber(result) then
+                                    result = tonumber(result)
+                                    Core.TriggerCallback('Core:GetPlayerById', function(player)
+                                        print(player.data.identifier)
+                                        Core.TriggerCallback('Factions:AddMemberWithRank', function(cb)
+                                            
+                                            MenuV:CloseAll()
+                                            sendNotification('Factiune', 'L-ai invitat pe: '..GetPlayerName(GetPlayerFromServerId(result))..'!', 'success')
+                                            
+                                        end, fData.name, result, 1, player.data.identifier)
+                                    end, result)
+                                else
+                                    sendNotification('Factiune', 'ID-ul trebuie sa fie un numar!', 'error')
+                                    return
+                                end
+                            end)
+                        end)
+
                         factionsMenu:AddButton({
                             label = 'Membrii',
                             icon = '👥',
@@ -347,14 +371,16 @@ RegisterCommand('faction', function()
                                                 end, user.identifier)
                                             end)
                                         end
+                                        Core.ClearEvents()
                                         MenuV:OpenMenu(factionMember)
                                     end)
                                 end
                             end, v.id)
+                            Core.ClearEvents()
                             MenuV:OpenMenu(factionMembers)
                         end)
                     end
-                    
+                    Core.ClearEvents()
                     MenuV:OpenMenu(factionsMenu)
                 end
             end
