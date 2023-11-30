@@ -178,6 +178,8 @@ Core.CreateCallback('Admin:HandleJail', function(source, cb, jailData)
                 args = {'^3[^0Admin Jail^3] ^0'..GetPlayerName(jailData.jailSource)..'('..jailData.jailSource..') a fost scos de la Admin Jail de '..GetPlayerName(source)..'('..source..')!'}
             })
             print("Player "..GetPlayerName(jailData.jailSource).."("..jailData.jailSource..") has been unjailed by "..GetPlayerName(source).."("..source..")!")
+            TriggerClientEvent('Player:UpdateData', src, pData)
+            
             return
         else
             cb(false)
@@ -197,6 +199,7 @@ Core.CreateCallback('Admin:HandleJail', function(source, cb, jailData)
 
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
     Wait(1000)
+    TriggerClientEvent('Player:UpdateData', src, pData)
     
     Core.InsertPunishment(src, punishment)
 
@@ -229,6 +232,8 @@ Core.CreateCallback('Admin:RevivePlayer', function(source, cb, id)
             multiline = true,
             args = {'^3[^0Admin^3] ^0'..GetPlayerName(id)..'('..id..') a primit revive de la'..GetPlayerName(source)..'('..source..')!'}
         })
+        TriggerClientEvent('Player:UpdateData', id, pData)
+
         cb(true)
     else
         cb(false)
@@ -296,6 +301,8 @@ Core.CreateCallback('Admin:Give', function(source, cb, data)
         args = {'^3[^0Admin^3] ^0'..GetPlayerName(data.src)..'('..data.src..') a primit '..FormatNumber(data.amount)..' '..data.type..' de la '..GetPlayerName(source)..'('..source..')!'}
     })
 
+    TriggerClientEvent('Player:UpdateData', data.src, pData)
+
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
     cb(true)
 end)
@@ -312,6 +319,7 @@ Core.CreateCallback('Admin:Take', function(source, cb, data)
         args = {'^3[^0Admin^3] ^0'..GetPlayerName(source)..'('..source..') i-a scos lui '..GetPlayerName(data.src)..'('..data.src..') '..FormatNumber(data.amount)..' '..data.type..'!'}
     })
 
+    TriggerClientEvent('Player:UpdateData', data.src, pData)
 
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
     cb(true)
@@ -344,6 +352,8 @@ Core.CreateCallback('Admin:SetLevel', function(source, cb, data)
     local pData = Core.GetPlayerData(data.src)
 
     pData.adminLevel = tonumber(data.lvl)
+    TriggerClientEvent('Player:UpdateData', data.src, pData)
+
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
     cb(true)
 end)
@@ -363,6 +373,8 @@ Core.CreateCallback('Admin:RemovePlayerPunish', function(source, cb, removedata)
             cb(false)
         end
     end
+    TriggerClientEvent('Player:UpdateData', removedata.player, pData)
+
 end)
 
 Core.CreateCallback('Admin:HandleBan', function(source, cb, banData)

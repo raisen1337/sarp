@@ -170,6 +170,21 @@ GeneratePlate = function()
     end
 end
 
+Core.CreateCallback('Vehicle:IsOwnedByPlayer', function (source, cb, plate)
+    local src = source
+    local steamIdentifier = GetPlayerSteamId(src)
+    local result = exports.oxmysql:executeSync("SELECT * FROM vehicles WHERE plate = ?", {plate})
+    if result[1] then
+        if result[1].owner == steamIdentifier then
+            cb(true)
+        else
+            cb(false)
+        end
+    else
+        cb(false)
+    end
+end)
+
 Core.CreateCallback('Dealership:GeneratePlate', function(source, cb)
     local plate = GeneratePlate()
     cb(plate)

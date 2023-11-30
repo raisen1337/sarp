@@ -10,7 +10,7 @@ local focuson = false
 local TunagensDefault = {}
 local preco = 0
 local multiplier = 1
-
+local vehLivery = 0
 local inTuning = false
 
 Citizen.CreateThread(function ()
@@ -105,8 +105,20 @@ Config.Range = 3.5 -- The range that you can open the menu
 
 Config.TunningLocations = {
 	{
-		name = "LS - Mechanic",           -- Name of the Location that will appear if blipmap == true
+		name = "Sandy Tuning",           -- Name of the Location that will appear if blipmap == true
 		coords = vector3(895.28576660156,3603.814453125,32.203659057617), --The coords to open menu
+		job = "mechanic",                 --The job that have access to it (remove the line and everyone can access it)
+		howmuchtopay = 100,               -- The percentage to pay. In this blip, the player/society will pay the normal price (100%), you can change it, for example, if you change it to 190, the player will pay 1.9x the original price, if the tunning costs 1000, the player will pay 1900
+		society = true,                   -- The money that the client pay goes to the society account? (will only work if job isn't nil.)
+		societypercentage = 50,           --50% of the money goes to society and the other 50% goes to the mechanic (will only work if society = true.)
+		blipmap = true,                   --Show the blip in map?
+		blipeveryone = false,             --if false, the blip will be only visible to the job
+		blipsprite = 72,                  -- The blip sprite, there's a list of all available: https://docs.fivem.net/docs/game-references/blips/
+		used = false,                     -- Don't tuch
+	},
+	{
+		name = "Paleto Tuning",           -- Name of the Location that will appear if blipmap == true
+		coords = vector3(110.24598693848,6626.1201171875,31.787244796753), --The coords to open menu
 		job = "mechanic",                 --The job that have access to it (remove the line and everyone can access it)
 		howmuchtopay = 100,               -- The percentage to pay. In this blip, the player/society will pay the normal price (100%), you can change it, for example, if you change it to 190, the player will pay 1.9x the original price, if the tunning costs 1000, the player will pay 1900
 		society = true,                   -- The money that the client pay goes to the society account? (will only work if job isn't nil.)
@@ -1531,6 +1543,8 @@ function getnameclr(id)
 	return retornar
 end
 
+
+
 function AplicarMod(mod, index)
 	local modindex = Config.TunningMods[mod]
 	if modindex and mod ~= "Tyres Front" and mod ~= "Tyres Back" and mod ~= "Turbo" and mod ~= "Xenon" then
@@ -1620,8 +1634,10 @@ function AplicarMod(mod, index)
 			AddMoneyNotDefault(TunagensDefault["extra"][index], Config.TunningPrices["extra"], wht, wht2)
 		end
 	elseif mod == "Livery2" then
+		
 		local antigo = GetVehicleLivery(carroselected)
 		SetVehicleLivery(carroselected, index + 1)
+
 		AddMoneyDefault("Livery2", index + 1, antigo)
 	end
 end
@@ -1763,11 +1779,14 @@ function AddMoneyTyres(mota, roda, tipo, antigonum)
 end
 
 local chegoupago = false
+SetEnableVehicleSlipstreaming(true)
 RegisterNUICallback("action", function(data)
+	local modtype
+	
+		
 	SetVehicleDoorsShut(carroselected, false)
 	if data.action == "openSubMenu" then -- aqui e quando o gajo clica para abrir
 		local tab = json.decode(data.type)
-		menuatual = tab.tipo
 		if tab.tipo == "HeadLight" then
 			SetVehicleLights(carroselected, 2)
 		end
@@ -1985,8 +2004,8 @@ RegisterNUICallback("action", function(data)
 		carroselected = nil
 	elseif data.action == "finish" then -- quando acabar
 		if preco > 0 then
-			TriggerServerEvent("TunningSystem3hu:PayModifications", preco, nomidaberto,
-				Core.GetVehicleProperties(GetVehiclePedIsIn(PlayerPedId())))
+			local mods = Core.GetVehicleProperties(carroselected)
+			TriggerServerEvent("TunningSystem3hu:PayModifications", preco, nomidaberto, mods)
 		else
 			TriggerServerEvent("TunningSystem3hu:Used", nomidaberto)
 		end

@@ -20,9 +20,29 @@ RegisterNetEvent('chat:addMessage', function (message)
     SendNUIMessage({action = 'addChatMessage', message = chatMsg})
 end)
 
-SetInterval(1, function()
+SetInterval(1000, function()
     if chatOn then
         SetNuiFocus(true, true)
+    end
+end)
+
+local randomChatMsgs = {
+    '^b[SERVER]: ^0Daca ai probleme cu serverul, te rugam sa ne contactezi pe discord: ^5https://discord.gg/voltro',
+    '^b[SERVER]: ^0Consideri ca un jucator incalca regulamentul? Fa un ticket! (K)',
+    '^b[SERVER]: ^0Nu stii ce job sa faci? Scrie ^b/jobs^0 pentru a vedea toate joburile disponibile!',
+    '^b[SERVER]: ^0Nu stii cum sa iti cumperi o masina? Mergi la ^bTargul Auto^0!',
+}
+
+Citizen.CreateThread(function ()
+    local lastRandomMsg = ""
+
+    while true do
+        Wait(60000)
+        local randomMsg = randomChatMsgs[math.random(1, #randomChatMsgs)]
+        if randomMsg ~= lastRandomMsg then
+            TriggerEvent('chat:addMessage', { args = { randomMsg } })
+            lastRandomMsg = randomMsg
+        end
     end
 end)
 

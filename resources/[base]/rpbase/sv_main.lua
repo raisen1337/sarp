@@ -56,11 +56,14 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
                         -- print('[F]PlayerAmmo['..v.name..'] = '..PlayerAmmo[v.name])
                         v.amount = PlayerAmmo[v.name]
                         exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
+                        TriggerClientEvent('Player:UpdateData', source, pData)
+                        
                         return
                     else
                         -- print('[NF]PlayerAmmo['..v.name..'] = '..v.amount)
                         v.amount = PlayerAmmo[v.name]
                         exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
+                        TriggerClientEvent('Player:UpdateData', source, pData)
                         return
                     end
                 end
@@ -175,6 +178,7 @@ function ACBan(source)
     
     exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
     Wait(1000)
+    TriggerClientEvent('Player:UpdateData', banData.banSource, pData)
     DropPlayer(banData.banSource, "You have been banned from the server. Reason: "..banData.banReason..". Ban ID: "..banId..". Ban expires in: "..banData.banTime.." days.")
 end
 
@@ -234,6 +238,110 @@ AddEventHandler('explosionEvent', function(sender, ev)
     checkPlayerReports(src)
     CancelEvent()
 end)
+
+local weathers = {
+    'EXTRASUNNY',
+    'CLEAR',
+    'CLOUDS',
+    'SMOG',
+    'FOGGY',
+    'OVERCAST',
+    'RAIN',
+    'THUNDER',
+    'CLEARING',
+    'NEUTRAL',
+    'SNOW',
+    'BLIZZARD',
+    'SNOWLIGHT',
+    'XMAS',
+}
+
+Citizen.CreateThread(function()
+    --pick a random weather every 10 minutes
+    while true do
+        local players = GetPlayers()
+        local season = 'summer'
+        local currentMonth = tonumber(os.date("%m"))
+        local isWinter = false
+        if currentMonth == 12 or currentMonth == 1 or currentMonth == 2 then
+            isWinter = true
+        end
+        
+        local randomWeather
+        if isWinter then
+            -- Increase chance of snowy weather in winter
+            randomWeather = GetRandomWeatherWithIncreasedChance({'EXTRASUNNY', "SNOW", "SNOWLIGHT", 'BLIZZARD', 'XMAS', 'SMOG'}, 0.8)
+            season = 'winter'
+        else
+            -- Normal random weather selection without snowy weathers
+            local filteredWeathers = {}
+            for i = 1, #weathers do
+                if not string.find(weathers[i], "BLIZZARD") and not string.find(weathers[i], "XMAS") and not string.find(weathers[i], "SNOW") and not string.find(weathers[i], "SNOWLIGHT") then
+                    table.insert(filteredWeathers, weathers[i])
+                end
+            end
+            season = 'summer'
+            randomWeather = filteredWeathers[math.random(1, #filteredWeathers)]
+        end
+        
+        currentWeather = randomWeather
+        
+        for k, v in pairs(players) do
+            TriggerClientEvent('Client:SyncSeason', v, season)
+            TriggerClientEvent('Client:SyncWeather', v, randomWeather)
+        end
+        Wait(600000)
+    end
+end)
+
+
+
+GetRandomWeatherWithIncreasedChance = function(weathers, chance)
+    local random = math.random()
+    if random <= chance then
+        return weathers[math.random(1, #weathers)]
+    else
+        return weathers[math.random(1, #weathers)]
+    end
+end
+
+function SyncWeatherAndSeason()
+    Wait(4000)
+    local players = GetPlayers()
+    local season = 'summer'
+    local currentMonth = tonumber(os.date("%m"))
+    local isWinter = false
+    if currentMonth == 12 or currentMonth == 1 or currentMonth == 2 then
+        isWinter = true
+    end
+    
+    local randomWeather
+    if isWinter then
+        -- Increase chance of snowy weather in winter
+        randomWeather = GetRandomWeatherWithIncreasedChance({'EXTRASUNNY', "SNOW", "SNOWLIGHT", 'BLIZZARD', 'XMAS', 'SMOG'}, 0.8)
+        season = 'winter'
+    else
+        -- Normal random weather selection without snowy weathers
+        local filteredWeathers = {}
+        for i = 1, #weathers do
+            if not string.find(weathers[i], "BLIZZARD") and not string.find(weathers[i], "XMAS") and not string.find(weathers[i], "SNOW") and not string.find(weathers[i], "SNOWLIGHT") then
+                table.insert(filteredWeathers, weathers[i])
+            end
+        end
+        season = 'summer'
+        randomWeather = filteredWeathers[math.random(1, #filteredWeathers)]
+    end
+    
+    currentWeather = randomWeather
+    
+    for k, v in pairs(players) do
+        TriggerClientEvent('Client:SyncSeason', v, season)
+        TriggerClientEvent('Client:SyncWeather', v, randomWeather)
+    end
+end
+
+SyncWeatherAndSeason()
+
 
 Core.CreateCallback('Server:SetWeather', function (source, cb, weather)
     currentWeather = weather
@@ -331,17 +439,21 @@ Core.CreateCallback('Clothing:UpdateClothes', function(source, cb, data)
     pData.clothing = data
 
     exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(pData), pData.identifier})
+    TriggerClientEvent('Player:UpdateData', source, pData)
+
     cb(true)
 end)
 
 Core.CreateCallback('Clothing:GetClothing', function(source, cb)
     local data = exports.oxmysql:executeSync("SELECT data FROM players WHERE identifier = ?", {GetPlayerSteamId(source)})
-    
-    local pData = json.decode(data[1].data)
+    if data[1] then
+        local pData = json.decode(data[1].data)
 
-    if not pData.clothing then
-        pData.clothing = {}
+        if not pData.clothing then
+            pData.clothing = {}
+        end
+        if type(pData.clothing) ~= 'table' then pData.clothing = {} end
+        cb(pData.clothing)
     end
-    if type(pData.clothing) ~= 'table' then pData.clothing = {} end
-    cb(pData.clothing)
+    
 end)

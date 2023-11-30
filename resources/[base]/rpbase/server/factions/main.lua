@@ -98,6 +98,7 @@ Core.CreateCallback('Factions:KickMember', function(source, cb, id, identifier)
             pData.faction = fData
             
             exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+
             cb(true)
         else
             cb(false)

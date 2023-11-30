@@ -11,7 +11,7 @@ Armour.textFormat = "none"
 window.addEventListener("message", function (event1) {
     let event = event1['data'];
     if (event.action == "updateStatus") {
-        Health.value = event.health
+        Health.value = event.health / 2; // Adapt event.health to fit the range of 0-100
         Armour.value = event.armour
     }
     if(event.action == 'hideHud'){

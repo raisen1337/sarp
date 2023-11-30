@@ -3,7 +3,8 @@ function reloadScripts()
     LoggedIn = true
 end
 
-local SelectGender = MenuV:CreateMenu(false, "Selecteaza sexul", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'selectgender')
+local SelectGender = MenuV:CreateMenu(false, "Selecteaza sexul", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'selectgender')
 
 local function LoadModel(model)
     if IsModelInCdimage(model) and IsModelValid(model) then
@@ -28,7 +29,7 @@ SelectGender:AddButton({
         SetPedDefaultComponentVariation(PlayerPedId())
         SetModelAsNoLongerNeeded(model)
     end
-    PlayerData.gender = 1 
+    PlayerData.gender = 1
     TriggerEvent('chat:clear')
     TriggerEvent('Identity:OpenSetup')
     PlayerData.character['ped_model'] = model
@@ -45,7 +46,7 @@ SelectGender:AddButton({
 }):On('select', function()
     SetEntityVisible(PlayerPedId(), true)
     FreezeEntityPosition(PlayerPedId(), false)
-    PlayerData.gender = 2 
+    PlayerData.gender = 2
     local model = 'mp_f_freemode_01'
     if LoadModel(model) then
         SetPlayerModel(PlayerId(), model)
@@ -75,10 +76,10 @@ end)
 
 
 AddEventHandler('onResourceStart', function(resourceName)
-  if (GetCurrentResourceName() ~= resourceName) then
-    return
-  end
-  PlayerSpawned()
+    if (GetCurrentResourceName() ~= resourceName) then
+        return
+    end
+    PlayerSpawned()
 end)
 
 PlayerCoords = function()
@@ -124,7 +125,7 @@ Citizen.CreateThread(function()
             DisableControlAction(0, 22, true)  -- Jump
             DisableControlAction(0, 24, true)  -- Disable attack control
             DisableControlAction(0, 25, true)  -- Disable aim control
-            DisableControlAction(0, 140, true)  -- Disable aim control
+            DisableControlAction(0, 140, true) -- Disable aim control
         else
             wait = 3005
         end
@@ -152,7 +153,7 @@ Citizen.CreateThread(function()
                         ReviveInjuredPed(PlayerPedId())
                         SetEntityInvincible(PlayerPedId(), false)
                         SetEntityHealth(PlayerPedId(), 200)
-                        SetEntityCoords(PlayerPedId(), 1768.0767822266,3639.5483398438,35.071006774902)
+                        SetEntityCoords(PlayerPedId(), 1768.0767822266, 3639.5483398438, 35.071006774902)
                         SetEntityHeading(PlayerPedId(), 177.82786560059)
                         comaTime = 300
                     end
@@ -235,18 +236,18 @@ AddEventHandler('playerDied', PlayerDied)
 Core.FixSkin = function()
     PlayerData = Core.GetPlayerData()
     local model = PlayerData.character['ped_model']
-  
+
     if IsModelInCdimage(model) and IsModelValid(model) then
         RequestModel(model)
         while not HasModelLoaded(model) do
-          Wait(0)
+            Wait(0)
         end
         SetPlayerModel(PlayerId(), model)
         SetModelAsNoLongerNeeded(model)
         SetPedDefaultComponentVariation(PlayerPedId())
-         --SetModelAsNoLongerNeeded(model)
+        --SetModelAsNoLongerNeeded(model)
     end
-   
+
     TriggerEvent('Player:LoadSkin')
 end
 
@@ -264,11 +265,11 @@ PlayerSpawned = function()
     end
     SetPlayerModel(PlayerId(), mhash_male)
     local playerPed = GetPlayerPed(-1)
-	 --SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
-    SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
-    SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
-    SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
-    SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+    --SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
+    SetPedComponentVariation(playerPed, 0, 0, 0, 2)  --Face
+    SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair
+    SetPedComponentVariation(playerPed, 4, 1, 5, 2)  -- Pantalon
+    SetPedComponentVariation(playerPed, 6, 1, 0, 2)  -- Shoes
     SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
     while not PlayerData do
         Wait(0)
@@ -321,10 +322,10 @@ PlayerSpawned = function()
             -- });
             local playerPed = PlayerPedId()
             SetPedDefaultComponentVariation(PlayerPedId())
-            SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
-            SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
-            SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
-            SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+            SetPedComponentVariation(playerPed, 0, 0, 0, 2)  --Face
+            SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair
+            SetPedComponentVariation(playerPed, 4, 1, 5, 2)  -- Pantalon
+            SetPedComponentVariation(playerPed, 6, 1, 0, 2)  -- Shoes
             SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
         else
             -- spawnPlayer({
@@ -337,20 +338,20 @@ PlayerSpawned = function()
             SetPlayerModel(PlayerId(), mhash_female)
             local playerPed = PlayerPedId()
             SetPedDefaultComponentVariation(PlayerPedId())
-            SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
-            SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
-            SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
-            SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+            SetPedComponentVariation(playerPed, 0, 0, 0, 2)  --Face
+            SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair
+            SetPedComponentVariation(playerPed, 4, 1, 5, 2)  -- Pantalon
+            SetPedComponentVariation(playerPed, 6, 1, 0, 2)  -- Shoes
             SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
         end
-        
+
         SetEntityVisible(PlayerPedId(), true)
         SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + 1)
         FreezeEntityPosition(PlayerPedId(), false)
 
         LoggedIn = true
         local PlayerData = Core.GetPlayerData()
-    
+
         TriggerEvent('Player:LoadSkin')
         -- while not GetCurrentPed() ~= PlayerData.clothing do
         --     Wait(0)
@@ -360,7 +361,7 @@ PlayerSpawned = function()
         local Inventory = PlayerData.inventory
         local playerAmmo = Core.GetPlayerAmmo()
 
-        for k,v in pairs(Inventory) do
+        for k, v in pairs(Inventory) do
             if v.type == 'weapon' then
                 GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
                 for a, b in pairs(playerAmmo) do
@@ -376,10 +377,10 @@ PlayerSpawned = function()
         LoadBusinesses()
         loadHouses()
         LoadFactions()
- 
+
 
         ClientVehicles = GetVehicles()
-      
+
         TriggerServerEvent("Scoreboard:AddPlayer")
         TriggerServerEvent("Scoreboard:SetScoreboard")
 
@@ -388,15 +389,37 @@ PlayerSpawned = function()
             Core.TriggerCallback("Houses:GetHouseById", EnterHouseCallback, PlayerData.inHouseId)
         end
 
-        
 
-   
+
+
         Core.startPayday()
-
-       
-        
     end
+
+  
 end
+
+local skinFixed = false
+
+RegisterNetEvent('Skin:fix', function()
+    skinFixed = true
+end)
+
+Citizen.CreateThread(function ()
+    while true do
+        wait = 1000
+        if not skinFixed then
+            SetPedClothes()
+            FreezeEntityPosition(PlayerPedId(), false)
+            SetEntityVisible(PlayerPedId(), true)
+            wait = 500
+        else
+            wait = 5000
+        end
+       
+      
+        Wait(wait)
+    end
+end)
 
 function LoadPlayerModel()
     local model = PlayerData.character['ped_model']
@@ -427,7 +450,7 @@ function LoadPlayerWeapons()
     local Inventory = PlayerData.inventory
     local playerAmmo = Core.GetPlayerAmmo()
 
-    for k,v in pairs(Inventory) do
+    for k, v in pairs(Inventory) do
         if v.type == 'weapon' then
             GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
             for a, b in pairs(playerAmmo) do
@@ -439,7 +462,6 @@ function LoadPlayerWeapons()
     end
 end
 
-
 PlayAnim = function(ped, dict, name, blendInSpeed, blendOutSpeed, duration, flag, playbackRate, lockX, lockY, lockZ)
     RequestAnimDict(dict)
     while not HasAnimDictLoaded(dict) do
@@ -449,14 +471,16 @@ PlayAnim = function(ped, dict, name, blendInSpeed, blendOutSpeed, duration, flag
 end
 
 function GetPedInFront()
-	local player = PlayerId()
-	local plyPed = GetPlayerPed(player)
-	local plyPos = GetEntityCoords(plyPed, false)
-	local plyOffset = GetOffsetFromEntityInWorldCoords(plyPed, 0.0, 1.3, 0.0)
-	local rayHandle = StartShapeTestCapsule(plyPos.x, plyPos.y, plyPos.z, plyOffset.x, plyOffset.y, plyOffset.z, 1.0, 12, plyPed, 7)
-	local _, _, _, _, ped = GetShapeTestResult(rayHandle)
-	return ped
+    local player = PlayerId()
+    local plyPed = GetPlayerPed(player)
+    local plyPos = GetEntityCoords(plyPed, false)
+    local plyOffset = GetOffsetFromEntityInWorldCoords(plyPed, 0.0, 1.3, 0.0)
+    local rayHandle = StartShapeTestCapsule(plyPos.x, plyPos.y, plyPos.z, plyOffset.x, plyOffset.y, plyOffset.z, 1.0, 12,
+        plyPed, 7)
+    local _, _, _, _, ped = GetShapeTestResult(rayHandle)
+    return ped
 end
+
 Citizen.CreateThread(function()
     SetMapZoomDataLevel(0, 0.96, 0.9, 0.08, 0.0, 0.0)
     SetMapZoomDataLevel(1, 1.6, 0.9, 0.08, 0.0, 0.0)
@@ -467,12 +491,12 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-		Citizen.Wait(1)
-		if IsPedOnFoot(PlayerPedId()) then
-			SetRadarZoom(1100)
-		elseif IsPedInAnyVehicle(PlayerPedId(), true) then
-			SetRadarZoom(1100)
-		end
+        Citizen.Wait(300)
+        if IsPedOnFoot(PlayerPedId()) then
+            SetRadarZoom(1100)
+        elseif IsPedInAnyVehicle(PlayerPedId(), true) then
+            SetRadarZoom(1100)
+        end
     end
 end)
 function GetNearestPlayer()
@@ -490,7 +514,6 @@ function GetNearestPlayer()
 
     return player
 end
-
 
 Citizen.CreateThread(function()
     while true do
@@ -513,7 +536,7 @@ Citizen.CreateThread(function()
             DisableControlAction(0, 22, true)
 
             if not IsEntityPlayingAnim(PlayerPedId(), "mp_arresting", "idle", 3) then
-                local animation = {dict = "mp_arresting", name = "idle"}
+                local animation = { dict = "mp_arresting", name = "idle" }
                 local unarmed = GetHashKey("WEAPON_UNARMED")
                 PlayAnim(PlayerPedId(), animation.dict, animation.name, 8.0, -8, -1, 49, 0, 0, 0, 0)
                 SetEnableHandcuffs(PlayerPedId(), PlayerData.cuffed)
@@ -538,7 +561,7 @@ function SetCuffed()
         return
     end
     if not PlayerData.cuffed then
-        local animation = {dict = "mp_arresting", name = "idle"}
+        local animation = { dict = "mp_arresting", name = "idle" }
         local unarmed = GetHashKey("WEAPON_UNARMED")
 
         PlayAnim(PlayerPedId(), animation.dict, animation.name, 8.0, -8, -1, 49, 0, 0, 0, 0)
@@ -551,8 +574,7 @@ function SetCuffed()
     end
 end
 
-
-RegisterNetEvent("Player:GetCuffed", function ()
+RegisterNetEvent("Player:GetCuffed", function()
     if not PlayerData.cuffed then
         PlayerData.cuffed = false
         Core.SavePlayer()
@@ -563,10 +585,8 @@ end)
 
 SetMillisecondsPerGameMinute(60000)
 Citizen.CreateThread(function()
-   
     SetCanAttackFriendly(PlayerPedId(), true, false)
     NetworkSetFriendlyFireOption(true)
-   
 end)
 
 
@@ -603,7 +623,9 @@ function Core.startPayday()
     Core.TriggerCallback('PayDay:Finish', function(total)
         SendNUIMessage({
             action = 'payday',
-            paydayInfo = 'Payday: $'..FormatNumber(total.check)..'<br>Salariu: $'..FormatNumber(total.job).."<br>VIP Bonus: $"..FormatNumber(total.vip)
+            paydayInfo = 'Payday: $' ..
+            FormatNumber(total.check) ..
+            '<br>Salariu: $' .. FormatNumber(total.job) .. "<br>VIP Bonus: $" .. FormatNumber(total.vip)
         })
     end)
     Core.startPayday()
@@ -613,8 +635,7 @@ function GetPlayerCoords()
     return GetEntityCoords(PlayerPedId())
 end
 
-
-RegisterCommand('fmmtwaxx', function ()
+RegisterCommand('fmmtwaxx', function()
     Core.startPayday()
 end)
 
@@ -632,7 +653,7 @@ selectedPed = 1
 
 local pedwait = 300500000
 
-function table.empty (self)
+function table.empty(self)
     for _, _ in pairs(self) do
         return false
     end
@@ -684,7 +705,7 @@ RegisterNetEvent("Hud:Tog", function(tog)
         })
         SendNUIMessage({
             action = "showHud",
-            onlinePlayers = onlinePlayers or 0 ,
+            onlinePlayers = onlinePlayers or 0,
             cash = PlayerData.cash or 0,
             bank = PlayerData.bank or 0,
             wantedLevel = PlayerData.wantedLevel or 0,
@@ -710,7 +731,7 @@ showHud = function(onlinePlayers)
     if not LoggedIn then return end
     SendNUIMessage({
         action = "showHud",
-        onlinePlayers = onlinePlayers or 0 ,
+        onlinePlayers = onlinePlayers or 0,
         cash = PlayerData.cash or 0,
         bank = PlayerData.bank or 0,
         wantedLevel = PlayerData.wantedLevel or 0,
@@ -739,30 +760,29 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(0)
-		HideHudComponentThisFrame(3) -- CASH
-		HideHudComponentThisFrame(4) -- MP CASH
-		HideHudComponentThisFrame(2) -- weapon icon
-		HideHudComponentThisFrame(9) -- STREET NAME
-		HideHudComponentThisFrame(7) -- Area NAME
-		HideHudComponentThisFrame(8) -- Vehicle Class
-		HideHudComponentThisFrame(6) -- Vehicle Name 
-	end
+    while true do
+        Citizen.Wait(1)
+        HideHudComponentThisFrame(3) -- CASH
+        HideHudComponentThisFrame(4) -- MP CASH
+        HideHudComponentThisFrame(2) -- weapon icon
+        HideHudComponentThisFrame(9) -- STREET NAME
+        HideHudComponentThisFrame(7) -- Area NAME
+        HideHudComponentThisFrame(8) -- Vehicle Class
+        HideHudComponentThisFrame(6) -- Vehicle Name
+    end
 end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         Wait(2000)
-        local health = GetEntityHealth(PlayerPedId())
-        local armour = GetPedArmour(PlayerPedId())
+        local hp = GetEntityHealth(PlayerPedId())
+        local armor = GetPedArmour(PlayerPedId())
         SendNUIMessage({
             action = "updateStatus",
-            health = health,
-            armour = armour,
+            health = hp,
+            armour = armor,
         })
     end
-
 end)
 
 RegisterNetEvent("Scoreboard:AddPlayer", function(player)
@@ -781,7 +801,7 @@ RegisterNetEvent("Scoreboard:RemovePlayer", function(player)
     })
 end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         Wait(1)
         if IsControlJustPressed(0, 212) then
@@ -835,16 +855,17 @@ local hudTog = true
 local togRadar = false
 
 local togMenu = MenuV:CreateMenu(false, 'Toggles', 'center', 0, 0, 0, 'size-125', 'none', 'menuv', 'toggles-menu')
-RegisterCommand('tog', function ()
+RegisterCommand('tog', function()
     togMenu:ClearItems()
 
     if not PlayerData.transactionsActive then
         togMenu:AddButton({
             label = "Tranzactii",
             icon = "🔴"
-        }):On('select', function ()
+        }):On('select', function()
             PlayerData.transactionsActive = true
-            sendNotification("Toggle", 'Ti-ai pornit tranzactiile. Acestea se vor oprii cand realizezi o tranzactie', 'success')
+            sendNotification("Toggle", 'Ti-ai pornit tranzactiile. Acestea se vor oprii cand realizezi o tranzactie',
+                'success')
             Core.SavePlayer()
             MenuV:CloseAll()
         end)
@@ -853,7 +874,7 @@ RegisterCommand('tog', function ()
         togMenu:AddButton({
             label = "Tranzactii",
             icon = "🟢"
-        }):On('select', function ()
+        }):On('select', function()
             PlayerData.transactionsActive = false
             sendNotification("Toggle", 'Ti-ai oprit tranzactiile.', 'success')
             Core.SavePlayer()
@@ -865,7 +886,7 @@ RegisterCommand('tog', function ()
         togMenu:AddButton({
             label = 'Chat',
             icon = '🔴'
-        }):On("select", function ()
+        }):On("select", function()
             chatTog = false
             TriggerEvent("Chat:Tog", false)
             MenuV:CloseAll()
@@ -874,7 +895,7 @@ RegisterCommand('tog', function ()
         togMenu:AddButton({
             label = 'Chat',
             icon = '🟢'
-        }):On("select", function ()
+        }):On("select", function()
             chatTog = true
             TriggerEvent("Chat:Tog", true)
             MenuV:CloseAll()
@@ -885,7 +906,7 @@ RegisterCommand('tog', function ()
         togMenu:AddButton({
             label = 'Hud',
             icon = '🔴'
-        }):On("select", function ()
+        }):On("select", function()
             hudTog = false
             TriggerEvent("Hud:Tog", hudTog)
             MenuV:CloseAll()
@@ -894,7 +915,7 @@ RegisterCommand('tog', function ()
         togMenu:AddButton({
             label = 'Hud',
             icon = '🟢'
-        }):On("select", function ()
+        }):On("select", function()
             hudTog = true
             TriggerEvent("Hud:Tog", hudTog)
             MenuV:CloseAll()
@@ -905,7 +926,7 @@ RegisterCommand('tog', function ()
         togMenu:AddButton({
             label = 'Radar',
             icon = '🔴'
-        }):On("select", function ()
+        }):On("select", function()
             togRadar = true
             DisplayRadar(not togRadar)
             MenuV:CloseAll()
@@ -914,7 +935,7 @@ RegisterCommand('tog', function ()
         togMenu:AddButton({
             label = 'Radar',
             icon = '🟢'
-        }):On("select", function ()
+        }):On("select", function()
             togRadar = false
             DisplayRadar(not togRadar)
             MenuV:CloseAll()
@@ -935,12 +956,12 @@ RegisterNetEvent("Ped:Change", function(id)
 
     local model = Peds[pedId]
     if IsModelInCdimage(model) and IsModelValid(model) then
-      RequestModel(model)
-      while not HasModelLoaded(model) do
-        Wait(0)
-      end
-      SetPlayerModel(PlayerId(), model)
-      --SetModelAsNoLongerNeeded(model)
+        RequestModel(model)
+        while not HasModelLoaded(model) do
+            Wait(0)
+        end
+        SetPlayerModel(PlayerId(), model)
+        --SetModelAsNoLongerNeeded(model)
     end
     ExecuteCommand('fixskin')
     Core.TriggerCallback('Clothing:GetClothing', function(cb)
@@ -958,14 +979,16 @@ Citizen.CreateThread(function()
         local distance = #(coords - vector3(1829.4066162109, 3681.0725097656, 34.334838867188))
         if distance < 3.0 then
             wait = 1
-            DrawMarker(0, 1829.4066162109, 3681.0725097656, 34.334838867188, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 255, 209, 82, 255, true, false, false, true, false, false, false)
-            DrawText3D(1829.4066162109, 3681.0725097656, 34.334838867188, "~y~Identitate~n~~w~Aici iti poti seta identitatea caracterului.~n~~y~(~w~/identitate~y~)~w~")
+            DrawMarker(0, 1829.4066162109, 3681.0725097656, 34.334838867188, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 255, 209,
+                82, 255, true, false, false, true, false, false, false)
+            DrawText3D(1829.4066162109, 3681.0725097656, 34.334838867188,
+                "~y~Identitate~n~~w~Aici iti poti seta identitatea caracterului.~n~~y~(~w~/identitate~y~)~w~")
         end
         Wait(wait)
     end
 end)
 
-RegisterCommand('identitate', function ()
+RegisterCommand('identitate', function()
     local distance = #(GetEntityCoords(PlayerPedId()) - vec3(1829.4066162109, 3681.0725097656, 34.334838867188))
     if distance < 4 then
         TriggerEvent('Identity:OpenSetup')
@@ -976,21 +999,25 @@ end)
 
 RegisterCommand('stats', function()
     local statsMsg = [[
-       
+
        ^0Username: ^3%s^0 | Level: ^3%s^0 | Job: ^3%s^0 | Job Rank: ^3%s^0 | Nume: ^3%s^0 | Prenume: ^3%s^0
         Cash: $^3%s^0 | Bani in banca: $^3%s^0 | Wanted Level: ^3%s^0 | Admin Level: ^3%s^0
-        Ped Model: ^3%s^0 | Identifier: ^3%s^0 
+        Ped Model: ^3%s^0 | Identifier: ^3%s^0
     ]]
-    statsMsg = statsMsg:format(PlayerData.user, PlayerData.level, PlayerData.job.name, PlayerData.job.rank, PlayerData.character.name, PlayerData.character.surname, PlayerData.cash, PlayerData.bank, PlayerData.wantedLevel, PlayerData.adminLevel, PlayerData.character.ped_model, PlayerData.identifier)
+    statsMsg = statsMsg:format(PlayerData.user, PlayerData.level, PlayerData.job.name, PlayerData.job.rank,
+        PlayerData.character.name, PlayerData.character.surname, PlayerData.cash, PlayerData.bank, PlayerData
+    .wantedLevel, PlayerData.adminLevel, PlayerData.character.ped_model, PlayerData.identifier)
 
-    TriggerEvent('chatMessage', "", { 255, 255, 255 }, statsMsg)
+    TriggerEvent('chat:addMessage', {
+        args = { statsMsg }
+    })
 end)
 
 RegisterCommand('getjob', function()
     TriggerEvent("Jobs:Check")
 end)
 
-RegisterCommand('quitjob', function ()
+RegisterCommand('quitjob', function()
     TriggerEvent('Jobs:Quit')
     Wait(1000)
     PlayerData.job.name = 'Unemployed'
@@ -1000,16 +1027,16 @@ end)
 AddEventHandler('playerSpawned', function()
     FreezeEntityPosition(PlayerPedId(), true)
     PlayerSpawned()
-    
+    SetTimeout(6000, PlayerSpawned())
 end)
 AddEventHandler("playerSpawned", function(spawn)
-Citizen.CreateThread(function()
-     local playerPed = GetPlayerPed(-1)
-	 --SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
-	 SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
-	 SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair 
-	 SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
-	 SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
-	 SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
-   end)
+    Citizen.CreateThread(function()
+        local playerPed = GetPlayerPed(-1)
+        --SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
+        SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
+        SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair
+        SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
+        SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
+        SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
+    end)
 end)

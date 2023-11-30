@@ -134,6 +134,27 @@ local function refreshSaleVehicles(vehicle)
     end
 end
 
+local delay = false
+
+Citizen.CreateThread(function()
+    while not LoggedIn do Wait(100) end
+    while true do
+        Wait(1000)
+        if delay then
+            delay = false
+        end
+        if not table.empty(a) then
+            for k,v in pairs(a) do
+                if v.id then
+                    local vehicle = v.id
+                    if GetEntityHeading(vehicle) ~= v.pos.w then
+                        SetEntityHeading(vehicle, v.pos.w)
+                    end
+                end
+            end
+        end
+    end
+end)
 
 Citizen.CreateThread(function ()
     while not LoggedIn do Wait(100) end
@@ -168,6 +189,7 @@ Citizen.CreateThread(function ()
                         SetVehicleOnGroundProperly(vehicle)
 
                         count = count + 1
+                        a[randomIndex].pos = vector4(b.x, b.y, b.z, b.w)
                         saleVehicles[count].id = vehicle
                     end
                 end
@@ -193,52 +215,60 @@ Citizen.CreateThread(function ()
                         DrawText3D(v.x, v.y, v.z, '~w~[~g~'..v.name..'~w~]~n~Pret: ~g~'..FormatNumber(v.price)..'~w~$', 255, 255, 255, 255)
                         DrawText3D(v.x, v.y, v.z-0.3, 'Apasa ~g~E~w~ pentru a schimba masina.', 255, 255, 255, 255)
                         if IsControlJustPressed(0, 38) then
-                            DeleteCar(v.id)
+                            if not delay then
+                                DeleteCar(v.id)
+                                local randomIndex = math.random(1, #saleVehicles)
+                                local vehicle = saleVehicles[randomIndex]
+                                local pos = vec3(v.x, v.y, v.z)
+                                local spawnedVehicle = CreateCar(vehicle.model, pos, v.w, false, true, false, "TGAUTO", true)
+                                delay = true
+                                a[k].id = spawnedVehicle
+                                a[k].pos = vector4(pos.x, pos.y, pos.z, v.w)
+                                SetVehicleDoorsLocked(spawnedVehicle, 2)
+                                SetVehicleDoorsLockedForAllPlayers(spawnedVehicle, true)
+                                SetVehicleDoorsLockedForPlayer(spawnedVehicle, PlayerId(), false)
+                                SetVehicleEngineOn(spawnedVehicle, false, true, true)
+                                SetVehicleUndriveable(spawnedVehicle, true)
+                                FreezeEntityPosition(spawnedVehicle, true)
+                                SetVehicleOnGroundProperly(vespawnedVehiclehicle)
+                        
+                                v.model = vehicle.model
+                                v.name = vehicle.name
+                                v.price = vehicle.price
+                            end
                             --spawn another car random from saleVehicles
-                            local randomIndex = math.random(1, #saleVehicles)
-                            local vehicle = saleVehicles[randomIndex]
-                            local pos = vec3(v.x, v.y, v.z)
-                            local spawnedVehicle = CreateCar(vehicle.model, pos, v.w, false, true, false, "TGAUTO", true)
+
                             
-                            a[k].id = spawnedVehicle
-                            
-                            SetVehicleDoorsLocked(spawnedVehicle, 2)
-                            SetVehicleDoorsLockedForAllPlayers(spawnedVehicle, true)
-                            SetVehicleDoorsLockedForPlayer(spawnedVehicle, PlayerId(), false)
-                            SetVehicleEngineOn(spawnedVehicle, false, true, true)
-                            SetVehicleUndriveable(spawnedVehicle, true)
-                            FreezeEntityPosition(spawnedVehicle, true)
-                      
-                            v.model = vehicle.model
-                            v.name = vehicle.name
-                            v.price = vehicle.price
+
 
                         end
                         DrawText3D(v.x, v.y, v.z-0.5, 'Apasa ~g~G~w~ pentru a cumpara masina.', 255, 255, 255, 255)
 
                         -- check for G press
                         if IsControlJustPressed(0, 47) then
-                            if pData.cash >= v.price then
-                                Core.TriggerCallback('Dealership:GeneratePlate', function(plate)
-                                    local vehicle = v.id
-                                    local plate = plate
-                                    local price = v.price
-                                    local model = v.model
-                                    local name = v.name
-                                    local mods = {}
-                                    Core.TriggerCallback('Dealership:BuyCar', function(cb)
-                                        if cb then
-                                            pData.cash = pData.cash - price
-                                            Core.SavePlayer()
-                                            sendNotification('Targ Auto', 'Ai cumparat masina cu succes.', 'success')
-                                            TriggerServerEvent('Dealership:RemoveSaleVehicle', name, model, price)
-                                        else
-                                            sendNotification('Targ Auto', 'Nu ai cumparat masina.', 'error')
-                                        end
-                                    end, {name = name, spawncode = model, plate = plate, mods = mods})
-                                end)
-                            else
-                                sendNotification('Targ Auto', 'Nu ai suficienti bani.', 'error')
+                            if not delay then
+                                if pData.cash >= v.price then
+                                    Core.TriggerCallback('Dealership:GeneratePlate', function(plate)
+                                        local vehicle = v.id
+                                        local plate = plate
+                                        local price = v.price
+                                        local model = v.model
+                                        local name = v.name
+                                        local mods = {}
+                                        pData.cash = pData.cash - price
+                                        Core.SavePlayer()
+                                        Core.TriggerCallback('Dealership:BuyCar', function(cb)
+                                            if cb then
+                                                sendNotification('Targ Auto', 'Ai cumparat masina cu succes.', 'success')
+                                                TriggerServerEvent('Dealership:RemoveSaleVehicle', name, model, price)
+                                            else
+                                                sendNotification('Targ Auto', 'Nu ai cumparat masina.', 'error')
+                                            end
+                                        end, {name = name, spawncode = model, plate = plate, mods = mods})
+                                    end)
+                                else
+                                    sendNotification('Targ Auto', 'Nu ai suficienti bani.', 'error')
+                                end
                             end
                         end
                     else

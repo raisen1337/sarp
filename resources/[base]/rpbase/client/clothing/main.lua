@@ -768,9 +768,7 @@ function SetPedClothes()
         if not table.empty(cb) then
             LoadPed(cb)
         else
-            
         end
-        
     end)
 end
 
@@ -789,7 +787,7 @@ function LoadPed(data)
     local headStructure = data.headStructure
     local model = GetEntityModel(PlayerPedId())
     
-
+    TriggerEvent('Skin:fix')
     for k,v in pairs(drawables) do
         local tn = tostring(k)
      

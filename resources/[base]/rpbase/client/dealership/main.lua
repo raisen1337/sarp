@@ -228,9 +228,14 @@ RegisterCommand('v', function()
                         return
                     end
                     for k,v in pairs(vehicles) do
-                        if all_trim(GetVehicleNumberPlateText(v)) == vData.plate then
-                            found = true
+                        if DoesEntityExist(v) then
+                            if GetVehicleNumberPlateText(v) then
+                                if all_trim(GetVehicleNumberPlateText(v)) == vData.plate then
+                                    found = true
+                                end  
+                            end
                         end
+                        
                     end
 
                     if found then
@@ -301,6 +306,7 @@ RegisterCommand('v', function()
 
                     if not found then
                         --create vehicle at player coords
+                       
                         local veh = CreateCar(vData.spawncode, GetEntityCoords(PlayerPedId()), 0, true, true, true, vData.plate)
                         Core.TriggerCallback("Core:GetVehicleMods", function(mods)
                             if mods then

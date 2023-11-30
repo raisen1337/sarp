@@ -10,12 +10,33 @@ AddEventHandler('onClientMapStart', function()
 	forceRespawn()
 end)
 
+local requireUpdate = false
+
+Citizen.CreateThread(function()
+	while true do
+		Wait(6000)
+		if not requireUpdate then
+			requireUpdate = true
+		end
+	end
+end)
+
 function Core.GetPlayerData()
+	if requireUpdate then
+		requireUpdate = false
+		Core.TriggerCallback('Player:GetData', function(data)
+			PlayerData = data
+		end)
+		return PlayerData
+	end
+	if PlayerData and not table.empty(PlayerData) then
+		return PlayerData
+	end
+	
 	Core.TriggerCallback("Player:GetData", function(data)
 		PlayerData = data
 		return data
 	end)
-
 	return PlayerData
 end
 currentWeather = false
@@ -27,25 +48,18 @@ function Core.GetWeather()
 		currentWeather = weather
 		if currentWeather == 'snow_only' then
 			snowOn = true
+			ForceSnowPass(snowOn)
+
 		else
 			snowOn = false
+			ForceSnowPass(snowOn)
+
 		end
 	end)
 	return currentWeather
 end
 
-Citizen.CreateThread(function ()
-	while true do
-		local wait = 1000
-		if snowOn then
-			wait = 1
-			ForceSnowPass(snowOn)
-		else
-			ForceSnowPass(false)
-		end
-		Wait(wait)
-	end
-end)
+
 
 Citizen.CreateThread(function()
 	while true do
@@ -61,9 +75,14 @@ function Core.SetWeather(weather)
 	end
 	if weather:lower() == 'snow_only' then
 		snowOn = true
+		ForceSnowPass(snowOn)
+
 	end
+	
 	if weather:lower() == 'snow_off' then
 		snowOn = false
+		ForceSnowPass(snowOn)
+
 	end
 	currentWeather = weather
 	SetWeatherTypePersist(weather)
@@ -71,7 +90,20 @@ function Core.SetWeather(weather)
 	SetWeatherTypeNowPersist(weather)
 end
 
+RegisterNetEvent('Client:SyncSeason', function(season)
+	if season == 'winter' then
+		snowOn = true
+		ForceSnowPass(snowOn)
+
+	else
+		snowOn = false
+		ForceSnowPass(snowOn)
+
+	end
+end)
+
 RegisterNetEvent('Client:SyncWeather', function(weather)
+	weather = weather:lower()
 	Core.SetWeather(weather)
 end)
 
@@ -132,6 +164,28 @@ Citizen.CreateThread(function ()
     end
 end)
 
+Core.TeleportToCp = function (cp)
+	local coords = cp.coords
+	local heading = cp.heading
+	local ped = PlayerPedId()
+
+	-- Fade out screen
+	DoScreenFadeOut(500)
+
+	-- Wait for screen to fade out
+	Citizen.Wait(500)
+
+	-- Teleport player
+	SetEntityCoords(ped, coords.x, coords.y, coords.z)
+	SetEntityHeading(ped, heading)
+
+	-- Fade in screen
+	DoScreenFadeIn(500)
+
+	-- Wait for screen to fade in
+	Citizen.Wait(500)
+end
+
 RegisterCommand('setw', function()
 	ShowDialog('Set weather', 'Type the weather name', 'weather', true, false, 'c')
 	local event
@@ -147,10 +201,11 @@ RegisterCommand('setw', function()
 	
 end)
 
+
 progressBars = {}
 currentProgress = {}
 
-Core.ProgressBar = function(duration, percentage, canClose, animation, prop, freeze, cb)
+Core.ProgressBar = function(duration, percentage, canClose, animation, prop, freeze, cb, closecb)
 	local id = math.random(1, 9999999)
 	local this = {}
 	this.id = id
@@ -182,7 +237,8 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 		AttachEntityToEntity(prop.prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), prop.boneIndex), prop.x, prop.y,
 			prop.z, prop.xR, prop.yR, prop.zR, false, false, false, false, 2, true)
 	end
-
+	
+	
 	SendNUIMessage({
 		action = "setProgress",
 		duration = duration,
@@ -190,8 +246,15 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 		canCancel = canClose,
 	})
 	currentProgress = this
+	
 	if cb then
 		SetTimeout(duration * 1000, function()
+			if not this then
+				return
+			end
+			if not currentProgress then
+				return
+			end
 			if animation then
 				ClearPedTasksImmediately(PlayerPedId())
 			end
@@ -202,14 +265,39 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 			if freeze then
 				FreezeEntityPosition(PlayerPedId(), false)
 			end
-
+			this = false
+			currentProgress = false
 			cb()
+		end)
+	end
+	if closecb then
+		Citizen.CreateThread(function()
+			while true do
+				local wait = 1
+				if this then
+					if this.canClose then
+						wait = 1
+						if IsControlJustPressed(0, 200) then
+							closecb()
+							Wait(300)
+							this = false
+							
+						end
+					else
+						wait = 1000
+					end
+				else
+					wait = 1000
+				end
+				Wait(wait)
+			end
 		end)
 	end
 	return this
 end
 
 Core.CancelProgressBar = function()
+
 	if currentProgress.animation then
 		ClearPedTasksImmediately(PlayerPedId())
 		StopAnimTask(PlayerPedId(), currentProgress.animation.dict, currentProgress.animation.name, 1.0)
@@ -224,6 +312,8 @@ Core.CancelProgressBar = function()
 		FreezeEntityPosition(PlayerPedId(), false)
 	end
 
+
+	currentProgress = false
 	SendNUIMessage({
 		action = "cancelProgress"
 	})
@@ -241,7 +331,7 @@ end)
 Citizen.CreateThread(function()
 	while true do
 		local wait = 1000
-		if not table.empty(currentProgress) then
+		if currentProgress and not table.empty(currentProgress) then
 			if currentProgress.canClose then
 				wait = 1
 				if IsControlJustPressed(0, 200) then
@@ -255,8 +345,17 @@ Citizen.CreateThread(function()
 	end
 end)
 
-RegisterNetEvent("Player:UpdateData", function()
-	Core.GetPlayerData()
+Citizen.CreateThread(function()
+	while true do
+		Wait(6000)
+		Core.TriggerCallback('Player:GetData', function(data)
+			PlayerData = data
+		end)
+	end
+end)
+
+RegisterNetEvent("Player:UpdateData", function(data)
+	PlayerData = data
 end)
 
 
@@ -273,8 +372,34 @@ function Core.SaveHouse(house)
 	TriggerServerEvent('Houses:Save', house)
 end
 
+local callbacksCalled = {}
+
+Citizen.CreateThread(function ()
+	while true do
+		Wait(3000)
+		if callbacksCalled then
+			for k,v in pairs(callbacksCalled) do
+				if v >= 6 then
+					callbacksCalled[k] = nil
+				end
+			end
+		end
+	end
+end)
+
 function Core.TriggerCallback(name, cb, ...)
 	Core.ServerCallbacks[name] = cb
+
+	if not callbacksCalled[name] then
+		callbacksCalled[name] = 0
+		callbacksCalled[name] = callbacksCalled[name] + 1
+		if callbacksCalled[name] + 1 > 6 then
+			print('Callback limit reached for ' .. name)
+			callbacksCalled[name] = 6
+			return
+		end
+	end
+
 	TriggerServerEvent('Core:Server:TriggerCallback', name, ...)
 end
 
@@ -401,6 +526,13 @@ Core.SetVehicleProperties = function(vehicle, data)
 		SetVehicleWheelType(vehicle, data.wheels)
 	end
 
+	if(data.modLivery) then
+		SetVehicleMod(vehicle, 48, data.modLivery, false)
+	end
+
+	if data.livery then
+		SetVehicleLivery(vehicle, data.livery)
+	end
 
 	if (data.windowTint) then
 		SetVehicleWindowTint(vehicle, data.windowTint)
@@ -632,12 +764,21 @@ function Core.MathRound(num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
+RegisterCommand('liverytest', function()
+	local veh = GetVehiclePedIsIn(PlayerPedId())
+	local livery = GetVehicleLiveryCount(veh)
+	local livery2 = GetVehicleLivery(veh)
+	print(livery, livery2)
+end)
+
 Core.GetVehicleProperties = function(vehicle)
 	local color1, color2, color3 = GetVehicleCustomPrimaryColour(vehicle)
 
-
+	print(DoesEntityExist(vehicle))
 	local pearlescentColor, wheelColor = GetVehicleExtraColours(vehicle)
 	local extras = {}
+	local livery
+	local liveries = GetVehicleLiveryCount(vehicle)
 
 	for id = 0, 12 do
 		if DoesExtraExist(vehicle, id) then
@@ -675,7 +816,7 @@ Core.GetVehicleProperties = function(vehicle)
 		},
 
 		extras            = extras,
-
+		
 		neonColor         = table.pack(GetVehicleNeonLightsColour(vehicle)),
 		tyreSmokeColor    = table.pack(GetVehicleTyreSmokeColor(vehicle)),
 
@@ -699,8 +840,10 @@ Core.GetVehicleProperties = function(vehicle)
 		modArmor          = GetVehicleMod(vehicle, 16),
 
 		modTurbo          = IsToggleModOn(vehicle, 18),
+		color1Type = 	GetVehicleModColor_1(vehicle),
+		color2Type = 	GetVehicleModColor_2(vehicle),
 		modSmokeEnabled   = IsToggleModOn(vehicle, 20),
-		modXenon          = IsToggleModOn(vehicle, 22),
+		modXenon          = GetVehicleXenonLightsColour(vehicle),
 
 		modFrontWheels    = GetVehicleMod(vehicle, 23),
 		modBackWheels     = GetVehicleMod(vehicle, 24),
@@ -727,9 +870,12 @@ Core.GetVehicleProperties = function(vehicle)
 		modTrimB          = GetVehicleMod(vehicle, 44),
 		modTank           = GetVehicleMod(vehicle, 45),
 		modWindows        = GetVehicleMod(vehicle, 46),
-		modLivery         = GetVehicleLivery(vehicle)
+		modLivery         = GetVehicleMod(vehicle, 48),
+		livery = GetVehicleLivery(vehicle)
 	}
 end
+
+
 
 
 function GetVehicles()
@@ -910,7 +1056,7 @@ end
 
 Citizen.CreateThread(function()
 	while true do
-		Wait(1000)
+		Wait(6000)
 		while not LoggedIn do
 			Wait(1000)
 		end
@@ -927,7 +1073,6 @@ Citizen.CreateThread(function()
 		local notRegistered = false
 		for k,v in pairs(vehs) do
 			if not isVehicleRegistered(v) then
-				print('not')
 				notRegistered = v
 			end
 		end

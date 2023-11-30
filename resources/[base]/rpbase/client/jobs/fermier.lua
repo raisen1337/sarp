@@ -279,7 +279,33 @@ AddEventHandler('Jobs:Quit', function ()
     })
 end)
 
-AddEventHandler('Jobs:Check', function ()
+AddEventHandler('Jobs:Check', function (bypass, jobName)
+    if bypass then
+        if jobName == JobInfo.jobName then
+            PlayerData.job.name = 'Fermier';
+            if table.empty(PlayerData.skills) then
+                table.insert(PlayerData.skills, {
+                    ['fermier'] = {
+                        level = 1,
+                        experience = 0,
+                    }
+                })
+            end
+            local places = JobInfo.places
+            for k,v in pairs(places) do
+                for i = 1, #v do
+                    local blip = CreateBlip(v[i].coords, k, v.blip, v.blipColor)
+                    table.insert(jobBlips, blip)
+                end
+            end
+            Core.SavePlayer()
+            sendNotification("Job", "Te-ai angajat ca Fermier.")
+            TriggerEvent('chat:addMessage', {
+                args = {'^gNicu Fermieru^0: Noroc, '..PlayerData.user..'! Bine ai venit la ferma. Ai pe ^gharta^0 locurile unde poti sa lucrezi. Succes!'}
+            })
+            return
+        end
+    end
     local dist = #(JobInfo.pedCoords - GetEntityCoords(PlayerPedId()))
     if dist < 3.0 then
         PlayerData.job.name = 'Fermier';
@@ -411,6 +437,20 @@ Citizen.CreateThread(function ()
             end
         end
         Wait(wait)
+    end
+end)
+
+AddEventHandler('Job:StopWork', function(jobName)
+    if jobName == JobInfo.jobName then
+        workingWithTractor = false
+        workedTimes = 0
+        inHarvestingField = false
+        if DoesEntityExist(tractor) then
+            DeleteEntity(tractor)
+        end
+        TriggerEvent('chat:addMessage', {
+            args = {'^*^gNicu Fermieru^0: Te-ai oprit din muncit.'}
+        })
     end
 end)
 

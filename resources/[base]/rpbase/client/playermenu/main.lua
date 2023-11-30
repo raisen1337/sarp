@@ -454,12 +454,36 @@ function BuildPlayerMenu()
     
 end
 
+
+
+local pMenuOpen = false
+local closedTimes = 0
+playerMenu:On('close', function ()
+    pMenuOpen = false
+    closedTimes = closedTimes + 1
+end)
+
+
+
 Citizen.CreateThread(function()
     while true do
-        Wait(0)
-        if IsControlJustPressed(0, 311) then
-            BuildPlayerMenu()
-            MenuV:OpenMenu(playerMenu)
+        Wait(4000)
+        if closedTimes >= 4 then
+            closedTimes = 0
         end
     end
 end)
+
+
+
+RegisterCommand('pmenu', function()
+    if MenuV.CurrentMenu == nil or not MenuV.CurrentMenu then
+        if closedTimes >= 4 then
+            return
+        end
+        BuildPlayerMenu()
+        MenuV:OpenMenu(playerMenu)
+    end
+end)
+
+RegisterKeyMapping('pmenu', 'Open Player Menu', 'keyboard', 'K')

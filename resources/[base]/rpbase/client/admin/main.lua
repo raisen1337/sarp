@@ -911,9 +911,13 @@ RegisterCommand('admin', function()
                                         label = 'Teleport',
                                         icon = '🔗'
                                     }):On('select', function()
+                                        DoScreenFadeOut(500)
+                                        Citizen.Wait(500)
                                         Core.TriggerCallback('Core:GetPlayerById', function(player)
                                             local coords = player.coords
                                             SetEntityCoords(PlayerPedId(), coords.x, coords.y, coords.z)
+                                            Citizen.Wait(500)
+                                            DoScreenFadeIn(500)
                                             sendNotification('Admin', 'Te-ai teleportat la '..v.name..'!')
                                             Core.TriggerCallback('Admin:Log', function() end, '[^3ADMIN^0] Adminul '..GetPlayerName(PlayerId())..' s-a teleportat la '..v.name..'!')
                                         end, v.source)
@@ -1042,6 +1046,28 @@ RegisterCommand('admin', function()
         }):On("select", function()
             personalSettings:ClearItems()
             if HasAccess(1) then
+                personalSettings:AddButton({
+                    icon = '🔴',
+                    label = 'Tp To Checkpoint'
+                }):On('select', function ()
+                    local cp = Core.GetActiveCheckpoint()
+                    Core.TeleportToCp(cp)
+                end)
+
+                personalSettings:AddButton({
+                    icon = '🟣',
+                    label = 'Tp To Waypoint'
+                }):On('select', function ()
+                    local wp = GetFirstBlipInfoId(8)
+                    if wp ~= 0 then
+                        local wpCoords = GetBlipCoords(wp)
+                        local z = GetGroundZFor_3dCoord(wpCoords.x, wpCoords.y, wpCoords.z, 0)
+                        SetEntityCoords(PlayerPedId(), wpCoords.x, wpCoords.y, z)                        
+                    else
+                        sendNotification('Admin', 'Nu ai setat un waypoint!', 'error')
+                    end
+                end)
+
                 personalSettings:AddButton({
                     icon = '🔧',
                     label = 'Fix',

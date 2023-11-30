@@ -386,7 +386,9 @@ $(document).ready(function(){
 	document.onkeyup = function (data) {
         if(opened){
             if (data.which == 27) {
-                $("#popup").show();
+                $.post('https://rpbase/action', JSON.stringify({
+                    action: "camlivre",
+                }));
             } else if (data.which == 81 & pode) {
                 console.log(pode);
                 $.post('https://rpbase/action', JSON.stringify({

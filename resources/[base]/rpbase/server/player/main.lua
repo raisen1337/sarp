@@ -1150,13 +1150,13 @@ RegisterNetEvent("Player:Save", function(pData)
         identifier = pData.identifier
         exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
         Wait(2000)
-        TriggerClientEvent("Player:UpdateData", src)
+        TriggerClientEvent("Player:UpdateData", src, pData)
         return
     else
         pData = jd(pData)
         exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", {je(pData), pData.identifier})
         Wait(2000)
-        TriggerClientEvent("Player:UpdateData", src)
+        TriggerClientEvent("Player:UpdateData", src, pData)
         return
     end
 end)

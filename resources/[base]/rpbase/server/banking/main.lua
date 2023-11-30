@@ -38,6 +38,8 @@ Core.CreateCallback('Banking:TryTransaction', function(source, cb, transaction)
                 })
             end
             exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(PlayerData), PlayerData.identifier})
+            TriggerClientEvent('Player:UpdateData', src, PlayerData)
+           
             cb(true)
         else
             cb({
@@ -74,6 +76,7 @@ Core.CreateCallback('Banking:TryTransaction', function(source, cb, transaction)
                     })
                 end
                 exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(PlayerData), PlayerData.identifier})
+                TriggerClientEvent('Player:UpdateData', source, PlayerData)
                 cb(true)
             else
                 cb({
@@ -138,6 +141,7 @@ Core.CreateCallback('Banking:TryTransaction', function(source, cb, transaction)
                         
                         exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(recipientData), recipientData.identifier})
                         exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(PlayerData), PlayerData.identifier})
+                        TriggerClientEvent('Player:UpdateData', source, PlayerData)
                         cb(true)
                     else
                         cb({

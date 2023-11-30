@@ -154,7 +154,7 @@
     position: absolute;
     bottom: 3.2%;
     opacity: 0;
-    border: 7px solid white;
+    border: 5px solid rgb(125, 203, 255);
     border-radius: 1rem;
     width: 14vw;
     height: 15.3vh;

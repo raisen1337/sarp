@@ -84,17 +84,20 @@ CreateThread(function()
 		if IsPedShooting(PlayerPedId()) and not IsPedDoingDriveby(PlayerPedId()) then
 			local _,wep = GetCurrentPedWeapon(PlayerPedId())
 			_,cAmmo = GetAmmoInClip(PlayerPedId(), wep)
-			if weapons[wep].recoil and weapons[wep].recoil ~= 0 then
-				tv = 0
-				repeat 
-					Wait(0)
-					p = GetGameplayCamRelativePitch()
-					if GetFollowPedCamViewMode() ~= 4 then
-						SetGameplayCamRelativePitch(p+0.1, 0.2)
-					end
-					tv = tv+0.1
-				until tv >= weapons[wep].recoil
+			if weapons[wep] then
+				if weapons[wep].recoil and weapons[wep].recoil ~= 0 then
+					tv = 0
+					repeat 
+						Wait(0)
+						p = GetGameplayCamRelativePitch()
+						if GetFollowPedCamViewMode() ~= 4 then
+							SetGameplayCamRelativePitch(p+0.1, 0.2)
+						end
+						tv = tv+0.1
+					until tv >= weapons[wep].recoil
+				end
 			end
+			
 			
 		end
 	end

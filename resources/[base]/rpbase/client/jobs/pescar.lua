@@ -67,7 +67,26 @@ local JobInfo = {
     }
 }
 
-AddEventHandler('Jobs:Check', function ()
+AddEventHandler('Jobs:Check', function (bypass, jobName)
+   
+    if bypass then
+        if jobName == JobInfo.jobName then
+            PlayerData.job.name = 'Fisherman';
+            if table.empty(PlayerData.skills) then
+                local fish = 
+                table.insert(PlayerData.skills, {
+                    ['fish'] = {
+                        level = 1,
+                        experience = 0,
+                    }
+                })
+            end
+            
+            Core.SavePlayer()
+            sendNotification("Job", "Te-ai angajat ca Fisherman.")
+            return
+        end
+    end
     local dist = #(JobInfo.pedCoords - GetEntityCoords(PlayerPedId()))
     if dist < 3.0 then
         PlayerData.job.name = 'Fisherman';
