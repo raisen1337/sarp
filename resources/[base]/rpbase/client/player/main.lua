@@ -176,6 +176,8 @@ Citizen.CreateThread(function()
         if PlayerData then
             local pHealth = GetEntityHealth(PlayerPedId())
             if pHealth <= 0 and not inComa then
+                Core.TriggerCallback('Player:CheckDeath', function(info)
+                end)
                 inComa = true
                 PlayerData.dead = true
                 Core.SavePlayer()
@@ -223,11 +225,11 @@ Citizen.CreateThread(function()
 end)
 
 PlayerKilled = function(killerid, coords)
-    print(killerid, coords)
+  
 end
 
 PlayerDied = function(killertype, coords)
-    print(killertype, coords)
+
 end
 
 AddEventHandler('playerKilled', PlayerKilled)

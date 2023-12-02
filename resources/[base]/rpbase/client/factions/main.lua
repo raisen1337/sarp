@@ -281,7 +281,6 @@ RegisterCommand('faction', function()
                                 if tonumber(result) then
                                     result = tonumber(result)
                                     Core.TriggerCallback('Core:GetPlayerById', function(player)
-                                        print(player.data.identifier)
                                         Core.TriggerCallback('Factions:AddMemberWithRank', function(cb)
                                             
                                             MenuV:CloseAll()

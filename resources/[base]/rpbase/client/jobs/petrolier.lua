@@ -471,7 +471,7 @@ Citizen.CreateThread(function ()
                                         end)
                                     end)
                                 end
-                            elseif table.empty(PlayerData.ownedTrucks) or not PlayerData.ownedTrucks then   
+                            elseif not PlayerData.ownedTrucks or table.empty(PlayerData.ownedTrucks) then   
                                 petrolierGarage:ClearItems()
 
                                 for k,v in pairs(availableTrucks) do

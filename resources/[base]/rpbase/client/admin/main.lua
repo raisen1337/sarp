@@ -995,14 +995,14 @@ RegisterCommand('admin', function()
                                         ShowDialog('Seteaza factiune', 'Scrie factiunea pe care vrei sa o setezi jucatorului: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
                                         local event
                                         event = Core.AddEventHandler('Admin:HandleSetFaction', function(faction)
-                                            RemoveEventHandler(event)
                                             if string.len(faction) == 0 then
                                                 sendNotification('Admin', 'Invalid input', 'error')
                                                 return
                                             end
+                                            RemoveEventHandler(event)
                                             ShowDialog('Seteaza factiune', 'Scrie rankul pe care vrei sa il aiba: '..v.name..'['..v.source..'].', 'Admin:HandleSetFaction', true, true, 'c')
                                             event = Core.AddEventHandler('Admin:HandleSetFaction', function(rank)
-                                                RemoveEventHandler(event)
+                                                
                                                 if not tonumber(rank) then
                                                     sendNotification('Admin', 'Invalid input', 'error')
                                                     return
@@ -1019,6 +1019,7 @@ RegisterCommand('admin', function()
                                                         end
                                                     end, faction, rank, player.data.identifier)
                                                 end, v.source)
+                                                RemoveEventHandler(event)
                                             end)
                                         end)
                                     end)

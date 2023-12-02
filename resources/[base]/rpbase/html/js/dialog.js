@@ -4,7 +4,7 @@ let dialogCancelListener = null;
 window.addEventListener("message", function (event1) {
     let event = event1['data'];
     if (event.action == "openPrompt") {
-
+        console.log('called')
         let dialogContainer = document.querySelector(".dialog-container");
         let dialogTitle = document.querySelector(".dialog-title");
         let dialogSubtitle = document.querySelector(".dialog-subtitle");
@@ -22,6 +22,10 @@ window.addEventListener("message", function (event1) {
         if (dialogCancelListener) {
             dialogCancel.removeEventListener('click', dialogCancelListener);
             dialogCancelListener = null;
+        }
+
+        if(event.action == 'closeDialog'){
+            closeDialog();
         }
 
         if (event.hasCancel) {
@@ -93,14 +97,12 @@ window.addEventListener("message", function (event1) {
 });
 
 function closeDialog() {
-    
     let dialogContainer = document.querySelector(".dialog-container");
     dialogContainer.style.display = 'none';
     let dialogInput = document.querySelector(".dialog-input");
 
-    dialogInput.value = "";
-
     $.post('http://rpbase/dialogClose', JSON.stringify({
-       
+       response: dialogInput.value
     }));
+    dialogInput.value = "";
 }

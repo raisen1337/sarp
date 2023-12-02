@@ -15,7 +15,7 @@ local eventHandlers = {}
 Core.AddEventHandler = function(eventName, cb)
 	local event = AddEventHandler(eventName, cb)
 	table.insert(eventHandlers, { event = event, name = eventName })
-	SetTimeout(6000, function()
+	SetTimeout(20000, function()
 		RemoveEventHandler(event)
 	end)
 	return event
@@ -41,7 +41,7 @@ local requireUpdate = false
 
 Citizen.CreateThread(function()
 	while true do
-		Wait(6000)
+		Wait(20000)
 		if not requireUpdate then
 			requireUpdate = true
 		end
@@ -214,15 +214,15 @@ Core.TeleportToCp = function (cp)
 end
 
 RegisterCommand('setw', function()
-	ShowDialog('Set weather', 'Type the weather name', 'weather', true, false, 'c', function(data)
-		if string.len(data) > 0 then
-			
+	Core.ShowDialogBox('Set Weather', 'Type the weather name', true, false, function(result)
+		if string.len(result) > 0 then
 			Core.TriggerCallback('Server:SetWeather', function()
-				Core.SetWeather(string.upper(data))
-			end, data)
+				Core.SetWeather(string.upper(result))
+			end, result)
 			Core.ClearEvent('weather')
 		end
 	end)
+
 end)
 
 
@@ -794,13 +794,11 @@ RegisterCommand('liverytest', function()
 	local veh = GetVehiclePedIsIn(PlayerPedId())
 	local livery = GetVehicleLiveryCount(veh)
 	local livery2 = GetVehicleLivery(veh)
-	print(livery, livery2)
 end)
 
 Core.GetVehicleProperties = function(vehicle)
 	local color1, color2, color3 = GetVehicleCustomPrimaryColour(vehicle)
 
-	print(DoesEntityExist(vehicle))
 	local pearlescentColor, wheelColor = GetVehicleExtraColours(vehicle)
 	local extras = {}
 	local livery

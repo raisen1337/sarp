@@ -66,6 +66,19 @@ CreateBlip = function(coords, name, icon, color)
     return mapBlip
 end
 
+function intToFloat(num)
+    return num + 0.0
+end
+
+CreateBlipRadius = function(coords, radius, color)
+    local blip = AddBlipForRadius(coords.x, coords.y, coords.z, intToFloat(radius)) 
+    SetBlipHighDetail(blip, true)
+    SetBlipColour(blip, color)
+    SetBlipAlpha (blip, 128)
+    SetBlipAsShortRange(blip, true)
+    return blip
+end
+
 Citizen.CreateThread(function ()
     while true do
         

@@ -162,8 +162,8 @@ end)
 
 local tickets = {}
 
-Core.CreateCallback("Core:CallRemoteEvent", function(source, cb, event, src)
-    TriggerClientEvent(event, src)
+Core.CreateCallback("Core:CallRemoteEvent", function(source, cb, event, src, ...)
+    TriggerClientEvent(event, src, ...)
 end)
 
 Core.CreateCallback('Admin:HandleJail', function(source, cb, jailData)

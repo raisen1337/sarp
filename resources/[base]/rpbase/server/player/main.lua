@@ -1039,6 +1039,42 @@ Citizen.CreateThread(function()
     end
 end)
 
+Core.CreateCallback('Player:CheckDeath', function(source, cb)
+    local src = source
+    local ped = GetPlayerPed(src)
+
+    local killer = GetPedSourceOfDeath(ped)
+    
+    local killerId = 0
+    local players = GetPlayers()
+    local killerWeapon
+    for k, v in pairs(players) do
+        print(v, killer, GetPlayerPed(v), killer == GetPlayerPed(v))
+        if GetPlayerPed(v) == killer then
+            killerId = v
+            killerWeapon = GetPedCauseOfDeath(ped)
+        end
+    end
+    
+    local killData = {}
+    if killer == 0 or killerId == -1 or killerId == 0 then
+        killData = {
+            killer = 'none',
+            killerId = -1,
+            killerWeapon = 0,
+        }
+    elseif killerId ~= -1 then
+        killData = {
+            killer = GetPlayerName(killerId),
+            killerId = killerId,
+            killerWeapon = killerWeapon,
+        }
+    end
+    print(je(killData))
+    TriggerClientEvent('playerKilled', src, killData)
+    cb(true)
+end)
+
 Core.CreateCallback('Core:GetPlayerById', function(source, cb, id)
     id = tonumber(id)
     local players = GetPlayers()

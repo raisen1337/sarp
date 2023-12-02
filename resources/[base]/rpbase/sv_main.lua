@@ -273,7 +273,7 @@ Citizen.CreateThread(function()
         local currentMonth = tonumber(os.date("%m"))
         local isWinter = false
         if currentMonth == 12 or currentMonth == 1 or currentMonth == 2 then
-            isWinter = true
+            isWinter = false
         end
         
         local randomWeather
@@ -325,7 +325,7 @@ function SyncWeatherAndSeason()
     local currentMonth = tonumber(os.date("%m"))
     local isWinter = false
     if currentMonth == 12 or currentMonth == 1 or currentMonth == 2 then
-        isWinter = true
+        isWinter = false
     end
     
     local randomWeather
