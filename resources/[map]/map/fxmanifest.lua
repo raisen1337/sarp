@@ -18,3 +18,8 @@ data_file 'TIMECYCLEMOD_FILE' 'gabz_mrpd_timecycle.xml'
 
 data_file 'DLC_ITYP_REQUEST' 'starter_shells_k4mb1.ytyp'
 data_file 'INTERIOR_PROXY_ORDER_FILE' 'interiorproxies.meta'
+
+files {
+    'stream/vms_gift.ytyp'
+}
+data_file 'DLC_ITYP_REQUEST' 'vms_gift.ytyp'
