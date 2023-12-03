@@ -3,7 +3,6 @@ Core.ServerCallbacks = {}
 ServerVehicles = {}
 
 function Core.CreateCallback(name, cb)
-   
     Core.ServerCallbacks[name] = cb
 end
 
@@ -45,7 +44,6 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
     local PlayerAmmo = ammoTable
     local pAmmo = {}
     if not table.empty(PlayerAmmo) then
-
         local pData = Core.GetPlayerData(source)
         local Inventory = pData.inventory
         if not table.empty(Inventory) then
@@ -55,14 +53,16 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
                         if v.amount == PlayerAmmo[v.name] then return end
                         -- print('[F]PlayerAmmo['..v.name..'] = '..PlayerAmmo[v.name])
                         v.amount = PlayerAmmo[v.name]
-                        exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
+                        exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?',
+                            { json.encode(pData), pData.identifier })
                         TriggerClientEvent('Player:UpdateData', source, pData)
-                        
+
                         return
                     else
                         -- print('[NF]PlayerAmmo['..v.name..'] = '..v.amount)
                         v.amount = PlayerAmmo[v.name]
-                        exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {json.encode(pData), pData.identifier})
+                        exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?',
+                            { json.encode(pData), pData.identifier })
                         TriggerClientEvent('Player:UpdateData', source, pData)
                         return
                     end
@@ -72,7 +72,6 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
     else
         --print('PlayerAmmo is empty')
     end
-    
 end)
 
 Core.CreateCallback('Core:IsOnline', function(source, cb, id)
@@ -88,7 +87,7 @@ Core.CreateCallback('Core:IsOnline', function(source, cb, id)
     cb(isOnline)
 end)
 
-Core.CreateCallback('Core:GetNearestPlayer', function (source, cb)
+Core.CreateCallback('Core:GetNearestPlayer', function(source, cb)
     local ped = GetPlayerPed(source)
     local pos = GetEntityCoords(ped)
 
@@ -101,7 +100,7 @@ Core.CreateCallback('Core:GetNearestPlayer', function (source, cb)
             cb(v)
             return
         end
-       
+
         -- if GetPlayerPed(source) ~= targetped and dist < 3.0 then
         --     cb(v)
         --     return
@@ -124,7 +123,7 @@ Core.CreateCallback('Police:AnnounceShooting', function(source, cb, zone, crossi
             else
                 return
             end
-            TriggerClientEvent('Notify:Send', v, "Politie", 'Shots fired in '..zone..' near '..crossing)
+            TriggerClientEvent('Notify:Send', v, "Politie", 'Shots fired in ' .. zone .. ' near ' .. crossing)
             cb(true)
         end
     end
@@ -140,7 +139,7 @@ function ACBan(source)
     }
     local pData = Core.GetPlayerData(banData.banSource)
     local banId = generateBanId()
-    
+
     pData.banned = 1
     pData.banId = banId
     pData.banReason = banData.banReason
@@ -165,7 +164,7 @@ function ACBan(source)
     }
     playerACReports[src] = nil
 
-    if  pData.punishHistory then
+    if pData.punishHistory then
         if table.empty(pData.punishHistory) then
             pData.punishHistory = {}
             table.insert(pData.punishHistory, punishment)
@@ -175,11 +174,14 @@ function ACBan(source)
         table.insert(pData.punishHistory, punishment)
     end
 
-    
-    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), pData.identifier})
+
+    exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+        { json.encode(pData), pData.identifier })
     Wait(1000)
     TriggerClientEvent('Player:UpdateData', banData.banSource, pData)
-    DropPlayer(banData.banSource, "You have been banned from the server. Reason: "..banData.banReason..". Ban ID: "..banId..". Ban expires in: "..banData.banTime.." days.")
+    DropPlayer(banData.banSource,
+        "You have been banned from the server. Reason: " ..
+        banData.banReason .. ". Ban ID: " .. banId .. ". Ban expires in: " .. banData.banTime .. " days.")
 end
 
 local currentWeather = false
@@ -190,25 +192,29 @@ end)
 Core.CreateCallback('Server:UnsyncVehicle', function(source, cb, vehicle)
     local src = source
     local players = GetPlayers()
-    for k,v in pairs(players) do
+    for k, v in pairs(players) do
         TriggerClientEvent('Client:UnsyncVehicle', v, vehicle)
     end
 end)
+
 -- SERVER script, requires OneSync!
 function checkPlayerReports(source)
     local src = source
     if not playerACReports[src] then return end
-    for k,v in pairs(playerACReports[src]) do
+    for k, v in pairs(playerACReports[src]) do
         if v.count > 3 then
             if os.time() < v.lastReport + 60 then
-                print('[AC]Player '..GetPlayerName(src)..'('..src..')'..' has been detected by anticheat. Detection type: '..k..'! Count: '..v.count)
+                print('[AC]Player ' ..
+                    GetPlayerName(src) ..
+                    '(' ..
+                    src .. ')' .. ' has been detected by anticheat. Detection type: ' .. k .. '! Count: ' .. v.count)
                 local players = GetPlayers()
-                for a,b in pairs(players) do
+                for a, b in pairs(players) do
                     local pData = Core.GetPlayerData(b)
                     if pData.adminLevel > 0 then
                         TriggerClientEvent('chat:addMessage', b, {
-                            args = { '^1[AC]: ^0Jucatorul ^1'..GetPlayerName(src)..'('..src..') ^0a fost detectat de anticheat. Detection type: ^1'..k..'!' }
-                        })  
+                            args = { '^1[AC]: ^0Jucatorul ^1' .. GetPlayerName(src) .. '(' .. src .. ') ^0a fost detectat de anticheat. Detection type: ^1' .. k .. '!' }
+                        })
                     end
                 end
                 ACBan(src)
@@ -219,7 +225,9 @@ end
 
 AddEventHandler('explosionEvent', function(sender, ev)
     local src = sender
-    print('[AC Explosion]Player '..GetPlayerName(src)..'('..src..')'..' has been detected by anticheat. Explosion type: '..ev.explosionType..'!')
+    print('[AC Explosion]Player ' ..
+        GetPlayerName(src) .. '(' .. src .. ')' .. ' has been detected by anticheat. Explosion type: ' ..
+        ev.explosionType .. '!')
     if not playerACReports[src] then
         playerACReports[src] = {}
         playerACReports[src][ev.explosionType] = {}
@@ -256,9 +264,9 @@ local weathers = {
     'XMAS',
 }
 
-RegisterNetEvent('onPlayerDied', function ()
-   local src = source
---    TriggerClientEvent('onPlayerDied', src)
+RegisterNetEvent('onPlayerDied', function()
+    local src = source
+    --    TriggerClientEvent('onPlayerDied', src)
 end)
 
 RegisterNetEvent('onPlayerKilled', function(killerid, data)
@@ -275,11 +283,12 @@ Citizen.CreateThread(function()
         if currentMonth == 12 or currentMonth == 1 or currentMonth == 2 then
             isWinter = false
         end
-        
+
         local randomWeather
         if isWinter then
             -- Increase chance of snowy weather in winter
-            randomWeather = GetRandomWeatherWithIncreasedChance({'EXTRASUNNY', "SNOW", "SNOWLIGHT", 'BLIZZARD', 'XMAS', 'SMOG'}, 0.8)
+            randomWeather = GetRandomWeatherWithIncreasedChance(
+                { 'EXTRASUNNY', "SNOW", "SNOWLIGHT", 'BLIZZARD', 'XMAS', 'SMOG' }, 0.8)
             season = 'winter'
         else
             -- Normal random weather selection without snowy weathers
@@ -292,9 +301,9 @@ Citizen.CreateThread(function()
             season = 'summer'
             randomWeather = filteredWeathers[math.random(1, #filteredWeathers)]
         end
-        
+
         currentWeather = randomWeather
-        
+
         for k, v in pairs(players) do
             TriggerClientEvent('Client:SyncSeason', v, season)
             TriggerClientEvent('Client:SyncWeather', v, randomWeather)
@@ -327,11 +336,12 @@ function SyncWeatherAndSeason()
     if currentMonth == 12 or currentMonth == 1 or currentMonth == 2 then
         isWinter = false
     end
-    
+
     local randomWeather
     if isWinter then
         -- Increase chance of snowy weather in winter
-        randomWeather = GetRandomWeatherWithIncreasedChance({'EXTRASUNNY', "SNOW", "SNOWLIGHT", 'BLIZZARD', 'XMAS', 'SMOG'}, 0.8)
+        randomWeather = GetRandomWeatherWithIncreasedChance(
+            { 'EXTRASUNNY', "SNOW", "SNOWLIGHT", 'BLIZZARD', 'XMAS', 'SMOG' }, 0.8)
         season = 'winter'
     else
         -- Normal random weather selection without snowy weathers
@@ -344,9 +354,9 @@ function SyncWeatherAndSeason()
         season = 'summer'
         randomWeather = filteredWeathers[math.random(1, #filteredWeathers)]
     end
-    
+
     currentWeather = randomWeather
-    
+
     for k, v in pairs(players) do
         TriggerClientEvent('Client:SyncSeason', v, season)
         TriggerClientEvent('Client:SyncWeather', v, randomWeather)
@@ -356,7 +366,7 @@ end
 SyncWeatherAndSeason()
 
 
-Core.CreateCallback('Server:SetWeather', function (source, cb, weather)
+Core.CreateCallback('Server:SetWeather', function(source, cb, weather)
     currentWeather = weather
     local players = GetPlayers()
     for k, v in pairs(players) do
@@ -365,7 +375,7 @@ Core.CreateCallback('Server:SetWeather', function (source, cb, weather)
     cb(true)
 end)
 
-Core.CreateCallback('Server:SyncWeather', function (source, cb)
+Core.CreateCallback('Server:SyncWeather', function(source, cb)
     local players = GetPlayers()
     if not currentWeather then
         currentWeather = 'EXTRASUNNY'
@@ -378,7 +388,8 @@ end)
 
 Core.CreateCallback('AC:ReportAnomaly', function(source, cb, type)
     local src = source
-    print('[AC]Player '..GetPlayerName(src)..'('..src..')'..' has been detected by anticheat. Detection type: '..type..'!')
+    print('[AC]Player ' ..
+        GetPlayerName(src) .. '(' .. src .. ')' .. ' has been detected by anticheat. Detection type: ' .. type .. '!')
     if not playerACReports[src] then
         playerACReports[src] = {}
         playerACReports[src][type] = {}
@@ -429,14 +440,14 @@ end)
 
 RegisterNetEvent('Vehicles:Insert', function(vehicle)
     table.insert(ServerVehicles, vehicle)
-    for k,v in pairs(GetPlayers()) do
+    for k, v in pairs(GetPlayers()) do
         TriggerClientEvent("Vehicles:Update", v, ServerVehicles)
     end
 end)
 
 RegisterNetEvent('Vehicles:Remove', function(key)
     table.remove(ServerVehicles, key)
-    for k,v in pairs(GetPlayers()) do
+    for k, v in pairs(GetPlayers()) do
         TriggerClientEvent("Vehicles:Update", v, ServerVehicles)
     end
 end)
@@ -446,19 +457,20 @@ Core.CreateCallback('Vehicles:Get', function(source, cb)
 end)
 
 Core.CreateCallback('Clothing:UpdateClothes', function(source, cb, data)
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {GetPlayerSteamId(source)})
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", { GetPlayerSteamId(source) })
 
     local pData = json.decode(result[1].data)
     pData.clothing = data
 
-    exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', {je(pData), pData.identifier})
+    exports.oxmysql:executeSync('UPDATE players SET data = ? WHERE identifier = ?', { je(pData), pData.identifier })
     TriggerClientEvent('Player:UpdateData', source, pData)
 
     cb(true)
 end)
 
 Core.CreateCallback('Clothing:GetClothing', function(source, cb)
-    local data = exports.oxmysql:executeSync("SELECT data FROM players WHERE identifier = ?", {GetPlayerSteamId(source)})
+    local data = exports.oxmysql:executeSync("SELECT data FROM players WHERE identifier = ?",
+        { GetPlayerSteamId(source) })
     if data[1] then
         local pData = json.decode(data[1].data)
 
@@ -468,5 +480,4 @@ Core.CreateCallback('Clothing:GetClothing', function(source, cb)
         if type(pData.clothing) ~= 'table' then pData.clothing = {} end
         cb(pData.clothing)
     end
-    
 end)
