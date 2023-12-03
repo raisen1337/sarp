@@ -29,6 +29,10 @@ OpenBank = function()
     SetNuiFocus(true, true)
 end
 
+RegisterCommand('bank',function ()
+    OpenBank()
+end)
+
 RegisterNUICallback('closeBank', function()
     TriggerScreenblurFadeOut(1)
     SetNuiFocus(false, false)

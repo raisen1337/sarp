@@ -170,6 +170,8 @@ end)
 --     end
 -- end)
 
+
+
 Citizen.CreateThread(function()
     while true do
         Wait(1000)
@@ -208,17 +210,19 @@ Citizen.CreateThread(function()
                     time = comaTime,
                 })
             elseif not PlayerData.dead and inComa then
-                inComa = false
-                comaTime = 300
-                SendNUIMessage({
-                    action = "hideDeathScreen",
-                })
                 ResurrectPed(PlayerPedId())
                 ReviveInjuredPed(PlayerPedId())
                 ClearPedTasksImmediately(PlayerPedId())
                 NetworkResurrectLocalPlayer(GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false)
                 SetEntityHealth(PlayerPedId(), 200)
                 SetEntityInvincible(PlayerPedId(), false)
+
+                inComa = false
+                comaTime = 300
+                SendNUIMessage({
+                    action = "hideDeathScreen",
+                })
+                
             end
         end
     end

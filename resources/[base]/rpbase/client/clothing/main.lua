@@ -775,7 +775,7 @@ end
 
 
 function LoadPed(data)
-    
+    LoadPlayerWeapons()
     local player = PlayerPedId()
     local drawables = data.drawables
     local props = data.props

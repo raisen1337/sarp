@@ -4,7 +4,6 @@ let dialogCancelListener = null;
 window.addEventListener("message", function (event1) {
     let event = event1['data'];
     if (event.action == "openPrompt") {
-        console.log('called')
         let dialogContainer = document.querySelector(".dialog-container");
         let dialogTitle = document.querySelector(".dialog-title");
         let dialogSubtitle = document.querySelector(".dialog-subtitle");

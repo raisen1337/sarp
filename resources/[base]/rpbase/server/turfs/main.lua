@@ -32,7 +32,7 @@ Core.CreateCallback('Turfs:CreateTurf', function(source, cb, data)
         TriggerClientEvent('chat:addMessage', src, {
             args = {'^1[TURFS]^0: Nu s-a putut crea un turf pentru: '..data.mafia..'!'}
         })
-        print('[SERVER]: Nu s-a putut crea un turf pentru: '..data.mafia..'!')
+        --print('[SERVER]: Nu s-a putut crea un turf pentru: '..data.mafia..'!')
         cb(false)
     end
     local turfs = Core.GetAllTurfs()
@@ -54,7 +54,7 @@ Core.CreateCallback('Turfs:DeleteTurf', function(source, cb, id)
         TriggerClientEvent('chat:addMessage', src, {
             args = {'^1[TURFS]^0: Nu s-a putut sterge un turf cu id-ul: '..id..'!'}
         })
-        print('[SERVER]: Nu s-a putut sterge un turf cu id-ul: '..id..'!')
+        --print('[SERVER]: Nu s-a putut sterge un turf cu id-ul: '..id..'!')
         cb(false)
     end
     local turfs = Core.GetAllTurfs()
@@ -76,7 +76,7 @@ Core.CreateCallback('Turfs:DeleteAllTurfs', function(source, cb)
         TriggerClientEvent('chat:addMessage', src, {
             args = {'^1[TURFS]^0: Nu s-au putut sterge toate turf-urile!'}
         })
-        print('[SERVER]: Nu s-au putut sterge toate turf-urile!')
+        --print('[SERVER]: Nu s-au putut sterge toate turf-urile!')
         cb(false)
     end
     local turfs = Core.GetAllTurfs()
@@ -107,7 +107,7 @@ Core.IsAttacked = function(id)
     if not table.empty(attacks) then
         for k,v in pairs(attacks) do
             if k == id then
-                print('Turf '..id..' is attacked')
+                --print('Turf '..id..' is attacked')
                 return v
             end
         end
@@ -198,6 +198,19 @@ end)
 
 Core.CreateCallback('Turfs:PlayerKilled', function(source, cb, killerId)
     local src = source
+    local pData = Core.GetPlayerData(src)
+
+    local fData = pData.faction
+    local fCoords = factions[fData.name].coords
+
+    SetEntityCoords(GetPlayerPed(src), fCoords.main.x, fCoords.main.y, fCoords.main.z)
+    pData.dead = false
+    if killerId == -1 then
+        TriggerClientEvent('Turfs:AddKill', -1, GetPlayerName(src), GetPlayerName(src))
+    else
+        TriggerClientEvent('Turfs:AddKill', -1, GetPlayerName(src), GetPlayerName(killerId))
+    end
+    exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {je(pData), pData.identifier})
     if attacks and not table.empty(attacks) then
         for _, v in pairs(attacks) do
             if v.attacked then
@@ -205,14 +218,14 @@ Core.CreateCallback('Turfs:PlayerKilled', function(source, cb, killerId)
                     if Core.GetPlayerData(src).faction.name == v.attacker then
                         for _, defender in pairs(v.defenders) do
                             defender.kills = defender.kills + 1
-                            print('DKills: '..defender.kills)
+                            --print('DKills: '..defender.kills)
                             cb(true)
                             return
                         end
                     else
                         for _, attacker in pairs(v.attackers) do
                             attacker.kills = attacker.kills + 1
-                            print('AKills: '..attacker.kills)
+                            --print('AKills: '..attacker.kills)
                             cb(true)
                             return
                         end
@@ -221,7 +234,7 @@ Core.CreateCallback('Turfs:PlayerKilled', function(source, cb, killerId)
                     for _, attacker in pairs(v.attackers) do
                         if attacker.src == killerId then
                             attacker.kills = attacker.kills + 1
-                            print('AKills: '..attacker.kills)
+                            --print('AKills: '..attacker.kills)
                             cb(true)
                             return
                         end
@@ -229,7 +242,7 @@ Core.CreateCallback('Turfs:PlayerKilled', function(source, cb, killerId)
                     for _, defender in pairs(v.defenders) do
                         if defender.src == killerId then
                             defender.kills = defender.kills + 1
-                            print('DKills: '..defender.kills)
+                            --print('DKills: '..defender.kills)
                             cb(true)
                             return
                         end
@@ -274,7 +287,7 @@ Core.AttackTurf = function(id, team)
         attacker = team,
         turf = turf,
         attacked = true,
-        time = 300,
+        time = 15,
         defender = turf.mafia,
         defenders = {},
         attackers = {}
@@ -289,7 +302,7 @@ Core.AttackTurf = function(id, team)
                 team = team,
                 kills = 0,
             })
-            print('Inserted '..GetPlayerName(src)..' in attackers')
+            --print('Inserted '..GetPlayerName(src)..' in attackers')
             TriggerClientEvent("Turfs:AttackTurf", src, id, team, attacks[id])
         end
     end
@@ -302,7 +315,7 @@ Core.AttackTurf = function(id, team)
                 team = turf.mafia,
                 kills = 0,
             })
-            print('Inserted '..GetPlayerName(src)..' in defenders')
+            --print('Inserted '..GetPlayerName(src)..' in defenders')
             TriggerClientEvent("Turfs:AttackTurf", src, id, team, attacks[id])
         end
     end
@@ -427,19 +440,85 @@ Citizen.CreateThread(function ()
         if not table.empty(attacks) then
             for k,v in pairs(attacks) do
                 if v.time > 0 then
-                    v.time = v.time - 1
-                    for _, attacker in pairs(v.attackers) do
-                        for _, src in pairs(GetPlayers()) do
-                            if src == attacker.src then
-                                TriggerClientEvent('Turf:UpdateTime', src, k, v.time)
+                    if v.time - 1 > 0 then
+                        v.time = v.time - 1
+                        for _, attacker in pairs(v.attackers) do
+                            for _, src in pairs(GetPlayers()) do
+                                if src == attacker.src then
+                                    TriggerClientEvent('Turf:UpdateTime', src, k, v.time)
+                                end
                             end
                         end
-                    end
-                    for _, defender in pairs(v.defenders) do
-                        for _, src in pairs(GetPlayers()) do
-                            if src == defender.src then
-                                TriggerClientEvent('Turf:UpdateTime', src, k, v.time)
+                        for _, defender in pairs(v.defenders) do
+                            for _, src in pairs(GetPlayers()) do
+                                if src == defender.src then
+                                    TriggerClientEvent('Turf:UpdateTime', src, k, v.time)
+                                end
                             end
+                        end
+                    elseif v.time - 1 <= 0 then
+                        v.time = 0
+                        local kills = {
+                            attackers = 0,
+                            defenders = 0
+                        }
+                        for _, attacker in pairs(v.attackers) do
+                            for _, src in pairs(GetPlayers()) do
+                                kills.attackers = kills.attackers + attacker.kills
+                                if src == attacker.src then
+                                    TriggerClientEvent('Turf:UpdateTime', src, k, v.time)
+                                end
+                            end
+                        end
+                        for _, defender in pairs(v.defenders) do
+                            for _, src in pairs(GetPlayers()) do
+                                kills.defenders = kills.defenders + defender.kills
+                                if src == defender.src then
+                                    TriggerClientEvent('Turf:UpdateTime', src, k, v.time)
+                                end
+                            end
+                        end
+                        if kills.defenders > kills.attackers then
+                            --defenders win
+                            local turf = Core.GetTurfById(k)
+                            turf = json.decode(turf[1].data)
+                            turf.mafia = v.defender
+                            turf.attack = false
+                            turf.time = 0
+                            turf.kills = kills
+                            turf = je(turf)
+                            Core.UpdateTurf(k, turf)
+                            TriggerClientEvent('Turf:AttackEnded', -1, turf.id)
+                            TriggerClientEvent('chat:addMessage', -1, {
+                                args = {'^1[TURFS]^0: Turful '..k..' a fost castigat de '..v.defender..'!'}
+                            })
+                            print('[SERVER]: Turful '..k..' a fost castigat de '..v.defender..'!')
+                            attacks[k] = nil
+                        elseif kills.defenders < kills.attackers then
+                            --attackers win
+                            local turf = Core.GetTurfById(k)
+                            turf = json.decode(turf[1].data)
+                            turf.mafia = v.attacker
+                            turf.attack = false
+                            Core.UpdateTurf(k, turf)
+                            TriggerClientEvent('Turf:AttackEnded', -1, turf.id)
+                            TriggerClientEvent('chat:addMessage', -1, {
+                                args = {'^1[TURFS]^0: Turful '..k..' a fost castigat de '..v.attacker..'!'}
+                            })
+                            print('[SERVER]: Turful '..k..' a fost castigat de '..v.attacker..'!')
+                            attacks[k] = nil
+                        elseif kills.defenders == kills.attackers then
+                            --draw
+                            local turf = Core.GetTurfById(k)
+                            turf = json.decode(turf[1].data)
+                            turf.attack = false
+                            Core.UpdateTurf(k, turf)
+                            TriggerClientEvent('Turf:AttackEnded', -1, turf.id)
+                            TriggerClientEvent('chat:addMessage', -1, {
+                                args = {'^1[TURFS]^0: Turful '..k..' a fost egal!'}
+                            })
+                            print('[SERVER]: Turful '..k..' a fost egal!')
+                            attacks[k] = nil
                         end
                     end
                 end
@@ -524,7 +603,7 @@ Core.CreateCallback('Turfs:StopAttacks', function(source, cb)
         TriggerClientEvent('chat:addMessage', src, {
             args = {'^1[TURFS]^0: Nu s-au putut opri toate atacurile!'}
         })
-        print('[SERVER]: Nu s-au putut opri toate atacurile!')
+        --print('[SERVER]: Nu s-au putut opri toate atacurile!')
         cb(false)
     end
 end)

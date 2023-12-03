@@ -33,19 +33,36 @@ Citizen.CreateThread(function ()
                 for k,v in pairs(attacks) do
                     for _, turf in pairs(Turfs) do
                         if turf.id == v.id then
-                            if PlayerData.faction.name == v.attacker then
-                                inAttack = true
-                                turf.attack = true
-                                attackData = v
-                            elseif PlayerData.faction.name == v.defender then
-                                inAttack = true
-                                turf.attack = true
-                                attackData = v
+                            if turf.attack then
+                                if PlayerData.faction.name == v.attacker then
+                                    inAttack = true
+                                    turf.attack = true
+                                    attackData = v
+                                elseif PlayerData.faction.name == v.defender then
+                                    inAttack = true
+                                    turf.attack = true
+                                    attackData = v
+                                end
                             end
                         end
                     end
                 end
             end)
+        end
+    end
+end)
+
+RegisterNetEvent('Turf:AttackEnded', function(turfId)
+    if Turfs and not table.empty(Turfs) then
+        for k,v in pairs(Turfs) do
+            if v.id == turfId then
+                v.attack = false
+                attackData = {}
+                inAttack = false
+                SendNUIMessage({
+                    action = 'finishTurf'
+                })
+            end
         end
     end
 end)
@@ -74,6 +91,16 @@ RegisterNetEvent('Turf:Reload', function(turfs)
                Core.SaveTurf(v.id, v)
             end
          end
+    end
+end)
+
+RegisterNetEvent('Turfs:AddKill', function (dead, killer)
+    if inAttack then
+        SendNUIMessage({
+            action = 'createKill',
+            dead = dead,
+            killer = killer
+        })
     end
 end)
 
@@ -113,6 +140,12 @@ Citizen.CreateThread(function ()
             for k,v in pairs(Turfs) do
                 local dist = #(vector3(v.x, v.y, v.z) - GetEntityCoords(PlayerPedId()))
                 if dist <= v.turfRadius then
+                    if IsPedInAnyVehicle(PlayerPedId(), false) then
+                        if inAttack then
+                            DeleteCar(GetVehiclePedIsIn(PlayerPedId()))
+                            DeleteEntity(GetVehiclePedIsIn(PlayerPedId()))
+                        end
+                    end
                     Turf = v
                     wait = 1000
                 end
@@ -124,7 +157,7 @@ Citizen.CreateThread(function ()
    
 end)
 local colorChanged = false
-
+--flashing
 Citizen.CreateThread(function()
     while true do
         local wait = 1000
@@ -230,6 +263,9 @@ end)
 
 
 RegisterCommand('attack', function()
+    if inAttack then
+        return
+    end
     if not table.empty(Turf) then
         if not table.empty(Turfs) then
             for k,v in pairs(Turfs) do

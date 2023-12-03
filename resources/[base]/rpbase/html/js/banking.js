@@ -209,7 +209,6 @@ window.addEventListener("message", function (event1) {
     let event = event1['data'];
     if (event.action == "openBanking") {
         deleteTransactions()
-        console.log(event.data.playerBank)
         bankingContainer.classList.add('fadeIn')
         bankingContainer.classList.remove('fadeOut')
 

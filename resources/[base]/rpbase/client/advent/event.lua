@@ -91,7 +91,6 @@ Citizen.CreateThread(function ()
                 if PlayerData.giftsCollected == 30 then
                     return
                 end
-                print('da')
                 giftObj = Core.CreateObject("vms_gift", vec3(giftLocations[random].x , giftLocations[random].y, giftLocations[random].z - 1), false, true, false)
              
                 giftBlip = AddBlipForCoord(giftLocations[random].x , giftLocations[random].y, giftLocations[random].z)

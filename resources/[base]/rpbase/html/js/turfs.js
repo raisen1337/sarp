@@ -7,6 +7,44 @@ let teamBScore = document.querySelector('#teamBScore')
 
 let turfsTime = document.querySelector('#turfTime')
 
+function createTurfsKill(killer, victim) {
+    // Create elements
+    const turfsKill = document.createElement('div');
+    turfsKill.classList.add('turfs-kill');
+    
+    const skullIcon = document.createElement('i');
+    skullIcon.classList.add('fa-solid', 'fa-skull');
+    
+    const killerSpan = document.createElement('span');
+    killerSpan.classList.add('turfs-kill-killer');
+    killerSpan.textContent = killer;
+    
+    const killedText = document.createTextNode(' killed ');
+    
+    const victimSpan = document.createElement('span');
+    victimSpan.classList.add('turfs-kill-victim');
+    victimSpan.textContent = victim;
+    
+    // Append elements
+    turfsKill.appendChild(skullIcon);
+    turfsKill.appendChild(killerSpan);
+    turfsKill.appendChild(killedText);
+    turfsKill.appendChild(victimSpan);
+    turfsKill.classList.add('turfs-kill', 'appearFromRight'); // Added 'appearFromRight' class
+
+    setTimeout(() => {
+        turfsKill.classList.add('disappearFromLeft'); // Added 'disappearFromLeft' class after 4 seconds
+        setTimeout(() => {
+            turfsKill.remove(); // Remove the turfsKill element after the disappear animation
+        }, 1000); // Wait for 1 second (assuming 'disappearFromLeft' animation duration is 1 second)
+    }, 4000); // After 4 seconds
+    
+    // Append turfs-kill to turfs-kills container
+    const turfsKillsContainer = document.querySelector('.turfs-kills');
+    turfsKillsContainer.appendChild(turfsKill);
+}
+
+
 function hexToRgb(hex) {
     let bigint = parseInt(hex, 16);
     let r = (bigint >> 16) & 255;
@@ -69,5 +107,7 @@ window.addEventListener("message", function (event1) {
         }else{
             teamBScore.textContent = tBScore + 1
         }
-    }
+    }else if (event.action == 'createKill') [
+        createTurfsKill(event.killer, event.dead)
+    ]
 });

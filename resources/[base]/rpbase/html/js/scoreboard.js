@@ -5,7 +5,6 @@ function createScoreboardPlayer(id, name, level) {
     
     // Check if the player with the given ID already exists
     if (players.some(player => player.id === id)) {
-        console.log(`Player with ID ${id} already exists.`);
         return;
     }
 
@@ -56,7 +55,6 @@ function removeScoreboardPlayerById(id) {
     // Check if the player with the given ID exists
     const existingPlayerIndex = players.findIndex(player => player.id === id);
     if (existingPlayerIndex === -1) {
-        console.log(`Player with ID ${id} does not exist.`);
         return;
     }
 

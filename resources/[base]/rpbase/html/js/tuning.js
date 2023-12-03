@@ -390,7 +390,6 @@ $(document).ready(function(){
                     action: "camlivre",
                 }));
             } else if (data.which == 81 & pode) {
-                console.log(pode);
                 $.post('https://rpbase/action', JSON.stringify({
                     action: "camlivre",
                 }));
