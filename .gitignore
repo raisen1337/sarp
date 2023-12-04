@@ -5,3 +5,6 @@ txData/
 vMenu/
 .vscode/
 .git/
+server.cfg.bkp
+.replxx_history
+start_6683_default.bat
