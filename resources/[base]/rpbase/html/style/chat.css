@@ -1,30 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-.color-0{color: rgb(255, 255, 255);}
-.color-1{color: #ff4444;}
-.color-2{color: #99cc00;}
-.color-3{color: #ffbb33;}
-.color-4{color: #0099cc;}
-.color-5{color: #33b5e5;}
-.color-6{color: #aa66cc;}
-.color-8{color: #cc0000;}
-.color-9{color: #cc0068;}
-.color-g{color: #00c851;}
-.color-b{color: #33b5e5;}
-.color-r{color: #ff4444;}
-.color-y{color: #ffbb33;}
-.color-p{color: #aa66cc;}
-.color-o{color: #ff8800;}
-.color-c{color: #99cc00;}
-.color-m{color: #ff00dd;}
-.color-w{color: #ffffff;}
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+.color-0 {
+    color: rgb(255, 255, 255);
+}
+.color-1 {
+    color: #ff4444;
+}
+.color-2 {
+    color: #99cc00;
+}
+.color-3 {
+    color: #ffbb33;
+}
+.color-4 {
+    color: #0099cc;
+}
+.color-5 {
+    color: #33b5e5;
+}
+.color-6 {
+    color: #aa66cc;
+}
+.color-8 {
+    color: #cc0000;
+}
+.color-9 {
+    color: #cc0068;
+}
+.color-g {
+    color: #00c851;
+}
+.color-b {
+    color: #33b5e5;
+}
+.color-r {
+    color: #ff4444;
+}
+.color-y {
+    color: #ffbb33;
+}
+.color-p {
+    color: #aa66cc;
+}
+.color-o {
+    color: #ff8800;
+}
+.color-c {
+    color: #99cc00;
+}
+.color-m {
+    color: #ff00dd;
+}
+.color-w {
+    color: #ffffff;
+}
 
 .chat {
-    
     position: fixed;
     top: 0;
     left: 0;
     font-family: Poppins, sans-serif;
-    font-size: .9rem;
+    font-size: 0.9rem;
     color: white;
     padding: 2rem;
     width: 60rem;
@@ -43,7 +78,7 @@
 /* Your existing styles */
 .message {
     overflow: hidden;
-    margin-bottom: .3rem;
+    margin-bottom: 0.3rem;
     max-height: 40px;
     margin-left: 1rem;
     /* Updated properties for better word spacing */
@@ -60,6 +95,7 @@
     overflow-y: scroll;
     scroll-behavior: smooth; /* Enable smooth scrolling (supported in some browsers) */
     max-height: 15rem;
+    max-width: 60rem;
     direction: rtl; /* Set direction to right-to-left */
     writing-mode: horizontal-tb; /* Set writing mode */
     margin-bottom: 1rem;
@@ -67,7 +103,6 @@
 
 /* For WebKit-based browsers (Chrome, Safari, etc.) */
 .messages::-webkit-scrollbar {
-
     width: 3px; /* Width of the scrollbar */
 }
 
@@ -78,11 +113,14 @@
 
 /* Style the scrollbar thumb/dragger */
 .messages::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.321); /* Color of the scrollbar thumb */
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.321
+    ); /* Color of the scrollbar thumb */
     border-radius: 3px; /* Border radius for a rounded thumb */
 }
-
-
 
 .message-text {
     position: relative;
@@ -90,7 +128,9 @@
     flex-direction: row;
     font-weight: 500;
     align-items: center;
-    
+    word-wrap: break-word;
+    white-space: pre-wrap;
+
     transform: translateY(100%); /* Start position, off the bottom */
 }
 
@@ -98,18 +138,18 @@
     text-align: center;
     color: white;
     font-weight: 600;
-    font-size: .65rem;
+    font-size: 0.65rem;
     background: rgba(0, 0, 0, 0.5);
-    padding: .3rem;
+    padding: 0.3rem;
     width: 3rem;
-    margin-right: .5rem;
+    margin-right: 0.5rem;
     border-radius: 1rem;
 }
 
 .chat-suggestions {
     display: none; /* Hidden by default - flex*/
     gap: 1rem;
-    margin-top: .7rem;
+    margin-top: 0.7rem;
     width: 30rem;
     height: 10rem;
     max-height: 10rem;
@@ -117,16 +157,16 @@
     flex-direction: column;
     border-radius: 1rem;
     background: rgba(0, 0, 0, 0.511);
-    font-size: .8rem;
-    padding: .5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem;
 }
 
 .chat-suggestion > i {
     font-size: 1rem;
-    border-radius: .5rem;
-    margin-right: .5rem;
+    border-radius: 0.5rem;
+    margin-right: 0.5rem;
     background: rgba(3, 3, 3, 0.546);
-    padding: .8rem;
+    padding: 0.8rem;
 }
 .chat-suggestions::-webkit-scrollbar {
     display: none;
@@ -142,13 +182,18 @@
 /* Style the scrollbar thumb/dragger */
 .chat-suggestions::-webkit-scrollbar-thumb {
     display: none;
-    background-color: rgba(255, 255, 255, 0.321); /* Color of the scrollbar thumb */
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.321
+    ); /* Color of the scrollbar thumb */
     border-radius: 3px; /* Border radius for a rounded thumb */
 }
 
 .chat-suggestion {
     display: flex;
-    font-size: .8rem;
+    font-size: 0.8rem;
     font-style: italic;
     font-weight: light;
     flex-direction: row;
@@ -177,17 +222,20 @@
     display: none; /* Hidden by default - flex*/
     flex-direction: row;
     align-items: center;
-    background: rgb(0,0,0);
-    background: linear-gradient(90deg, rgba(0,0,0,0.9379726890756303) -10%, rgba(255,255,255,0) 100%);
-    padding: .5rem;
+    background: rgb(0, 0, 0);
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.9379726890756303) -10%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    padding: 0.5rem;
     max-width: 30rem;
     position: relative;
     border-radius: 1rem;
 }
 
-
 .chat-input > i {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
     font-size: 1rem;
 }
 
@@ -196,9 +244,9 @@
     background: rgba(0, 0, 0, 0.7);
     padding-left: 1rem;
     padding-right: 1rem;
-    padding-top: .4rem;
-    padding-bottom: .3rem;
-    font-size: .8rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.3rem;
+    font-size: 0.8rem;
     border-radius: 1rem;
     font-weight: light;
     position: absolute;

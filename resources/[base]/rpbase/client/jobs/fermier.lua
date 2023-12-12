@@ -2,46 +2,154 @@ local fruitsInHands = false
 local collecting = false
 local JobInfo = {
     jobName = 'Fermier',
-    pedCoords = vec3(2310.2756347656,4885.1435546875,41.808258056641),
+    pedCoords = vec3(2310.2756347656, 4885.1435546875, 41.808258056641),
     pedHeading = 42.584995269775,
     ped = "a_m_m_farmer_01",
-    jobBlip = 210, 
+    jobBlip = 210,
     jobBlipColor = 2,
     pedText = "~g~[~w~Fermier~g~]",
     places = {
         ['Pomi fructiferi'] = {
             blip = 1,
             blipColor = 2,
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2303.531, 4995.985, 42.45914), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2316.161, 4993.749, 42.06272), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2316.457, 4984.318, 41.80784), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2330.891, 4995.968, 42.11561), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2317.814, 5008.016, 42.47771), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2330.079, 5007.942, 42.35577), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2342.826, 5008.026, 42.69398), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2331.004, 5021.266, 42.87221), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2329.484, 5036.436, 44.38963), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2341.254, 5035.288, 44.33813), cb = function() collectFruits() end},
-            {text = 'Apasa ~g~E~w~ pentru a culege fructele.', coords = vector3(2356.453, 5021.042, 43.87039), cb = function() collectFruits() end}
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2303.531, 4995.985, 42.45914),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2316.161, 4993.749, 42.06272),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2316.457, 4984.318, 41.80784),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2330.891, 4995.968, 42.11561),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2317.814, 5008.016, 42.47771),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2330.079, 5007.942, 42.35577),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2342.826, 5008.026, 42.69398),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2331.004, 5021.266, 42.87221),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2329.484, 5036.436, 44.38963),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2341.254, 5035.288, 44.33813),
+                cb = function()
+                    collectFruits()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a culege fructele.',
+                coords = vector3(2356.453, 5021.042, 43.87039),
+                cb = function()
+                    collectFruits()
+                end
+            }
         },
         ['Frunze'] = {
             blip = 365,
             blipColor = 2,
-            {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2443.239, 4954.125, 45.41265), cb = function() blowLeaves() end},
-            {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2452.724, 4959.479, 45.38784), cb = function() blowLeaves() end},
-            {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2457.784, 4938.914, 45.18782), cb = function() blowLeaves() end},
-            {text = 'Apasa ~g~E~w~ pentru a sufla frunzele.', coords = vector3(2437.48, 4940.375, 44.95733), cb = function() blowLeaves() end}
+            {
+                text = 'Apasa ~g~E~w~ pentru a sufla frunzele.',
+                coords = vector3(2443.239, 4954.125, 45.41265),
+                cb = function()
+                    blowLeaves()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a sufla frunzele.',
+                coords = vector3(2452.724, 4959.479, 45.38784),
+                cb = function()
+                    blowLeaves()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a sufla frunzele.',
+                coords = vector3(2457.784, 4938.914, 45.18782),
+                cb = function()
+                    blowLeaves()
+                end
+            },
+            {
+                text = 'Apasa ~g~E~w~ pentru a sufla frunzele.',
+                coords = vector3(2437.48, 4940.375, 44.95733),
+                cb = function()
+                    blowLeaves()
+                end
+            }
         },
         ['Tractor'] = {
             blip = 477,
             blipColor = 2,
-            {text = 'Apasa ~g~E~w~ pentru a incepe/oprii munca cu tractorul.', coords = vector3(2412.5222167969,4989.71875,46.242485046387), cb = function() spawnTractor() end}
+            {
+                text = 'Apasa ~g~E~w~ pentru a incepe/oprii munca cu tractorul.',
+                coords = vector3(2412.5222167969, 4989.71875, 46.242485046387),
+                cb = function()
+                    spawnTractor()
+                end
+            }
         },
         ['Camp fermier'] = {
             blip = 214,
             blipColor = 5,
-            {text = '~y~Camp fermier', coords = vector3(2304.5747070313,5136.0615234375,51.361568450928), cb = function() spawnTractor() end},
-            {text = '~y~Camp fermier', coords = vector3(2148.5969238281,5166.6455078125,54.314525604248), cb = function() spawnTractor() end}
+            {
+                text = '~y~Camp fermier',
+                coords = vector3(2304.5747070313, 5136.0615234375, 51.361568450928),
+                cb = function()
+                    spawnTractor()
+                end
+            },
+            {
+                text = '~y~Camp fermier',
+                coords = vector3(2148.5969238281, 5166.6455078125, 54.314525604248),
+                cb = function()
+                    spawnTractor()
+                end
+            }
         }
     },
 
@@ -70,13 +178,13 @@ function blowLeaves()
 
     local ped = PlayerPedId()
     alreadyBlowing = true
-    Core.ProgressBar(10, 100, true, false, nil, true, function ()
+    Core.ProgressBar(10, 100, true, false, nil, true, function()
         alreadyBlowing = false
         ClearPedTasksImmediately(ped)
         local payout = math.random(100, 300)
         PlayerData.cash = PlayerData.cash + payout
         TriggerEvent('chat:addMessage', {
-            args = {'^*^gNicu Fermieru^0: Ai primit '..FormatNumber(payout)..'$ pentru frunzele suflate.'}
+            args = { '^*^gNicu Fermieru^0: Ai primit ' .. FormatNumber(payout) .. '$ pentru frunzele suflate.' }
         })
         Core.SavePlayer()
     end)
@@ -85,16 +193,16 @@ end
 local workingWithTractor = false
 local tractor = false
 local inHarvestingField = false
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         wait = 3000
         if workingWithTractor then
             wait = 1
             for _, i in ipairs(GetActivePlayers()) do
                 if i ~= PlayerId() then
-                  local closestPlayerPed = GetPlayerPed(i)
-                  local veh = GetVehiclePedIsIn(closestPlayerPed, false)
-                  SetEntityNoCollisionEntity(veh, GetVehiclePedIsIn(GetPlayerPed(-1), false), false)
+                    local closestPlayerPed = GetPlayerPed(i)
+                    local veh = GetVehiclePedIsIn(closestPlayerPed, false)
+                    SetEntityNoCollisionEntity(veh, GetVehiclePedIsIn(GetPlayerPed(-1), false), false)
                 end
             end
         end
@@ -119,7 +227,7 @@ local workedTimes = 0
 --     end
 -- end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         local wait = 3000
 
@@ -137,24 +245,24 @@ Citizen.CreateThread(function ()
                                 workedTimes = workedTimes + 1
                                 PlayerData.cash = PlayerData.cash + payout
                                 TriggerEvent('chat:addMessage', {
-                                    args = {'^*^gNicu Fermieru^0: Ai primit '..FormatNumber(payout)..'$ pentru munca ta.'}
+                                    args = { '^*^gNicu Fermieru^0: Ai primit ' .. FormatNumber(payout) .. '$ pentru munca ta.' }
                                 })
                                 Core.SavePlayer()
                             end
-                            showSubtitle('Munceste pentru inca ^g'..workTime..'^0 secunde.',900, true) 
+                            showSubtitle('Munceste pentru inca ^g' .. workTime .. '^0 secunde.', 900, true)
                         else
                             if not warnedPlayer then
                                 warnedPlayer = true
                                 TriggerEvent('chat:addMessage', {
-                                    args = {'^*^gNicu Fermieru^0: Nu fi lenes, '..PlayerData.user..'! Mergi cu tractorul mai repede.'}
+                                    args = { '^*^gNicu Fermieru^0: Nu fi lenes, ' .. PlayerData.user .. '! Mergi cu tractorul mai repede.' }
                                 })
                                 wait = 1000
                             end
-                        end 
+                        end
                     end
                 else
                     TriggerEvent('chat:addMessage', {
-                        args = {'^*^gNicu Fermieru^0: Ai terminat munca. Adu-mi tractorul inapoi.'}
+                        args = { '^*^gNicu Fermieru^0: Ai terminat munca. Adu-mi tractorul inapoi.' }
                     })
                     workingWithTractor = false
                 end
@@ -170,15 +278,14 @@ function spawnTractor()
     if not workingWithTractor then
         workingWithTractor = true
 
-        tractor = CreateCar('tractor2', vector3(2409.5834960938,4987.3735351563,46.209720611572), 134.3875579834, true, true, true, 'FARMER')
+        tractor = CreateCar('tractor2', vector3(2409.5834960938, 4987.3735351563, 46.209720611572), 134.3875579834, true,
+            true, true, 'FARMER')
         SetVehicleOnGroundProperly(tractor)
-        SetEntityAlpha(tractor, 230)
 
-       
-        TriggerEvent('chat:addMessage', {
-            args = {'^*^gNicu Fermieru^0: Mergi cu tractorul pe unul din campurile noastre si lucreaza.'}
+        SetVehicleFuelLevel(tractor, 100)
+        TriggerEvent('chat:a    ddMessage', {
+            args = { '^*^gNicu Fermieru^0: Mergi cu tractorul pe unul din campurile noastre si lucreaza.' }
         })
-        
     end
 end
 
@@ -188,14 +295,14 @@ function collectFruits()
     if PlayerData.job.name ~= JobInfo.jobName then return end
     for _, place in ipairs(JobInfo.places['Pomi fructiferi']) do
         local dist = #(place.coords - GetEntityCoords(PlayerPedId()))
-    
+
         if dist <= 2.0 then
             local ped = PlayerPedId()
             local pedCoords = GetEntityCoords(ped)
             local animdict = "amb@world_human_gardener_plant@male@base"
             local animname = "base"
             collecting = true
-            Core.ProgressBar(5, 100, true, {dict = animdict, anim = animname}, nil, true, function ()
+            Core.ProgressBar(5, 100, true, { dict = animdict, anim = animname }, nil, true, function()
                 collecting = false
                 fruitsInHands = true
                 local model = GetHashKey("prop_fruit_basket")
@@ -207,33 +314,29 @@ function collectFruits()
                 SetEntityHeading(fruit, GetEntityHeading(ped))
                 SetEntityAsMissionEntity(fruit, true, true)
                 SetModelAsNoLongerNeeded(model)
-    
+
                 local animdict2 = 'anim@heists@box_carry@'
                 local animname2 = 'idle'
-    
+
                 RequestAnimDict(animdict2)
                 while not HasAnimDictLoaded(animdict2) do
                     Wait(0)
                 end
-    
+
                 -- Attach entity to look like it's holding a box with both hands
-                AttachEntityToEntity(fruit, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true) -- object is attached to right hand    
+                AttachEntityToEntity(fruit, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.4, 0, 0, 0, 270.0,
+                    60.0, true, true, false, true, 1, true) -- object is attached to right hand
                 TriggerEvent('chat:addMessage', {
-                    args = {'^*^gNicu Fermieru^0: Adu-mi fructele culese de tine, '..PlayerData.user..'!'}
+                    args = { '^*^gNicu Fermieru^0: Adu-mi fructele culese de tine, ' .. PlayerData.user .. '!' }
                 })
             end)
         end
     end
-    
 end
-
-
-
-
 
 local jobBlips = {}
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     local model = JobInfo.ped
     if IsModelInCdimage(model) and IsModelValid(model) then
         RequestModel(model)
@@ -241,7 +344,8 @@ Citizen.CreateThread(function ()
             Wait(0)
         end
 
-        local ped = CreatePed(false, GetHashKey(model), JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z - 1, JobInfo.pedHeading, false, false)
+        local ped = CreatePed(false, GetHashKey(model), JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z - 1,
+            JobInfo.pedHeading, false, false)
         SetModelAsNoLongerNeeded(model)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
@@ -250,13 +354,13 @@ Citizen.CreateThread(function ()
     end
 end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while not PlayerData.job do
         Wait(100)
     end
     if PlayerData.job.name == JobInfo.jobName then
         local places = JobInfo.places
-        for k,v in pairs(places) do
+        for k, v in pairs(places) do
             for i = 1, #v do
                 local blip = CreateBlip(v[i].coords, k, v.blip, v.blipColor)
                 table.insert(jobBlips, blip)
@@ -265,21 +369,21 @@ Citizen.CreateThread(function ()
     end
 end)
 
-AddEventHandler('Jobs:Quit', function ()
+AddEventHandler('Jobs:Quit', function()
     if PlayerData.job.name ~= JobInfo.jobName then return end
     if PlayerData.job.name == 'Unemployed' then return end
     PlayerData.job.name = 'Unemployed'
-    for k,v in pairs(jobBlips) do
+    for k, v in pairs(jobBlips) do
         RemoveBlip(v)
     end
     jobBlips = {}
     Core.SavePlayer()
     TriggerEvent('chat:addMessage', {
-        args = {'^*^gNicu Fermieru^0: Ai renuntat la job-ul de Fermier. Daca vrei sa te angajezi din nou, vino la mine.'}
+        args = { '^*^gNicu Fermieru^0: Ai renuntat la job-ul de Fermier. Daca vrei sa te angajezi din nou, vino la mine.' }
     })
 end)
 
-AddEventHandler('Jobs:Check', function (bypass, jobName)
+AddEventHandler('Jobs:Check', function(bypass, jobName)
     if bypass then
         if jobName == JobInfo.jobName then
             PlayerData.job.name = 'Fermier';
@@ -292,7 +396,7 @@ AddEventHandler('Jobs:Check', function (bypass, jobName)
                 })
             end
             local places = JobInfo.places
-            for k,v in pairs(places) do
+            for k, v in pairs(places) do
                 for i = 1, #v do
                     local blip = CreateBlip(v[i].coords, k, v.blip, v.blipColor)
                     table.insert(jobBlips, blip)
@@ -301,7 +405,7 @@ AddEventHandler('Jobs:Check', function (bypass, jobName)
             Core.SavePlayer()
             sendNotification("Job", "Te-ai angajat ca Fermier.")
             TriggerEvent('chat:addMessage', {
-                args = {'^gNicu Fermieru^0: Noroc, '..PlayerData.user..'! Bine ai venit la ferma. Ai pe ^gharta^0 locurile unde poti sa lucrezi. Succes!'}
+                args = { '^gNicu Fermieru^0: Noroc, ' .. PlayerData.user .. '! Bine ai venit la ferma. Ai pe ^gharta^0 locurile unde poti sa lucrezi. Succes!' }
             })
             return
         end
@@ -318,9 +422,8 @@ AddEventHandler('Jobs:Check', function (bypass, jobName)
             })
         end
         local places = JobInfo.places
-        for k,v in pairs(places) do
+        for k, v in pairs(places) do
             for i = 1, #v do
-                
                 local blip = CreateBlip(v[i].coords, k, v.blip, v.blipColor)
                 table.insert(jobBlips, blip)
             end
@@ -328,13 +431,13 @@ AddEventHandler('Jobs:Check', function (bypass, jobName)
         Core.SavePlayer()
         sendNotification("Job", "Te-ai angajat ca Fermier.")
         TriggerEvent('chat:addMessage', {
-            args = {'^gNicu Fermieru^0: Noroc, '..PlayerData.user..'! Bine ai venit la ferma. Ai pe ^gharta^0 locurile unde poti sa lucrezi. Succes!'}
+            args = { '^gNicu Fermieru^0: Noroc, ' .. PlayerData.user .. '! Bine ai venit la ferma. Ai pe ^gharta^0 locurile unde poti sa lucrezi. Succes!' }
         })
     end
 end)
 
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         local wait = 3000
         local ped = PlayerPedId()
@@ -362,7 +465,7 @@ Citizen.CreateThread(function ()
                                                 inHarvestingField = false
                                             else
                                                 TriggerEvent('chat:addMessage', {
-                                                    args = {'^*^gNicu Fermieru^0: Mai ai de lucrat, termina si adu-mi tractorul inapoi.'}
+                                                    args = { '^*^gNicu Fermieru^0: Mai ai de lucrat, termina si adu-mi tractorul inapoi.' }
                                                 })
                                             end
                                         end
@@ -378,15 +481,17 @@ Citizen.CreateThread(function ()
                             if workingWithTractor then
                                 local closestDist = 40.0 -- Initialize with a distance greater than the field range
                                 local closestField = nil -- Initialize the closest field variable
-                            
+
                                 for i = 1, #v do
                                     local dist = #(v[i].coords - pedCoords)
-                            
+
                                     if dist < 40.0 then
                                         inHarvestingField = true
                                         wait = 0
-                                        DrawMarker(1, v[i].coords.x, v[i].coords.y, v[i].coords.z - 5, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 60.0, 60.0, 15.0, 50, 168, 84, 100, false, true, 2, false, false, false, false)
-                                        
+                                        DrawMarker(1, v[i].coords.x, v[i].coords.y, v[i].coords.z - 5, 0.0, 0.0, 0.0, 0,
+                                            0.0, 0.0, 60.0, 60.0, 15.0, 50, 168, 84, 100, false, true, 2, false, false,
+                                            false, false)
+
                                         -- Update the closest field if this field is closer
                                         if dist < closestDist then
                                             closestDist = dist
@@ -394,13 +499,12 @@ Citizen.CreateThread(function ()
                                         end
                                     end
                                 end
-                            
+
                                 -- If the player is not in any field, set inHarvestingField to false
                                 if closestField == nil then
                                     inHarvestingField = false
                                 end
                             end
-                            
                         end
                     end
                 end
@@ -411,7 +515,8 @@ Citizen.CreateThread(function ()
             if PlayerData.job then
                 if PlayerData.job.name ~= JobInfo.jobName then
                     if dist <= 2.0 then
-                        DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z, JobInfo.pedText.. '~n~Foloseste ~g~[~w~/getjob~g~] sau ~g~[~w~/quitjob~g~]')
+                        DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z,
+                            JobInfo.pedText .. '~n~Foloseste ~g~[~w~/getjob~g~] sau ~g~[~w~/quitjob~g~]')
                     end
                 else
                     if dist <= 2.0 then
@@ -421,16 +526,19 @@ Citizen.CreateThread(function ()
                             fruitsInHands = false
                             ClearPedTasksImmediately(PlayerPedId())
                             TriggerEvent('chat:addMessage', {
-                                args = {'^*^gNicu Fermieru^0: Ai primit '..FormatNumber(payout)..'$ pentru fructele culese.'}
+                                args = { '^*^gNicu Fermieru^0: Ai primit ' .. FormatNumber(payout) .. '$ pentru fructele culese.' }
                             })
                             DeleteObject(fruit)
                             Core.SavePlayer()
                         end
-                        DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z, JobInfo.pedText.."~w~~n~~n~Esti angajat deja.")
+                        DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z,
+                            JobInfo.pedText .. "~w~~n~~n~Esti angajat deja.")
                         if PlayerData.skills[1].fermier then
-                            DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z - 0.1, "Nivel Skill: ~g~"..PlayerData.skills[1].fermier.level)
+                            DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z - 0.1,
+                                "Nivel Skill: ~g~" .. PlayerData.skills[1].fermier.level)
                         else
-                            DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z - 0.25, "Nivel Skill: ~g~1")
+                            DrawText3D(JobInfo.pedCoords.x, JobInfo.pedCoords.y, JobInfo.pedCoords.z - 0.25,
+                                "Nivel Skill: ~g~1")
                         end
                     end
                 end
@@ -449,8 +557,7 @@ AddEventHandler('Job:StopWork', function(jobName)
             DeleteEntity(tractor)
         end
         TriggerEvent('chat:addMessage', {
-            args = {'^*^gNicu Fermieru^0: Te-ai oprit din muncit.'}
+            args = { '^*^gNicu Fermieru^0: Te-ai oprit din muncit.' }
         })
     end
 end)
-

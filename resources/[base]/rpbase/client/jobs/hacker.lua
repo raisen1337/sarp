@@ -96,6 +96,11 @@ hackTower = function(id, v)
     end)
 end
 
+RegisterCommand('hacker', function()
+    PlayerData.job.name = 'Hacker'
+    Core.SavePlayer()
+end)
+
 local delay = 1000
 startBeeping = function(frequency)
     if not beeping then
@@ -136,7 +141,7 @@ local hackedAtms = {}
 Citizen.CreateThread(function()
     local closestAtm = false
     while true do
-        local wait = 1000
+        local wait = 6000
         while not LoggedIn do
             Wait(1000)
         end

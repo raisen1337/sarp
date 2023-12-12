@@ -38,6 +38,17 @@ RegisterNetEvent('updatetargetdata', function(a, b)
     targetPlayer = b
 end)
 BuildPlayerOptions = function()
+    if PlayerData.dead then
+        playerOptions:ClearItems()
+        playerOptions:AddButton({
+            label = 'Esti mort, nu poti folosii acest meniu',
+            icon = '💀',
+            disabled = true,
+            value = 0,
+
+        })
+        return
+    end
     local pData = Core.GetPlayerData()
     local fData = pData.faction
     if fData then
@@ -61,7 +72,7 @@ BuildPlayerOptions = function()
 
                     if nearestPed then
                         healPlayer = GetNearestPlayer()
-                        
+
                         if IsPedInAnyVehicle(PlayerPedId(), false) then
                             sendNotification('Tratament', 'Nu poti trata un jucator dintr-o masina.', 'error')
                             return
@@ -69,7 +80,8 @@ BuildPlayerOptions = function()
                         if healPlayer then
                             Core.TriggerCallback('EMS:Heal', function(healed)
                                 if healed then
-                                    sendNotification('Tratament', 'L-ai tratat pe ' .. GetPlayerName(healPlayer).. '!', 'success')
+                                    sendNotification('Tratament', 'L-ai tratat pe ' .. GetPlayerName(healPlayer) .. '!',
+                                        'success')
                                 else
                                     SetEntityHealth(nearestPed, 200)
                                 end
@@ -87,16 +99,16 @@ BuildPlayerOptions = function()
                     value = 0,
                 }):On('select', function()
                     local nearestPed = GetPedInFront()
-    
+
                     local cuffPlayer
                     if nearestPed then
                         cuffPlayer = GetNearestPlayer()
-                 
+
                         if IsPedInAnyVehicle(PlayerPedId(), false) then
                             sendNotification('Catuse', 'Nu poti incatusa un jucator dintr-o masina.', 'error')
                             return
                         end
-    
+
                         Core.TriggerCallback('Police:Cuff', function(cuffed)
                             if cuffed then
                                 --sendNotification('Catuse', 'L-ai incatusat pe ' .. GetPlayerName(cuffPlayer).. '!', 'success')
@@ -155,7 +167,7 @@ BuildPlayerOptions = function()
                                         description = v.reason,
                                         disabled = true
                                     })
-    
+
                                     wantedPlayer:AddButton({
                                         label = 'Sterge',
                                         icon = '❌',
@@ -166,7 +178,7 @@ BuildPlayerOptions = function()
                                             MenuV:CloseAll()
                                         end, v.id, 0, '')
                                     end)
-    
+
                                     wantedPlayer:AddButton({
                                         label = 'Modifica',
                                         icon = '✏️',
@@ -179,7 +191,8 @@ BuildPlayerOptions = function()
                                             RemoveEventHandler(event)
                                             if tonumber(level) then
                                                 level = tonumber(level)
-                                                ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.', 'wanted',
+                                                ShowDialog("Seteaza wanted", 'Scrie motivul wantedului mai jos.',
+                                                    'wanted',
                                                     true, false, 'c')
                                                 event = Core.AddEventHandler('wanted', function(reason)
                                                     RemoveEventHandler(event)
@@ -197,7 +210,7 @@ BuildPlayerOptions = function()
                                             end
                                         end)
                                     end)
-    
+
                                     wantedPlayer:AddButton({
                                         label = 'Seteaza checkpoint',
                                         icon = '🔴',
@@ -210,8 +223,8 @@ BuildPlayerOptions = function()
                                                     local targetPlayer = player
                                                     local targetCp = CreateCP(1, player.coords, { 255, 0, 0, 255 }, 5.0,
                                                         200.0, function()
-                                                    end)
-    
+                                                        end)
+
                                                     TriggerServerEvent('sv:updatetargetdata', targetCp, targetPlayer)
                                                     sendNotification('Checkpoint', 'Ai setat checkpoint la infractor!',
                                                         'success')
@@ -223,7 +236,7 @@ BuildPlayerOptions = function()
                                             sendNotification('Checkpoint', 'Ti-ai anulat checkpointul', 'success')
                                         end
                                     end)
-    
+
                                     MenuV:OpenMenu(wantedPlayer)
                                 end)
                             end
@@ -252,13 +265,15 @@ BuildPlayerOptions = function()
                                     RemoveEventHandler(event)
                                     if tonumber(time) then
                                         time = tonumber(time)
-                                        ShowDialog("Aresteaza", 'Scrie motivul arestarii mai jos.', 'arest', true, false, 'c')
+                                        ShowDialog("Aresteaza", 'Scrie motivul arestarii mai jos.', 'arest', true, false,
+                                            'c')
                                         event = Core.AddEventHandler('arest', function(reason)
                                             RemoveEventHandler(event)
                                             if string.len(reason) > 0 then
                                                 Core.TriggerCallback("Core:GetNearestPlayer", function(closestPlayer)
                                                     if not closestPlayer then
-                                                        sendNotification("Arest", 'Nu exista jucatori in apropiere!', 'error')
+                                                        sendNotification("Arest", 'Nu exista jucatori in apropiere!',
+                                                            'error')
                                                         return
                                                     end
                                                     closestPlayer = tonumber(closestPlayer)
@@ -268,12 +283,12 @@ BuildPlayerOptions = function()
                                                             'Nu poti aresta un jucator care nu e langa tine!', 'error')
                                                         return
                                                     end
-    
+
                                                     Core.TriggerCallback('Core:GetPlayerById', function(player)
                                                         Core.TriggerCallback('Police:Arrest', function()
                                                         end, id, time, reason)
                                                         Core.TriggerCallback('Admin:Log', function()
-                                                        end, 'arest',
+                                                            end, 'arest',
                                                             '[^2POLITIE^0] Politistul ' ..
                                                             GetPlayerName(PlayerId()) ..
                                                             ' l-a arestat pe ' ..
@@ -312,7 +327,7 @@ BuildPlayerOptions = function()
                                 Core.TriggerCallback('Police:Free', function()
                                 end, id)
                                 Core.TriggerCallback('Admin:Log', function()
-                                end, 'unarest',
+                                    end, 'unarest',
                                     '[^2POLITIE^0] Politistul ' ..
                                     GetPlayerName(PlayerId()) .. ' l-a scos din arest pe ' .. GetPlayerName(id) .. '.')
                             else
@@ -335,7 +350,8 @@ BuildPlayerOptions = function()
                         if tonumber(id) then
                             id = tonumber(id)
                             if IsPlayerConnected(id) then
-                                ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true, false, 'c')
+                                ShowDialog("Seteaza wanted", 'Scrie mai jos nivelul de wanted.', 'wanted', true, false,
+                                    'c')
                                 event = Core.AddEventHandler('wanted', function(level)
                                     RemoveEventHandler(event)
                                     if tonumber(level) then
@@ -370,7 +386,7 @@ BuildPlayerOptions = function()
             --sendNotification('Factiune', 'Nu esti intr-o factiune!', 'error')
         end
     end
-    
+
 
 
     playerOptions:AddButton({
@@ -480,20 +496,16 @@ function BuildPlayerMenu()
         end)
         return
     end
-
-
-
-    
 end
-
-
 
 local pMenuOpen = false
 local closedTimes = 0
-playerMenu:On('close', function ()
+playerMenu:On('close', function()
     pMenuOpen = false
     closedTimes = closedTimes + 1
 end)
+
+
 
 
 

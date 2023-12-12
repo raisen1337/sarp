@@ -94,14 +94,14 @@ local function refreshSaleVehicles(vehicle)
             SetVehicleDoorsLockedForPlayer(spawnedVehicle, PlayerId(), false)
             SetVehicleEngineOn(spawnedVehicle, false, true, true)
             SetVehicleUndriveable(spawnedVehicle, true)
-            
+
             spawnPosition.id = spawnedVehicle
 
             local vehicle = spawnedVehicle
-          
+
             SetVehicleOnGroundProperly(spawnedVehicle)
-             -- Add random modifications to the vehicle
-             if GetNumVehicleMods(vehicle, 1) > 0 then
+            -- Add random modifications to the vehicle
+            if GetNumVehicleMods(vehicle, 1) > 0 then
                 SetVehicleMod(vehicle, 1, math.random(1, GetNumVehicleMods(vehicle, 1))) -- Set random bumper modification
             end
 
@@ -128,8 +128,6 @@ local function refreshSaleVehicles(vehicle)
             if GetNumVehicleMods(vehicle, 6) > 0 then
                 SetVehicleMod(vehicle, 6, math.random(1, GetNumVehicleMods(vehicle, 6))) -- Set random hood modification
             end
-
-
         end
     end
 end
@@ -144,7 +142,7 @@ Citizen.CreateThread(function()
             delay = false
         end
         if not table.empty(a) then
-            for k,v in pairs(a) do
+            for k, v in pairs(a) do
                 if v.id then
                     local vehicle = v.id
                     if GetEntityHeading(vehicle) ~= v.pos.w then
@@ -156,15 +154,15 @@ Citizen.CreateThread(function()
     end
 end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while not LoggedIn do Wait(100) end
     if LoggedIn then
-        CreateBlip(vec3(51.844806671143,6377.2495117188,30.835720062256), 'Targ Auto', 79, 5)
+        CreateBlip(vec3(51.844806671143, 6377.2495117188, 30.835720062256), 'Targ Auto', 79, 5)
         Core.TriggerCallback('Server:GetSaleVehicles', function(cb)
             if cb then
                 saleVehicles = cb
                 local count = 0
-                local usedPositions = {} -- Keep track of used positions
+                local usedPositions = {}                   -- Keep track of used positions
                 while count < 12 do
                     local randomIndex = math.random(1, #a) -- Get a random index from the 'a' table
                     local b = a[randomIndex]
@@ -172,10 +170,11 @@ Citizen.CreateThread(function ()
                         local pos = vec3(b.x, b.y, b.z)
                         usedPositions[randomIndex] = true -- Mark the position as used
                         a[randomIndex].occupied = true
-                        a[randomIndex].model = saleVehicles[count+1].model
-                        a[randomIndex].name = saleVehicles[count+1].name
-                        a[randomIndex].price = saleVehicles[count+1].price
-                        local vehicle = CreateCar(saleVehicles[count+1].model, vec3(pos.x, pos.y, pos.z - 1), b.w, false, false, false, "TGAUTO", true)
+                        a[randomIndex].model = saleVehicles[count + 1].model
+                        a[randomIndex].name = saleVehicles[count + 1].name
+                        a[randomIndex].price = saleVehicles[count + 1].price
+                        local vehicle = CreateCar(saleVehicles[count + 1].model, vec3(pos.x, pos.y, pos.z - 1), b.w,
+                            false, false, false, "TGAUTO", true)
                         Wait(100)
                         CreateBlip(pos, 'Masina de vanzare', 326, 11)
                         a[randomIndex].id = vehicle
@@ -199,9 +198,9 @@ Citizen.CreateThread(function ()
 end)
 
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
-        local wait = 1000
+        local wait = 5000
         local pCoords = GetEntityCoords(PlayerPedId())
         local inRange = false
         for k, v in pairs(a) do
@@ -210,17 +209,20 @@ Citizen.CreateThread(function ()
                 inRange = true
                 if dist < 2 then
                     wait = 1
-                    DrawMarker(0, v.x, v.y, v.z + 2, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.5, 0, 255, 0, 100, false, true, 2, false, false, false, false)
+                    DrawMarker(0, v.x, v.y, v.z + 2, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.5, 0, 255, 0, 100, false, true, 2,
+                        false, false, false, false)
                     if v.occupied then
-                        DrawText3D(v.x, v.y, v.z, '~w~[~g~'..v.name..'~w~]~n~Pret: ~g~'..FormatNumber(v.price)..'~w~$', 255, 255, 255, 255)
-                        DrawText3D(v.x, v.y, v.z-0.3, 'Apasa ~g~E~w~ pentru a schimba masina.', 255, 255, 255, 255)
+                        DrawText3D(v.x, v.y, v.z, '~w~[~g~' .. v.name ..
+                        '~w~]~n~Pret: ~g~' .. FormatNumber(v.price) .. '~w~$', 255, 255, 255, 255)
+                        DrawText3D(v.x, v.y, v.z - 0.3, 'Apasa ~g~E~w~ pentru a schimba masina.', 255, 255, 255, 255)
                         if IsControlJustPressed(0, 38) then
                             if not delay then
                                 DeleteCar(v.id)
                                 local randomIndex = math.random(1, #saleVehicles)
                                 local vehicle = saleVehicles[randomIndex]
                                 local pos = vec3(v.x, v.y, v.z)
-                                local spawnedVehicle = CreateCar(vehicle.model, pos, v.w, false, true, false, "TGAUTO", true)
+                                local spawnedVehicle = CreateCar(vehicle.model, pos, v.w, false, true, false, "TGAUTO",
+                                    true)
                                 delay = true
                                 a[k].id = spawnedVehicle
                                 a[k].pos = vector4(pos.x, pos.y, pos.z, v.w)
@@ -231,18 +233,14 @@ Citizen.CreateThread(function ()
                                 SetVehicleUndriveable(spawnedVehicle, true)
                                 FreezeEntityPosition(spawnedVehicle, true)
                                 SetVehicleOnGroundProperly(vespawnedVehiclehicle)
-                        
+
                                 v.model = vehicle.model
                                 v.name = vehicle.name
                                 v.price = vehicle.price
                             end
                             --spawn another car random from saleVehicles
-
-                            
-
-
                         end
-                        DrawText3D(v.x, v.y, v.z-0.5, 'Apasa ~g~G~w~ pentru a cumpara masina.', 255, 255, 255, 255)
+                        DrawText3D(v.x, v.y, v.z - 0.5, 'Apasa ~g~G~w~ pentru a cumpara masina.', 255, 255, 255, 255)
 
                         -- check for G press
                         if IsControlJustPressed(0, 47) then
@@ -264,7 +262,7 @@ Citizen.CreateThread(function ()
                                             else
                                                 sendNotification('Targ Auto', 'Nu ai cumparat masina.', 'error')
                                             end
-                                        end, {name = name, spawncode = model, plate = plate, mods = mods})
+                                        end, { name = name, spawncode = model, plate = plate, mods = mods })
                                     end)
                                 else
                                     sendNotification('Targ Auto', 'Nu ai suficienti bani.', 'error')
@@ -279,30 +277,32 @@ Citizen.CreateThread(function ()
         end
         Wait(wait)
     end
-    
 end)
 
 RegisterCommand('addsalevehicle', function()
-    ShowDialog('Adauga masina la targul auto', "Scrie mai jos modelul masinii pe care vrei sa o adaugi.", 'targauto', true, false, 'c')
+    ShowDialog('Adauga masina la targul auto', "Scrie mai jos modelul masinii pe care vrei sa o adaugi.", 'targauto',
+        true, false, 'c')
     local event
-    event = Core.AddEventHandler('targauto', function (result)
+    event = Core.AddEventHandler('targauto', function(result)
         RemoveEventHandler(event)
         local model = result
         if model then
-            ShowDialog('Adauga masina la targul auto', "Scrie mai jos numele masinii pe care vrei sa o adaugi.", 'targauto', true, false, 'c')
-            event = Core.AddEventHandler('targauto', function (result)
+            ShowDialog('Adauga masina la targul auto', "Scrie mai jos numele masinii pe care vrei sa o adaugi.",
+                'targauto', true, false, 'c')
+            event = Core.AddEventHandler('targauto', function(result)
                 RemoveEventHandler(event)
                 local name = result
                 if name then
-                    ShowDialog('Adauga masina la targul auto', "Scrie mai jos pretul masinii pe care vrei sa o adaugi.", 'targauto', true, false, 'c')
-                    event = Core.AddEventHandler('targauto', function (result)
+                    ShowDialog('Adauga masina la targul auto', "Scrie mai jos pretul masinii pe care vrei sa o adaugi.",
+                        'targauto', true, false, 'c')
+                    event = Core.AddEventHandler('targauto', function(result)
                         RemoveEventHandler(event)
                         local price = tonumber(result)
                         if price then
                             Core.TriggerCallback('Server:AddSaleVehicle', function(cb)
                                 if cb then
                                     saleVehicles = cb
-                                    refreshSaleVehicles({name = name, model = model, price = price})
+                                    refreshSaleVehicles({ name = name, model = model, price = price })
                                     sendNotification('Targ Auto', 'Ai adaugat masina la targul auto.', 'success')
                                 else
                                     sendNotification('Targ Auto', 'Nu ai adaugat masina la targul auto.', 'error')

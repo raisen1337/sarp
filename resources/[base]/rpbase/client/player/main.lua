@@ -222,14 +222,13 @@ Citizen.CreateThread(function()
                 SendNUIMessage({
                     action = "hideDeathScreen",
                 })
-                
             end
         end
     end
 end)
 
 PlayerKilled = function(killerid, coords)
-  
+
 end
 
 PlayerDied = function(killertype, coords)
@@ -257,10 +256,36 @@ Core.FixSkin = function()
     TriggerEvent('Player:LoadSkin')
 end
 
+PreloadModel = function(model)
+    if IsModelInCdimage(model) and IsModelValid(model) then
+        RequestModel(model)
+        while not HasModelLoaded(model) do
+            Wait(0)
+        end
+        SetModelAsNoLongerNeeded(model)
+    end
+
+    SetPedComponentVariation(PlayerPedId(), 0, 0, 0, 2)
+    SetPedComponentVariation(PlayerPedId(), 2, 11, 4, 2)
+    SetPedComponentVariation(PlayerPedId(), 4, 1, 5, 2)
+    SetPedComponentVariation(PlayerPedId(), 6, 1, 0, 2)
+    SetPedComponentVariation(PlayerPedId(), 11, 7, 2, 2)
+end
+
+function getRandomPositionInArea(coords, radius)
+    local randomX = math.random(-radius, radius)
+    local randomY = math.random(-radius, radius)
+    local randomZ = math.random(-radius, radius)
+    local found, spawnPos, heading = GetSafeCoordForPed(coords.x + randomX, coords.y + randomY, coords.z, 0, 0)
+    return spawnPos, heading
+end
+
 PlayerSpawned = function()
     local mhash_female = GetHashKey("mp_f_freemode_01")
     local mhash_male = GetHashKey("mp_m_freemode_01")
     local i = 0
+    Core.TriggerCallback("Player:SetRouting", function() end, 1)
+
     while not HasModelLoaded(mhash_male) and i < 10000 do
         RequestModel(mhash_male)
         Citizen.Wait(10)
@@ -293,7 +318,7 @@ PlayerSpawned = function()
         TriggerServerEvent("Scoreboard:SetScoreboard")
 
         LoadBusinesses()
-        Core.TriggerCallback("Houses:Get", function (data)
+        Core.TriggerCallback("Houses:Get", function(data)
             loadHouses(data)
         end)
         LoadFactions()
@@ -383,7 +408,7 @@ PlayerSpawned = function()
         BuildPlayerOptions()
 
         LoadBusinesses()
-        Core.TriggerCallback("Houses:Get", function (data)
+        Core.TriggerCallback("Houses:Get", function(data)
             loadHouses(data)
         end)
         LoadFactions()
@@ -404,8 +429,6 @@ PlayerSpawned = function()
 
         Core.startPayday()
     end
-
-  
 end
 
 local skinFixed = false
@@ -414,7 +437,7 @@ RegisterNetEvent('Skin:fix', function()
     skinFixed = true
 end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         wait = 1000
         if not skinFixed then
@@ -425,8 +448,8 @@ Citizen.CreateThread(function ()
         else
             wait = 5000
         end
-       
-      
+
+
         Wait(wait)
     end
 end)
@@ -460,12 +483,17 @@ function LoadPlayerWeapons()
     local Inventory = PlayerData.inventory
     local playerAmmo = Core.GetPlayerAmmo()
 
-    for k, v in pairs(Inventory) do
-        if v.type == 'weapon' then
-            GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
-            for a, b in pairs(playerAmmo) do
-                if checkWeaponPresence(v.name, a) then
-                    SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
+
+    if PlayerData then
+        if not table.empty(Inventory) then
+            for k, v in pairs(Inventory) do
+                if v.type == 'weapon' then
+                    GiveWeaponToPed(PlayerPedId(), GetHashKey(v.name), 0, false, false)
+                    for a, b in pairs(playerAmmo) do
+                        if checkWeaponPresence(v.name, a) then
+                            SetPedAmmo(PlayerPedId(), GetHashKey(v.name), b)
+                        end
+                    end
                 end
             end
         end
@@ -640,8 +668,8 @@ function Core.startPayday()
         SendNUIMessage({
             action = 'payday',
             paydayInfo = 'Payday: $' ..
-            FormatNumber(total.check) ..
-            '<br>Salariu: $' .. FormatNumber(total.job) .. "<br>VIP Bonus: $" .. FormatNumber(total.vip)
+                FormatNumber(total.check) ..
+                '<br>Salariu: $' .. FormatNumber(total.job) .. "<br>VIP Bonus: $" .. FormatNumber(total.vip)
         })
     end)
     Core.startPayday()
@@ -1027,14 +1055,11 @@ end)
 
 RegisterCommand('stats', function()
     local statsMsg = [[
-
-       ^0Username: ^3%s^0 | Level: ^3%s^0 | Job: ^3%s^0 | Job Rank: ^3%s^0 | Nume: ^3%s^0 | Prenume: ^3%s^0
-        Cash: $^3%s^0 | Bani in banca: $^3%s^0 | Wanted Level: ^3%s^0 | Admin Level: ^3%s^0
-        Ped Model: ^3%s^0 | Identifier: ^3%s^0
+^0Username: ^3%s^0 | Level: ^3%s^0 | Job: ^3%s^0 | Job Rank: ^3%s^0 | Nume: ^3%s^0 | Prenume: ^3%s^0 Cash: $^3%s^0 | Bani in banca: $^3%s^0 | Wanted Level: ^3%s^0 | Admin Level: ^3%s^0 Ped Model: ^3%s^0 | Identifier: ^3%s^0
     ]]
     statsMsg = statsMsg:format(PlayerData.user, PlayerData.level, PlayerData.job.name, PlayerData.job.rank,
         PlayerData.character.name, PlayerData.character.surname, PlayerData.cash, PlayerData.bank, PlayerData
-    .wantedLevel, PlayerData.adminLevel, PlayerData.character.ped_model, PlayerData.identifier)
+        .wantedLevel, PlayerData.adminLevel, PlayerData.character.ped_model, PlayerData.identifier)
 
     TriggerEvent('chat:addMessage', {
         args = { statsMsg }
@@ -1056,15 +1081,4 @@ AddEventHandler('playerSpawned', function()
     FreezeEntityPosition(PlayerPedId(), true)
     PlayerSpawned()
     SetTimeout(6000, PlayerSpawned())
-end)
-AddEventHandler("playerSpawned", function(spawn)
-    Citizen.CreateThread(function()
-        local playerPed = GetPlayerPed(-1)
-        --SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
-        SetPedComponentVariation(playerPed, 0, 0, 0, 2) --Face
-        SetPedComponentVariation(playerPed, 2, 11, 4, 2) --Hair
-        SetPedComponentVariation(playerPed, 4, 1, 5, 2) -- Pantalon
-        SetPedComponentVariation(playerPed, 6, 1, 0, 2) -- Shoes
-        SetPedComponentVariation(playerPed, 11, 7, 2, 2) -- Jacket
-    end)
 end)

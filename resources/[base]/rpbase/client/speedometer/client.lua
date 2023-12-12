@@ -88,53 +88,53 @@ Citizen.CreateThread(function()
             local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
             local speed = GetEntitySpeed(vehicle) * 3.6
             local health = GetVehicleEngineHealth(vehicle)
-            
+
             if health <= 600 then
                 SetVehicleMaxSpeed(vehicle, math.random(40, 70) / 3.6)
                 SetVehicleEngineHealth(vehicle, 300.0)
             elseif health >= 800 then
                 SetVehicleMaxSpeed(vehicle, 999.0)
             end
-            
+
             -- Calculate fuel consumption based on vehicle type and speed
             local vehicleType = GetVehicleClass(vehicle)
-            local fuelConsumption
-            for k,v in pairs(vehicleConsumptions) do
+            local fuelConsumption = 20.0
+            for k, v in pairs(vehicleConsumptions) do
                 if v.id == vehicleType then
                     fuelConsumption = (v.consumption / 10000) * (speed / 100)
                     break
                 end
             end
-            
+
             -- Reduce fuel level based on consumption
             local fuelLevel = GetVehicleFuelLevel(vehicle)
             fuelLevel = fuelLevel - fuelConsumption
             SetVehicleFuelLevel(vehicle, fuelLevel)
-            
+
             -- Update speedometer display
             local speedRounded = math.ceil(speed)
             local speedString = string.format("%03d", speedRounded)
             local doorLocked = GetVehicleDoorLockStatus(vehicle)
             local engineHealth = GetVehicleEngineHealth(vehicle)
             local fuelLevelRounded = math.ceil(fuelLevel)
-            
+
             local lightsOn = false
             local a, b, c = GetVehicleLightsState(vehicle)
             if b == 1 or c == 1 then
                 lightsOn = true
             end
-            
+
             SendNUIMessage({
                 type = "speed",
                 display = true,
                 speed = speedString,
                 vehicleGear = GetVehicleCurrentGear(vehicle),
                 locked = doorLocked,
-                engineHealth = engineHealth,  
+                engineHealth = engineHealth,
                 lights = lightsOn,
                 fuelLevel = fuelLevelRounded
             })
-            
+
             wait = 100
         else
             SendNUIMessage({
@@ -143,7 +143,7 @@ Citizen.CreateThread(function()
             })
             wait = 6000
         end
-        
+
         Wait(wait)
     end
 end)

@@ -2,19 +2,18 @@ Factions = {}
 LoadFactions = function()
     Core.TriggerCallback('Factions:GetFactions', function(data)
         Factions = data
-        for k,v in pairs(Factions) do
+        for k, v in pairs(Factions) do
             CreateBlip(v.coords.main, v.blipName, v.blip, v.blipColor)
-           
+
             if v.coords.helicopter then
-                CreateBlip(v.coords.helicopter, 'Helicopter - '..v.name, 64, v.blipColor)
+                CreateBlip(v.coords.helicopter, 'Helicopter - ' .. v.name, 64, v.blipColor)
             end
             if v.coords.vehicleArea then
-                CreateBlip(v.coords.vehicleArea, 'Garaj - '..v.name, 357, v.blipColor)
+                CreateBlip(v.coords.vehicleArea, 'Garaj - ' .. v.name, 357, v.blipColor)
             end
             if v.coords.armory then
-                CreateBlip(v.coords.armory, 'Armory - '..v.name, 150, v.blipColor)
+                CreateBlip(v.coords.armory, 'Armory - ' .. v.name, 150, v.blipColor)
             end
-          
         end
     end)
 end
@@ -29,14 +28,21 @@ local canSpawnHeli = false
 
 local canAccessArmory = false
 
-local factionsMenu = MenuV:CreateMenu(false, "Meniu Factiune", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'factions-main')
-local factionMembers = MenuV:CreateMenu(false, "Membrii", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'factions-members')
-local factionMember = MenuV:CreateMenu(false, "Detalii", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'factions-member')
-local factionVehicle = MenuV:CreateMenu(false, "Vehicul", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'factions-vehicle')
+local factionsMenu = MenuV:CreateMenu(false, "Meniu Factiune", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'factions-main')
+local factionMembers = MenuV:CreateMenu(false, "Membrii", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'factions-members')
+local factionMember = MenuV:CreateMenu(false, "Detalii", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'factions-member')
+local factionVehicle = MenuV:CreateMenu(false, "Vehicul", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'factions-vehicle')
 
-local factionArmorySubmenu = MenuV:CreateMenu(false, "Armory", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'factions-armory-submenu')
-local factionArmoryMenu = MenuV:CreateMenu(false, "Armory", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'factions-armory')
-local factionVehicles = MenuV:CreateMenu(false, "Vehicule", "center", 255, 0, 0, 'size-150', 'none', 'menuv', 'factions-vehicles')
+local factionArmorySubmenu = MenuV:CreateMenu(false, "Armory", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'factions-armory-submenu')
+local factionArmoryMenu = MenuV:CreateMenu(false, "Armory", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'factions-armory')
+local factionVehicles = MenuV:CreateMenu(false, "Vehicule", "center", 255, 0, 0, 'size-150', 'none', 'menuv',
+    'factions-vehicles')
 
 local playerFaction = {}
 
@@ -46,10 +52,10 @@ RegisterCommand('faction', function()
         local fData = pData.faction
         if fData.id ~= 0 then
             factionsMenu:ClearItems()
-            for k,v in pairs(Factions) do
+            for k, v in pairs(Factions) do
                 if fData.id == v.id then
                     playerFaction = v
-                    
+
                     factionsMenu:AddButton({
                         label = v.name,
                         icon = '💼',
@@ -57,18 +63,18 @@ RegisterCommand('faction', function()
                         value = 'faction',
                     })
                     factionsMenu:AddButton({
-                        label = "Numele tau: "..pData.user,
+                        label = "Numele tau: " .. pData.user,
                         icon = '👤',
                         disabled = true,
                     })
-                    
+
                     factionsMenu:AddButton({
-                        label = "Rankul tau: "..fData.rankName.." ("..fData.rank..")",
+                        label = "Rankul tau: " .. fData.rankName .. " (" .. fData.rank .. ")",
                         icon = '💼',
                         disabled = true,
                     })
                     factionsMenu:AddButton({
-                        label = "Salariul tau: "..FormatNumber(Factions[fData.name].ranks[fData.rank].salary).."$",
+                        label = "Salariul tau: " .. FormatNumber(Factions[fData.name].ranks[fData.rank].salary) .. "$",
                         icon = '💵',
                         disabled = true,
                     })
@@ -85,7 +91,7 @@ RegisterCommand('faction', function()
                             value = 'vehicles',
                         }):On('select', function()
                             factionVehicles:ClearItems()
-                            for k,v in pairs(playerFaction.vehicles) do
+                            for k, v in pairs(playerFaction.vehicles) do
                                 if fData.rank >= v.rank then
                                     if v.type == 'car' then
                                         factionVehicles:AddButton({
@@ -100,10 +106,11 @@ RegisterCommand('faction', function()
                                                     Wait(1500)
                                                 end
                                             end
-                                            currentCar = CreateCar(v.model, PlayerCoords(), GetEntityHeading(PlayerPedId()), true, true, true, 'PD'..math.random(1000, 9999))
+                                            currentCar = CreateCar(v.model, PlayerCoords(),
+                                                GetEntityHeading(PlayerPedId()), true, true, true,
+                                                'PD' .. math.random(1000, 9999))
                                         end)
                                     end
-                                   
                                 end
                             end
                             MenuV:OpenMenu(factionVehicles)
@@ -111,14 +118,13 @@ RegisterCommand('faction', function()
                     end
 
                     if canSpawnHeli then
-                        
                         factionsMenu:AddButton({
                             label = 'Helicopter',
                             icon = '🚁',
                             value = 'helicopters',
                         }):On('select', function()
                             factionVehicles:ClearItems()
-                            for k,v in pairs(playerFaction.vehicles) do
+                            for k, v in pairs(playerFaction.vehicles) do
                                 if fData.rank >= v.rank then
                                     if v.type == 'heli' then
                                         factionVehicles:AddButton({
@@ -131,7 +137,9 @@ RegisterCommand('faction', function()
                                                 DeleteEntity(currentCar)
                                                 Wait(1500)
                                             end
-                                            currentCar = CreateCar(v.model, PlayerCoords(), playerFaction.coords.helicopter.w, true, true, true, 'PD'..math.random(1000, 9999))
+                                            currentCar = CreateCar(v.model, PlayerCoords(),
+                                                playerFaction.coords.helicopter.w, true, true, true,
+                                                'PD' .. math.random(1000, 9999))
                                         end)
                                         MenuV:OpenMenu(factionVehicles)
                                     end
@@ -139,7 +147,7 @@ RegisterCommand('faction', function()
                             end
                         end)
                     end
-                    
+
 
                     if canAccessArmory then
                         factionArmorySubmenu:ClearItems()
@@ -151,8 +159,8 @@ RegisterCommand('faction', function()
                         }):On('select', function()
                             factionArmorySubmenu:ClearItems()
                             factionArmoryMenu:ClearItems()
-                           
-                            for k,v in pairs(playerFaction.armory) do
+
+                            for k, v in pairs(playerFaction.armory) do
                                 if fData.rank >= v.rank then
                                     factionArmorySubmenu:ClearItems()
 
@@ -163,30 +171,30 @@ RegisterCommand('faction', function()
                                     }):On('select', function()
                                         factionArmorySubmenu:ClearItems()
                                         factionArmorySubmenu:AddButton({
-                                            label = 'Nume: '..v.name,
+                                            label = 'Nume: ' .. v.name,
                                             icon = '📃',
                                             disabled = true,
                                         })
                                         if v.name == 'Armour' then
                                             factionArmorySubmenu:AddButton({
-                                                label = 'Cost: $'..FormatNumber(v.ammoCost)..'',
+                                                label = 'Cost: $' .. FormatNumber(v.ammoCost) .. '',
                                                 icon = '💰',
                                                 disabled = true,
                                             })
                                         elseif v.name == 'Medkit' then
                                             factionArmorySubmenu:AddButton({
-                                                label = 'Cost: $'..FormatNumber(v.ammoCost)..'',
+                                                label = 'Cost: $' .. FormatNumber(v.ammoCost) .. '',
                                                 icon = '💰',
                                                 disabled = true,
                                             })
                                         else
                                             factionArmorySubmenu:AddButton({
-                                                label = 'Cost munitie: $'..FormatNumber(v.ammoCost)..'/glont',
+                                                label = 'Cost munitie: $' .. FormatNumber(v.ammoCost) .. '/glont',
                                                 icon = '💰',
                                                 disabled = true,
                                             })
                                         end
-                                       
+
                                         factionArmorySubmenu:AddButton({
                                             label = 'Optiuni',
                                             icon = '',
@@ -214,13 +222,12 @@ RegisterCommand('faction', function()
                                                 if pData.cash >= v.weaponCost then
                                                     pData.cash = pData.cash - v.weaponCost
                                                     Core.TriggerCallback('Player:AddItem', function(cb)
-                                                        
-                                                        GiveWeaponToPed(PlayerPedId(), GetHashKey(v.model), 1, false, false)
+                                                        GiveWeaponToPed(PlayerPedId(), GetHashKey(v.model), 1, false,
+                                                            false)
                                                         --print
-                                                       
                                                     end, v.model, 1)
-                                                    Core.TriggerCallback('Player:Pay', function (cb)
-                                                                
+                                                    Core.TriggerCallback('Player:Pay', function(cb)
+
                                                     end, 'cash', v.weaponCost)
                                                     return
                                                 else
@@ -233,8 +240,10 @@ RegisterCommand('faction', function()
                                             }):On('select', function()
                                                 MenuV:CloseAll()
                                                 --print
-                                                
-                                                ShowDialog('Cumpara munitie', 'Scrie mai jos cata munitie ai nevoie! (Ex: 150).', 'buyammo', true, false, 'c')
+
+                                                ShowDialog('Cumpara munitie',
+                                                    'Scrie mai jos cata munitie ai nevoie! (Ex: 150).', 'buyammo', true,
+                                                    false, 'c')
                                                 local event;
                                                 event = Core.AddEventHandler('buyammo', function(ammo)
                                                     RemoveEventHandler(event)
@@ -242,19 +251,18 @@ RegisterCommand('faction', function()
                                                         if pData.cash >= tonumber(ammo) * v.ammoCost then
                                                             pData.cash = pData.cash - tonumber(ammo) * v.ammoCost
                                                             ammo = tonumber(ammo)
-                                            
+
                                                             Core.TriggerCallback('Player:AddItem', function(cb)
                                                                 --print
-                                                               
+
                                                                 AddAmmoToPed(PlayerPedId(), GetHashKey(v.model), ammo)
                                                                 --print
-                                                              
                                                             end, v.ammoName, ammo)
-                                                            Core.TriggerCallback('Player:Pay', function (cb)
+                                                            Core.TriggerCallback('Player:Pay', function(cb)
 
                                                             end, 'cash', tonumber(ammo) * v.ammoCost)
-                                                          
-                                                            
+
+
                                                             return
                                                         else
                                                             sendNotification('Armory', 'Nu ai destui bani.', 'error')
@@ -277,22 +285,24 @@ RegisterCommand('faction', function()
                             icon = '📝',
                             value = 'invite',
                         }):On('select', function()
-                            ShowDialog('Invita un membru', 'Scrie mai jos ID-ul jucatorului pe care vrei sa-l inviti', 'invite', true, true, 'c', function(result)
-                                if tonumber(result) then
-                                    result = tonumber(result)
-                                    Core.TriggerCallback('Core:GetPlayerById', function(player)
-                                        Core.TriggerCallback('Factions:AddMemberWithRank', function(cb)
-                                            
-                                            MenuV:CloseAll()
-                                            sendNotification('Factiune', 'L-ai invitat pe: '..GetPlayerName(GetPlayerFromServerId(result))..'!', 'success')
-                                            
-                                        end, fData.name, result, 1, player.data.identifier)
-                                    end, result)
-                                else
-                                    sendNotification('Factiune', 'ID-ul trebuie sa fie un numar!', 'error')
-                                    return
-                                end
-                            end)
+                            ShowDialog('Invita un membru', 'Scrie mai jos ID-ul jucatorului pe care vrei sa-l inviti',
+                                'invite', true, true, 'c', function(result)
+                                    if tonumber(result) then
+                                        result = tonumber(result)
+                                        Core.TriggerCallback('Core:GetPlayerById', function(player)
+                                            Core.TriggerCallback('Factions:AddMemberWithRank', function(cb)
+                                                MenuV:CloseAll()
+                                                sendNotification('Factiune',
+                                                    'L-ai invitat pe: ' ..
+                                                    GetPlayerName(GetPlayerFromServerId(result)) ..
+                                                    '!', 'success')
+                                            end, fData.name, result, 1, player.data.identifier)
+                                        end, result)
+                                    else
+                                        sendNotification('Factiune', 'ID-ul trebuie sa fie un numar!', 'error')
+                                        return
+                                    end
+                                end)
                         end)
 
                         factionsMenu:AddButton({
@@ -303,7 +313,7 @@ RegisterCommand('faction', function()
                         }):On('select', function()
                             factionMembers:ClearItems()
                             Core.TriggerCallback('Factions:GetFactionMembers', function(data)
-                                for _,user in pairs(data) do
+                                for _, user in pairs(data) do
                                     factionMembers:AddButton({
                                         label = user.name,
                                         icon = '🙍‍♂️',
@@ -311,18 +321,18 @@ RegisterCommand('faction', function()
                                     }):On('select', function()
                                         factionMember:ClearItems()
                                         factionMember:AddButton({
-                                            label = 'Nume: '..user.name,
+                                            label = 'Nume: ' .. user.name,
                                             icon = '👤',
                                             disabled = true,
                                             value = 0,
                                         })
                                         factionMember:AddButton({
-                                            label = 'Rank: '..user.rankName..' ('..user.rank..')',
+                                            label = 'Rank: ' .. user.rankName .. ' (' .. user.rank .. ')',
                                             icon = '💼',
                                             disabled = true,
                                         })
                                         factionMember:AddButton({
-                                            label = 'Salariu: '..FormatNumber(user.salary)..'$',
+                                            label = 'Salariu: ' .. FormatNumber(user.salary) .. '$',
                                             icon = '💵',
                                             disabled = true,
                                         })
@@ -341,7 +351,8 @@ RegisterCommand('faction', function()
                                                 Core.TriggerCallback('Factions:PromoteMember', function(cb)
                                                     if cb then
                                                         MenuV:CloseAll()
-                                                        sendNotification('Factiune', 'L-ai promovat pe: '..user.name..'!', 'success')
+                                                        sendNotification('Factiune', 'L-ai promovat pe: ' ..
+                                                            user.name .. '!', 'success')
                                                     end
                                                 end, user.identifier)
                                             end)
@@ -350,22 +361,24 @@ RegisterCommand('faction', function()
                                                 icon = '📝',
                                                 value = 'demote',
                                                 description = "",
-                                            }):On('select', function ()
+                                            }):On('select', function()
                                                 Core.TriggerCallback('Factions:DemoteMember', function(cb)
                                                     if cb then
                                                         MenuV:CloseAll()
-                                                        sendNotification('Factiune', 'L-ai degradat pe: '..user.name..'!', 'success')
+                                                        sendNotification('Factiune', 'L-ai degradat pe: ' ..
+                                                            user.name .. '!', 'success')
                                                     end
                                                 end, user.identifier)
                                             end)
                                             factionMember:AddButton({
                                                 label = 'Kick',
                                                 icon = '🚫',
-                                            }):On('select', function ()
+                                            }):On('select', function()
                                                 Core.TriggerCallback('Factions:KickMember', function(cb)
                                                     if cb then
                                                         MenuV:CloseAll()
-                                                        sendNotification('Factiune', 'L-ai dat afara pe: '..user.name..'!', 'success')
+                                                        sendNotification('Factiune',
+                                                            'L-ai dat afara pe: ' .. user.name .. '!', 'success')
                                                     end
                                                 end, user.identifier)
                                             end)
@@ -379,22 +392,23 @@ RegisterCommand('faction', function()
                             MenuV:OpenMenu(factionMembers)
                         end)
                     end
-                    Core.ClearEvents()
+
                     MenuV:OpenMenu(factionsMenu)
+                    Core.ClearEvents()
                 end
             end
         end
     end
 end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         wait = 5000
         if PlayerData then
             local fData = PlayerData.faction
             if fData then
                 if not table.empty(Factions) then
-                    for k,v in pairs(Factions) do
+                    for k, v in pairs(Factions) do
                         if fData.id == v.id then
                             coords = v.coords
                             local dist = {}
@@ -402,25 +416,31 @@ Citizen.CreateThread(function ()
                             dist[1] = #(pCoords - vec3(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z))
                             if dist[1] < 15.0 then
                                 wait = 1
-                                DrawText3D(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z, "Vehicle Area - 15m radius.")
-                                DrawMarker(1, coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 15.0, 15.0, 1.0, 255, 255, 255, 50, false, true, 2, false, false, false, false)
+                                DrawText3D(coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z,
+                                    "Vehicle Area - 15m radius.")
+                                DrawMarker(1, coords.vehicleArea.x, coords.vehicleArea.y, coords.vehicleArea.z - 1, 0.0,
+                                    0.0, 0.0, 0, 0.0, 0.0, 15.0, 15.0, 1.0, 255, 255, 255, 50, false, true, 2, false,
+                                    false, false, false)
                                 canSpawnVehicle = true
                             else
                                 canSpawnVehicle = false
                             end
-                            
+
                             if coords.helicopter then
                                 dist[2] = #(pCoords - vec3(coords.helicopter.x, coords.helicopter.y, coords.helicopter.z))
                                 if dist[2] < 2.0 then
                                     wait = 1
-                                    DrawText3D(coords.helicopter.x, coords.helicopter.y, coords.helicopter.z, "Helicopter")
-                                    DrawMarker(1, coords.helicopter.x, coords.helicopter.y, coords.helicopter.z - 1, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 2.0, 2.0, 2.0, 255, 255, 255, 100, false, true, 2, false, false, false, false)
+                                    DrawText3D(coords.helicopter.x, coords.helicopter.y, coords.helicopter.z,
+                                        "Helicopter")
+                                    DrawMarker(1, coords.helicopter.x, coords.helicopter.y, coords.helicopter.z - 1, 0.0,
+                                        0.0, 0.0, 0, 0.0, 0.0, 2.0, 2.0, 2.0, 255, 255, 255, 100, false, true, 2, false,
+                                        false, false, false)
                                     canSpawnHeli = true
                                 else
                                     canSpawnHeli = false
                                 end
                             end
-                            
+
                             if coords.armory then
                                 dist[3] = #(pCoords - vec3(coords.armory.x, coords.armory.y, coords.armory.z))
                                 if dist[3] < 10.0 then

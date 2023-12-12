@@ -22,14 +22,14 @@ Core.AddEventHandler = function(eventName, cb)
 end
 
 Core.ClearEvents = function()
-	for k,v in pairs(eventHandlers) do
+	for k, v in pairs(eventHandlers) do
 		RemoveEventHandler(v.event)
 	end
 	eventHandlers = {}
 end
 
 Core.ClearEvent = function(eventName)
-	for k,v in pairs(eventHandlers) do
+	for k, v in pairs(eventHandlers) do
 		if v.name == eventName then
 			RemoveEventHandler(v.event)
 			table.remove(eventHandlers, k)
@@ -59,13 +59,14 @@ function Core.GetPlayerData()
 	if PlayerData and not table.empty(PlayerData) then
 		return PlayerData
 	end
-	
+
 	Core.TriggerCallback("Player:GetData", function(data)
 		PlayerData = data
 		return data
 	end)
 	return PlayerData
 end
+
 currentWeather = false
 function Core.GetWeather()
 	Core.TriggerCallback('Server:GetWeather', function(weather)
@@ -76,17 +77,13 @@ function Core.GetWeather()
 		if currentWeather == 'snow_only' then
 			snowOn = true
 			ForceSnowPass(snowOn)
-
 		else
 			snowOn = false
 			ForceSnowPass(snowOn)
-
 		end
 	end)
 	return currentWeather
 end
-
-
 
 Citizen.CreateThread(function()
 	while true do
@@ -103,13 +100,11 @@ function Core.SetWeather(weather)
 	if weather:lower() == 'snow_only' then
 		snowOn = true
 		ForceSnowPass(snowOn)
-
 	end
-	
+
 	if weather:lower() == 'snow_off' then
 		snowOn = false
 		ForceSnowPass(snowOn)
-
 	end
 	currentWeather = weather
 	SetWeatherTypePersist(weather)
@@ -121,11 +116,9 @@ RegisterNetEvent('Client:SyncSeason', function(season)
 	if season == 'winter' then
 		snowOn = true
 		ForceSnowPass(snowOn)
-
 	else
 		snowOn = false
 		ForceSnowPass(snowOn)
-
 	end
 end)
 
@@ -134,7 +127,7 @@ RegisterNetEvent('Client:SyncWeather', function(weather)
 	Core.SetWeather(weather)
 end)
 
-RegisterCommand('killcp', function ()
+RegisterCommand('killcp', function()
 	Core.HasCheckpoint(function(has)
 		if has then
 			Core.DeleteAllCps()
@@ -143,15 +136,15 @@ RegisterCommand('killcp', function ()
 end)
 
 RegisterCommand('testbox', function()
-	Core.ShowDialogBox('Test', 'test', true, true, function (da)
+	Core.ShowDialogBox('Test', 'test', true, true, function(da)
 		-- print(da)
 	end)
 end)
 
-Citizen.CreateThread(function ()
-    while true do
+Citizen.CreateThread(function()
+	while true do
 		local wait = 1000
-        local weather = GetPrevWeatherTypeHashName()
+		local weather = GetPrevWeatherTypeHashName()
 		if not weather then
 			weather = 'extrasunny'
 		end
@@ -188,10 +181,10 @@ Citizen.CreateThread(function ()
 			end
 		end
 		Wait(wait)
-    end
+	end
 end)
 
-Core.TeleportToCp = function (cp)
+Core.TeleportToCp = function(cp)
 	local coords = cp.coords
 	local heading = cp.heading
 	local ped = PlayerPedId()
@@ -222,7 +215,6 @@ RegisterCommand('setw', function()
 			Core.ClearEvent('weather')
 		end
 	end)
-
 end)
 
 
@@ -230,7 +222,6 @@ progressBars = {}
 currentProgress = false
 
 Core.ProgressBar = function(duration, percentage, canClose, animation, prop, freeze, cb, closecb)
-	
 	local id = math.random(1, 9999999)
 	local this = {}
 	this.id = id
@@ -262,8 +253,8 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 		AttachEntityToEntity(prop.prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), prop.boneIndex), prop.x, prop.y,
 			prop.z, prop.xR, prop.yR, prop.zR, false, false, false, false, 2, true)
 	end
-	
-	
+
+
 	SendNUIMessage({
 		action = "setProgress",
 		duration = duration,
@@ -271,7 +262,7 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 		canCancel = canClose,
 	})
 	currentProgress = this
-	
+
 	if cb then
 		SetTimeout(duration * 1000, function()
 			if not this then
@@ -307,7 +298,6 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 							Wait(300)
 							currentProgress = false
 							this = false
-							
 						end
 					else
 						wait = 1000
@@ -323,7 +313,6 @@ Core.ProgressBar = function(duration, percentage, canClose, animation, prop, fre
 end
 
 Core.CancelProgressBar = function()
-
 	if currentProgress.animation then
 		ClearPedTasksImmediately(PlayerPedId())
 		StopAnimTask(PlayerPedId(), currentProgress.animation.dict, currentProgress.animation.name, 1.0)
@@ -400,11 +389,11 @@ end
 
 local callbacksCalled = {}
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
 	while true do
 		Wait(3000)
 		if callbacksCalled then
-			for k,v in pairs(callbacksCalled) do
+			for k, v in pairs(callbacksCalled) do
 				if v >= 6 then
 					callbacksCalled[k] = nil
 				end
@@ -552,7 +541,7 @@ Core.SetVehicleProperties = function(vehicle, data)
 		SetVehicleWheelType(vehicle, data.wheels)
 	end
 
-	if(data.modLivery) then
+	if (data.modLivery) then
 		SetVehicleMod(vehicle, 48, data.modLivery, false)
 	end
 
@@ -840,7 +829,7 @@ Core.GetVehicleProperties = function(vehicle)
 		},
 
 		extras            = extras,
-		
+
 		neonColor         = table.pack(GetVehicleNeonLightsColour(vehicle)),
 		tyreSmokeColor    = table.pack(GetVehicleTyreSmokeColor(vehicle)),
 
@@ -864,8 +853,8 @@ Core.GetVehicleProperties = function(vehicle)
 		modArmor          = GetVehicleMod(vehicle, 16),
 
 		modTurbo          = IsToggleModOn(vehicle, 18),
-		color1Type = 	GetVehicleModColor_1(vehicle),
-		color2Type = 	GetVehicleModColor_2(vehicle),
+		color1Type        = GetVehicleModColor_1(vehicle),
+		color2Type        = GetVehicleModColor_2(vehicle),
 		modSmokeEnabled   = IsToggleModOn(vehicle, 20),
 		modXenon          = GetVehicleXenonLightsColour(vehicle),
 
@@ -895,7 +884,7 @@ Core.GetVehicleProperties = function(vehicle)
 		modTank           = GetVehicleMod(vehicle, 45),
 		modWindows        = GetVehicleMod(vehicle, 46),
 		modLivery         = GetVehicleMod(vehicle, 48),
-		livery = GetVehicleLivery(vehicle)
+		livery            = GetVehicleLivery(vehicle)
 	}
 end
 
@@ -1077,7 +1066,6 @@ function isVehicleRegistered(veh)
 	return pass
 end
 
-
 Citizen.CreateThread(function()
 	while true do
 		Wait(6000)
@@ -1092,40 +1080,14 @@ Citizen.CreateThread(function()
 			pData = Core.GetPlayerData()
 			PlayerData = pData
 		end
-		
-		local vehs = GetAllVehicles()
-		local notRegistered = false
-		for k,v in pairs(vehs) do
-			if not isVehicleRegistered(v) then
-				notRegistered = v
-			end
-		end
-
-		if notRegistered then
-			while DoesEntityExist(notRegistered) do
-				Wait(1)
-				DeleteEntity(notRegistered)
-				DeleteVehicle(notRegistered)
-				DeleteCar(notRegistered)
-			end
-		end
 
 		local unarmed = GetHashKey('WEAPON_UNARMED')
-		if GetVehicles() and not table.empty(GetVehicles()) then
-			for k,v in pairs(GetVehicles()) do
-				if not v.netID then
-					if not v.ignore then
-						DeleteCar(v.localId)
-					end
-				end
-			end
-		end
 
 		if GetSelectedPedWeapon(PlayerPedId()) ~= unarmed and GetSelectedPedWeapon(PlayerPedId()) ~= 966099553 then
 			-- print(GetSelectedPedWeapon(PlayerPedId()))
 			-- print('Player armed')
 			local Inventory = pData.inventory
-			for k,v in pairs(Inventory) do
+			for k, v in pairs(Inventory) do
 				if v.type == 'weapon' then
 					if GetSelectedPedWeapon(PlayerPedId()) == GetHashKey(v.name) then
 						gunFound = true
@@ -1151,48 +1113,46 @@ Citizen.CreateThread(function()
 		end
 
 		pData.adminLevel = pData.adminLevel or false
-		if not IsGameplayCamRendering() and pData.adminLevel == 0 then
+		if not IsGameplayCamRendering() and not inClothing and pData.adminLevel == 0 then
 			Core.TriggerCallback('AC:ReportAnomaly', function()
 			end, 'freecam')
 		end
-		if not IsEntityVisible(PlayerPedId()) and pData.adminLevel == 0  then
+		if not IsEntityVisible(PlayerPedId()) and pData.adminLevel == 0 then
 			Core.TriggerCallback('AC:ReportAnomaly', function()
 			end, 'invisible')
 		end
-		if GetEntitySpeed(PlayerPedId()) > 150.0 and pData.adminLevel == 0   then
+		if GetEntitySpeed(PlayerPedId()) > 150.0 and pData.adminLevel == 0 then
 			Core.TriggerCallback('AC:ReportAnomaly', function()
 			end, 'walk-speed/ped-speed')
 		end
-		if IsPedInAnyVehicle(PlayerPedId(), false) and pData.adminLevel == 0  then
+		if IsPedInAnyVehicle(PlayerPedId(), false) and pData.adminLevel == 0 then
 			if GetEntityAlpha(GetVehiclePedIsIn(PlayerPedId())) < 255 then
 				Core.TriggerCallback('AC:ReportAnomaly', function()
 				end, 'invisible/maybe noclip')
 			end
 		end
-		if GetEntityAlpha(PlayerPedId()) < 255 and pData.adminLevel == 0  then
+		if GetEntityAlpha(PlayerPedId()) < 255 and pData.adminLevel == 0 then
 			Core.TriggerCallback('AC:ReportAnomaly', function()
 			end, 'invisible/maybe noclip')
 		end
 
-		if IsPedInAnyVehicle(PlayerPedId(), false) and pData.adminLevel == 0  then
+		if IsPedInAnyVehicle(PlayerPedId(), false) and pData.adminLevel == 0 then
 			local veh = GetVehiclePedIsIn(PlayerPedId(), false)
 			if GetEntitySpeed(veh) > 150.0 then
 				Core.TriggerCallback('AC:ReportAnomaly', function()
 				end, 'veh-speed/modifier')
 			end
 		end
-		
+
 		--detect flying/noclip
 		local ped = PlayerPedId()
 		local pos = GetEntityCoords(ped)
 		local ground, zPos = GetGroundZFor_3dCoord(pos.x, pos.y, pos.z, 0)
 		local height = pos.z - zPos
-		if height > 10.0 and pData.adminLevel == 0  then
+		if height > 10.0 and pData.adminLevel == 0 then
 			Core.TriggerCallback('AC:ReportAnomaly', function()
 			end, 'flying')
 		end
-
-		
 	end
 end)
 
@@ -1338,7 +1298,7 @@ end)
 local shots = 0
 AddEventHandler('CEventGunShot', function(a, b, c)
 	-- local shooter = GetPlayerServerId(NetworkGetEntityOwner(a))
-	
+
 	-- local weapon = GetSelectedPedWeapon(PlayerPedId())
 	-- if shots < 3 then
 	-- 	shots = shots + 1
@@ -1348,7 +1308,7 @@ AddEventHandler('CEventGunShot', function(a, b, c)
 	-- 			Core.TriggerCallback('AC:ReportAnomaly', function()
 	-- 			end, 'silent-weapon')
 	-- 		end
-			
+
 	-- 	end
 	-- end
 	local ammoType = GetPedAmmoTypeFromWeapon(PlayerPedId(), weapon)
@@ -1372,13 +1332,6 @@ AddEventHandler('CEventGunShot', function(a, b, c)
 		end
 	end
 
-	SendNUIMessage({
-		action = 'updateGun',
-		gun = wName,
-		ammo = loadedAmmo,
-		ammoMax = totalAmmo,
-	})
-
 	if ammoName then
 		if not PlayerAmmo[ammoName] then
 			PlayerAmmo[ammoName] = ammo
@@ -1393,8 +1346,6 @@ AddEventHandler('CEventGunShot', function(a, b, c)
 	if not PlayerData then
 		PlayerData = Core.GetPlayerData()
 	end
-	
-
 end)
 
 function Core.GetPlayerAmmo()
@@ -1420,36 +1371,39 @@ end
 local canRun = true
 local waitg = 5000
 local amountSaved = 0
+local PlayerAmmo = {} -- Add this line to declare PlayerAmmo variable
+
 Citizen.CreateThread(function()
 	while true do
 		waitg = 5000
 		local selectedWeapon = GetSelectedPedWeapon(PlayerPedId())
+
 		if selectedWeapon == -1569615261 and canRun then
-			----print
-			if amountSaved < 5 then
-				amountSaved = amountSaved + 1
-			end
-
-
-			if amountSaved + 1 == 5 then
-				amountSaved = 3
-				----print
-				Wait(5000)
-				amountSaved = 0
-			end
-
-			----print
 			canRun = false
-			if PlayerAmmo and not table.empty(PlayerAmmo) then
-				Core.UpdateAmmo(PlayerAmmo)
-			else
-				PlayerAmmo = Core.GetPlayerAmmo()
-				Core.UpdateAmmo(Core.GetPlayerAmmo())
-			end
-			waitg = 1
+			Core.UpdateAmmo(PlayerAmmo)
 		elseif selectedWeapon ~= -1569615261 and not canRun then
-			----print
 			canRun = true
+			local ammo = GetAmmoInPedWeapon(PlayerPedId(), selectedWeapon)
+			local ammoType = GetPedAmmoTypeFromWeapon(PlayerPedId(), selectedWeapon)
+			local ammoTypes = {
+				[1950175060] = 'pistol_ammo',
+				[218444191] = 'rifle_ammo',
+				[1820140472] = 'smg_ammo',
+				[1285032059] = 'rifle_ammo',
+				[-1878508229] = 'shotgun_ammo',
+			}
+			local ammoName = ammoTypes[ammoType]
+			if ammoName then
+				if not PlayerAmmo[ammoName] then
+					PlayerAmmo[ammoName] = ammo
+				end
+
+				if PlayerAmmo[ammoName] then
+					PlayerAmmo[ammoName] = ammo
+				end
+			end
+
+			local unarmed = GetHashKey('WEAPON_UNARMED')
 		end
 		Citizen.Wait(waitg)
 	end
@@ -1459,11 +1413,11 @@ playerObjects = {}
 
 Core.RequestModel = function(model)
 	if not HasModelLoaded(model) then
-        RequestModel(model)
-        while not HasModelLoaded(model) do
-            Citizen.Wait(1)
-        end
-    end
+		RequestModel(model)
+		while not HasModelLoaded(model) do
+			Citizen.Wait(1)
+		end
+	end
 end
 
 Core.CreateObject = function(model, coords, isNet, tsc, dynamic)

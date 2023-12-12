@@ -1,4 +1,5 @@
-local menu1 = MenuV:CreateMenu(false, "Seteaza identitate", "center", 0, 0, 0, 'size-150', 'none', 'menuv', 'identity-set')
+local menu1 = MenuV:CreateMenu(false, "Seteaza identitate", "center", 0, 0, 0, 'size-150', 'none', 'menuv',
+    'identity-set')
 
 local inDialog = false
 
@@ -26,7 +27,7 @@ local confirmIdentity = menu1:AddButton({
 --                 SendNUIMessage({
 --                     action = 'closethisshit'
 --                 })
-                
+
 --                 Wait(100)
 --                 inDialog = false
 --             end
@@ -37,7 +38,8 @@ local confirmIdentity = menu1:AddButton({
 
 confirmIdentity:On("select", function()
     MenuV:CloseAll(true);
-    ShowDialog("Seteaza identitatea", "Scrie mai jos ce nume de familie doresti sa aiba caracterul tau.", "Identity:SetName", false, false, "client")
+    ShowDialog("Seteaza identitatea", "Scrie mai jos ce nume de familie doresti sa aiba caracterul tau.",
+        "Identity:SetName", false, false, "client")
 end)
 
 RegisterNetEvent("Identity:OpenSetup", function()
@@ -46,7 +48,7 @@ RegisterNetEvent("Identity:OpenSetup", function()
             MenuV:OpenMenu(menu1)
         else
             sendNotification("Identitate", "Ai deja identitatea facuta.", 'error')
-        end 
+        end
     end)
 end)
 
@@ -58,7 +60,8 @@ RegisterNetEvent("Identity:SetName", function(name)
 
     Core.SavePlayer()
 
-    ShowDialog("Seteaza identitatea", "Scrie mai jos ce prenume doresti sa aiba caracterul tau.", "Identity:SetSurname", false, false, "client")
+    ShowDialog("Seteaza identitatea", "Scrie mai jos ce prenume doresti sa aiba caracterul tau.", "Identity:SetSurname",
+        false, false, "client")
 end)
 
 RegisterNetEvent("Identity:SetSurname", function(name)
@@ -90,7 +93,6 @@ end)
 
 
 RegisterNUICallback("dialogCallback", function(response)
-
     TriggerEvent('dialogHandler', response.eventName, response.type, response.response)
     inDialog = false
     SetNuiFocus(false, false)
@@ -123,7 +125,7 @@ function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, even
         RegisterNUICallback("dialogCallback", function(response)
             SetNuiFocus(false, false)
             inDialog = false
-            
+
             cb(response.response)
         end)
     end
@@ -136,7 +138,7 @@ function ShowDialog(title, subtitle, dialogEvent, hasCancel, canCloseEmpty, even
             Core.ClearEvents()
         end)
     end
-    
+
     SetNuiFocus(true, true)
 end
 

@@ -208,9 +208,11 @@ RegisterNetEvent('Turf:UpdateTime', function(turf, time)
 end)
 
 AddEventHandler('playerKilled', function(data)
-    Core.TriggerCallback('Turfs:PlayerKilled', function()
+    if inAttack then
+        Core.TriggerCallback('Turfs:PlayerKilled', function()
 
-    end, data.killerId)
+        end, data.killerId)
+    end
 end)
 
 Citizen.CreateThread(function()

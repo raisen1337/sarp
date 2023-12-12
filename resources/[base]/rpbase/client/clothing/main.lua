@@ -1,7 +1,12 @@
-local drawable_names = {"face", "masks", "hair", "torsos", "legs", "bags", "shoes", "neck", "undershirts", "vest", "decals", "jackets"}
-local prop_names = {"hats", "glasses", "earrings", "mouth", "lhand", "rhand", "watches", "braclets"}
-local head_overlays = {"Blemishes","FacialHair","Eyebrows","Ageing","Makeup","Blush","Complexion","SunDamage","Lipstick","MolesFreckles","ChestHair","BodyBlemishes","AddBodyBlemishes"}
-local face_features = {"Nose_Width","Nose_Peak_Hight","Nose_Peak_Lenght","Nose_Bone_High","Nose_Peak_Lowering","Nose_Bone_Twist","EyeBrown_High","EyeBrown_Forward","Cheeks_Bone_High","Cheeks_Bone_Width","Cheeks_Width","Eyes_Openning","Lips_Thickness","Jaw_Bone_Width","Jaw_Bone_Back_Lenght","Chimp_Bone_Lowering","Chimp_Bone_Lenght","Chimp_Bone_Width","Chimp_Hole","Neck_Thikness"}
+local drawable_names = { "face", "masks", "hair", "torsos", "legs", "bags", "shoes", "neck", "undershirts", "vest",
+    "decals", "jackets" }
+local prop_names = { "hats", "glasses", "earrings", "mouth", "lhand", "rhand", "watches", "braclets" }
+local head_overlays = { "Blemishes", "FacialHair", "Eyebrows", "Ageing", "Makeup", "Blush", "Complexion", "SunDamage",
+    "Lipstick", "MolesFreckles", "ChestHair", "BodyBlemishes", "AddBodyBlemishes" }
+local face_features = { "Nose_Width", "Nose_Peak_Hight", "Nose_Peak_Lenght", "Nose_Bone_High", "Nose_Peak_Lowering",
+    "Nose_Bone_Twist", "EyeBrown_High", "EyeBrown_Forward", "Cheeks_Bone_High", "Cheeks_Bone_Width", "Cheeks_Width",
+    "Eyes_Openning", "Lips_Thickness", "Jaw_Bone_Width", "Jaw_Bone_Back_Lenght", "Chimp_Bone_Lowering",
+    "Chimp_Bone_Lenght", "Chimp_Bone_Width", "Chimp_Hole", "Neck_Thikness" }
 
 local player
 local currentclothing
@@ -17,7 +22,7 @@ local customCam = false
 function GetDrawablesTotal()
     drawables = {}
     for i = 0, #drawable_names - 1 do
-        drawables[i] = {drawable_names[i+1], GetNumberOfPedDrawableVariations(player, i)}
+        drawables[i] = { drawable_names[i + 1], GetNumberOfPedDrawableVariations(player, i) }
     end
     return drawables
 end
@@ -25,7 +30,7 @@ end
 function GetPropDrawablesTotal()
     props = {}
     for i = 0, #prop_names - 1 do
-        props[i] = {prop_names[i+1], GetNumberOfPedPropDrawableVariations(player, i)}
+        props[i] = { prop_names[i + 1], GetNumberOfPedPropDrawableVariations(player, i) }
     end
     return props
 end
@@ -35,21 +40,22 @@ function GetTextureTotals()
     local draw = GetDrawables()
     local props = GetProps()
 
-    for idx = 0, #draw-1 do
+    for idx = 0, #draw - 1 do
         local name = draw[idx][1]
         local value = draw[idx][2]
         values[name] = GetNumberOfPedTextureVariations(player, idx, value)
     end
 
-    for idx = 0, #props-1 do
+    for idx = 0, #props - 1 do
         local name = props[idx][1]
         local value = props[idx][2]
         values[name] = GetNumberOfPedPropTextureVariations(player, idx, value)
     end
     return values
 end
+
 function GetPedHeadBlendData()
-    local blob = string.rep("\0\0\0\0\0\0\0\0", 6 + 3 + 1) -- Generate sufficient struct memory.
+    local blob = string.rep("\0\0\0\0\0\0\0\0", 6 + 3 + 1)                   -- Generate sufficient struct memory.
     if not Citizen.InvokeNative(0x2746BD9D88C5C5D0, player, blob, true) then -- Attempt to write into memory blob.
         return nil
     end
@@ -68,11 +74,11 @@ function GetPedHeadBlendData()
     }
 end
 
-
 function GetHeadOverlayData()
     local headData = {}
     for i = 1, #head_overlays do
-        local retval, overlayValue, colourType, firstColour, secondColour, overlayOpacity = GetPedHeadOverlayData(player, i-1)
+        local retval, overlayValue, colourType, firstColour, secondColour, overlayOpacity = GetPedHeadOverlayData(player,
+            i - 1)
         if retval then
             headData[i] = {}
             headData[i].name = head_overlays[i]
@@ -89,7 +95,7 @@ end
 function SetHeadOverlayData(data)
     if json.encode(data) ~= "[]" then
         for i = 1, #head_overlays do
-            SetPedHeadOverlay(player,  i-1, tonumber(data[i].overlayValue),  tonumber(data[i].overlayOpacity))
+            SetPedHeadOverlay(player, i - 1, tonumber(data[i].overlayValue), tonumber(data[i].overlayOpacity))
         end
 
         SetPedHeadOverlayColor(player, 0, 0, tonumber(data[1].firstColour), tonumber(data[1].secondColour))
@@ -110,7 +116,7 @@ end
 function GetHeadOverlayTotals()
     local totals = {}
     for i = 1, #head_overlays do
-        totals[head_overlays[i]] = GetNumHeadOverlayValues(i-1)
+        totals[head_overlays[i]] = GetNumHeadOverlayValues(i - 1)
     end
     return totals
 end
@@ -125,7 +131,7 @@ end
 function GetHeadStructureData()
     local structure = {}
     for i = 1, #face_features do
-        structure[face_features[i]] = GetPedFaceFeature(player, i-1)
+        structure[face_features[i]] = GetPedFaceFeature(player, i - 1)
     end
     return structure
 end
@@ -133,16 +139,17 @@ end
 function GetHeadStructure(data)
     local structure = {}
     for i = 1, #face_features do
-        structure[i] = GetPedFaceFeature(player, i-1)
+        structure[i] = GetPedFaceFeature(player, i - 1)
     end
     return structure
 end
 
 function SetHeadStructure(data)
     for i = 1, #face_features do
-        SetPedFaceFeature(player, i-1, data[i])
+        SetPedFaceFeature(player, i - 1, data[i])
     end
 end
+
 function SetSkin(model, setDefault)
     SetEntityInvincible(player, true)
     if IsModelInCdimage(model) and IsModelValid(model) then
@@ -154,8 +161,8 @@ function SetSkin(model, setDefault)
         SetModelAsNoLongerNeeded(model)
         player = PlayerPedId()
         FreezePedCameraRotation(player, true)
-           
-        
+
+
         SetPedComponentVariation(player, 11, 0, 11, 0)
         SetPedComponentVariation(player, 8, 0, 1, 0)
         SetPedComponentVariation(player, 6, 1, 2, 0)
@@ -166,14 +173,13 @@ function SetSkin(model, setDefault)
         SetPedHeadOverlayColor(player, 8, 2, 0, 0)
         SetPedHeadOverlayColor(player, 10, 1, 0, 0)
         SetPedHeadOverlay(player, 1, 0, 0.0)
-    
-       
     end
-    SetEntityInvincible(player,false)
+    SetEntityInvincible(player, false)
 end
+
 function SetHeadStructure(data)
     for i = 1, #face_features do
-        SetPedFaceFeature(player, i-1, data[i])
+        SetPedFaceFeature(player, i - 1, data[i])
     end
 end
 
@@ -183,7 +189,7 @@ function GetCurrentPed()
     local props = GetProps()
     local drawtextures = GetDrawTextures()
     local proptextures = GetPropTextures()
-    
+
     local skinData = {}
     skinData.drawables = drawables
     skinData.props = props
@@ -197,21 +203,20 @@ function GetCurrentPed()
     return skinData
 end
 
-
 function rotation(dir)
-    local pedRot = GetEntityHeading(PlayerPedId())+dir
+    local pedRot = GetEntityHeading(PlayerPedId()) + dir
     SetEntityHeading(player, pedRot % 360)
 end
 
 RegisterNUICallback('closeClothing', function()
     TriggerEvent('Player:LoadSkin')
-  
+    inClothing = false
     SetEntityInvincible(PlayerPedId(), false)
     FreezePedCameraRotation(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)
     customCam = false
     SetCamActive(cam, false)
-    RenderScriptCams(false,  false,  0,  true,  true)
+    RenderScriptCams(false, false, 0, true, true)
     if (DoesCamExist(cam)) then
         DestroyCam(cam, false)
     end
@@ -240,11 +245,12 @@ end)
 
 RegisterNUICallback('buyClothing', function(data)
     customCam = false
+    inClothing = false
     SetEntityInvincible(PlayerPedId(), false)
     FreezePedCameraRotation(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)
     SetCamActive(cam, false)
-    RenderScriptCams(false,  false,  0,  true,  true)
+    RenderScriptCams(false, false, 0, true, true)
     if (DoesCamExist(cam)) then
         DestroyCam(cam, false)
     end
@@ -255,7 +261,7 @@ RegisterNUICallback('buyClothing', function(data)
         action = "fixShow",
     })
     local price = data.price
-    
+
     DisplayRadar(true)
     local pData = Core.GetPlayerData()
     if pData.cash >= price then
@@ -277,7 +283,7 @@ RegisterNUICallback('buyClothing', function(data)
         skinData.headOverlay = GetHeadOverlayData(ped)
 
         Core.TriggerCallback('Clothing:UpdateClothes', function(cb)
-           
+
         end, skinData)
         sendNotification('Haine', 'Ti-ai schimbat imbracamintea si ai platit $500')
         Core.SavePlayer()
@@ -288,7 +294,6 @@ RegisterNUICallback('buyClothing', function(data)
         sendNotification('Haine', 'Nu ai $500', 'error')
     end
     SetNuiFocus(false, false)
-
 end)
 
 function Save(data)
@@ -296,15 +301,13 @@ function Save(data)
     end, data)
 end
 
-
-
 RegisterCommand('skintest', function()
     local ped = PlayerPedId()
     local drawables = GetDrawables()
     local props = GetProps()
     local drawtextures = GetDrawTextures()
     local proptextures = GetPropTextures()
-    
+
     local skinData = {}
     skinData.drawables = drawables
     skinData.props = props
@@ -325,7 +328,7 @@ function CustomCamera()
     if customCam or position == "torso" then
         FreezePedCameraRotation(player, false)
         SetCamActive(cam, false)
-        RenderScriptCams(false,  false,  0,  true,  true)
+        RenderScriptCams(false, false, 0, true, true)
         if (DoesCamExist(cam)) then
             DestroyCam(cam, false)
         end
@@ -344,13 +347,12 @@ function CustomCamera()
         SetCamRot(cam, 0.0, 0.0, 0.0)
 
         SetCamActive(cam, true)
-        RenderScriptCams(true,  false,  0,  true,  true)
+        RenderScriptCams(true, false, 0, true, true)
 
         SwitchCam(position)
         customCam = true
     end
 end
-
 
 function SwitchCam(name)
     if currentCamPos == name then
@@ -392,7 +394,7 @@ RegisterNUICallback('rotate', function(event)
         rotated = true
     else
         if not rotated then
-            
+
         else
             rotation(-180)
             rotated = false
@@ -401,9 +403,10 @@ RegisterNUICallback('rotate', function(event)
 end)
 
 local canOpenClothing = false
-
+inClothing = false
 RegisterCommand('clothes', function()
     if canOpenClothing then
+        inClothing = true
         OpenClothing()
     end
 end)
@@ -467,73 +470,72 @@ function OpenClothing()
         }
     })
 end
+
 local clothingCategorys = {
-    ["arms"]        = {type = "variation",  id = 3},
-    ["t-shirt"]     = {type = "variation",  id = 8},
-    ["torso2"]      = {type = "variation",  id = 11},
-    ["pants"]       = {type = "variation",  id = 4},
-    ["vest"]        = {type = "variation",  id = 9},
-    ["shoes"]       = {type = "variation",  id = 6},
-    ["bag"]         = {type = "variation",  id = 5},
-    ["hair"]        = {type = "hair",       id = 2},
-    ["face"]        = {type = "face",       id = 0},
-    ["mask"]        = {type = "variation",       id = 1},
-    ["hat"]         = {type = "prop",       id = 0},
-    ["glass"]       = {type = "prop",       id = 1},
-    ["ear"]         = {type = "prop",       id = 2},
-    ["watch"]       = {type = "prop",       id = 6},
-    ["bracelet"]    = {type = "prop",       id = 7},
-    ["accessory"]   = {type = "variation",  id = 7},
-    ["decals"]      = {type = "variation",  id = 10},
+    ["arms"]      = { type = "variation", id = 3 },
+    ["t-shirt"]   = { type = "variation", id = 8 },
+    ["torso2"]    = { type = "variation", id = 11 },
+    ["pants"]     = { type = "variation", id = 4 },
+    ["vest"]      = { type = "variation", id = 9 },
+    ["shoes"]     = { type = "variation", id = 6 },
+    ["bag"]       = { type = "variation", id = 5 },
+    ["hair"]      = { type = "hair", id = 2 },
+    ["face"]      = { type = "face", id = 0 },
+    ["mask"]      = { type = "variation", id = 1 },
+    ["hat"]       = { type = "prop", id = 0 },
+    ["glass"]     = { type = "prop", id = 1 },
+    ["ear"]       = { type = "prop", id = 2 },
+    ["watch"]     = { type = "prop", id = 6 },
+    ["bracelet"]  = { type = "prop", id = 7 },
+    ["accessory"] = { type = "variation", id = 7 },
+    ["decals"]    = { type = "variation", id = 10 },
 }
 
 function GetDrawables()
     drawables = {}
     local model = GetEntityModel(PlayerPedId())
     local mpPed = true
- 
-    for k,v in pairs(clothingCategorys) do
-        
-        if v.type == "variation"  then
-            drawables[v.id] = {v.id, GetPedDrawableVariation(player, v.id), type = v.type}
+
+    for k, v in pairs(clothingCategorys) do
+        if v.type == "variation" then
+            drawables[v.id] = { v.id, GetPedDrawableVariation(player, v.id), type = v.type }
         end
 
         if v.type == 'hair' then
-            drawables[v.id] = {v.id, GetPedDrawableVariation(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedDrawableVariation(player, v.id), type = v.type }
         end
 
         if v.type == 'face' then
-            drawables[v.id] = {v.id, GetPedDrawableVariation(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedDrawableVariation(player, v.id), type = v.type }
         end
 
         if v.type == "ageing" then
-            drawables[v.id] = {v.id, GetPedHeadOverlayValue(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedHeadOverlayValue(player, v.id), type = v.type }
         end
 
         if v.type == "overlay" then
-            drawables[v.id] = {v.id, GetPedHeadOverlayValue(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedHeadOverlayValue(player, v.id), type = v.type }
         end
 
         if v.type == "eye_color" then
-            drawables[v.id] = {v.id, GetPedEyeColor(player), type = v.type}
+            drawables[v.id] = { v.id, GetPedEyeColor(player), type = v.type }
         end
 
         if v.type == "moles" then
-            drawables[v.id] = {v.id, GetPedHeadOverlayValue(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedHeadOverlayValue(player, v.id), type = v.type }
         end
 
         if v.type == "nose" then
-            drawables[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedFaceFeature(player, v.id), type = v.type }
         end
 
         if v.type == "cheek" then
-            drawables[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedFaceFeature(player, v.id), type = v.type }
         end
 
         if v.type == "chin" then
-            drawables[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+            drawables[v.id] = { v.id, GetPedFaceFeature(player, v.id), type = v.type }
         end
-
     end
 
 
@@ -542,9 +544,9 @@ end
 
 function GetProps()
     props = {}
-    for k,v in pairs(clothingCategorys) do
+    for k, v in pairs(clothingCategorys) do
         if v.type == "prop" then
-            props[v.id] = {v.id, GetPedPropIndex(player, v.id), type = 'prop'}
+            props[v.id] = { v.id, GetPedPropIndex(player, v.id), type = 'prop' }
         end
     end
     return props
@@ -552,59 +554,58 @@ end
 
 function GetDrawTextures()
     textures = {}
-    for k,v in pairs(clothingCategorys) do
+    for k, v in pairs(clothingCategorys) do
         if v.type == "variation" then
             if v.type == 'arms' then
-                
+
             end
-            textures[v.id] = {v.id, GetPedTextureVariation(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedTextureVariation(player, v.id), type = v.type }
         end
 
         if v.type == 'hair' then
-            textures[v.id] = {v.id, GetPedTextureVariation(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedTextureVariation(player, v.id), type = v.type }
         end
 
         if v.type == 'face' then
-            textures[v.id] = {v.id, GetPedTextureVariation(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedTextureVariation(player, v.id), type = v.type }
         end
 
         if v.type == "ageing" then
-            textures[v.id] = {v.id, GetPedHeadOverlayData(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedHeadOverlayData(player, v.id), type = v.type }
         end
 
         if v.type == "overlay" then
-            textures[v.id] = {v.id, GetPedHeadOverlayData(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedHeadOverlayData(player, v.id), type = v.type }
         end
 
         if v.type == "eye_color" then
-            textures[v.id] = {v.id, GetPedEyeColor(player), type = v.type}
+            textures[v.id] = { v.id, GetPedEyeColor(player), type = v.type }
         end
 
         if v.type == "moles" then
-            textures[v.id] = {v.id, GetPedHeadOverlayData(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedHeadOverlayData(player, v.id), type = v.type }
         end
 
         if v.type == "nose" then
-            textures[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedFaceFeature(player, v.id), type = v.type }
         end
 
         if v.type == "cheek" then
-            textures[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedFaceFeature(player, v.id), type = v.type }
         end
 
         if v.type == "chin" then
-            textures[v.id] = {v.id, GetPedFaceFeature(player, v.id), type = v.type}
+            textures[v.id] = { v.id, GetPedFaceFeature(player, v.id), type = v.type }
         end
-
     end
     return textures
 end
 
 function GetPropTextures()
     textures = {}
-    for k,v in pairs(clothingCategorys) do
+    for k, v in pairs(clothingCategorys) do
         if v.type == "prop" then
-            textures[v.id] = {v.id, GetPedPropTextureIndex(player, v.id), type = 'prop'}
+            textures[v.id] = { v.id, GetPedPropTextureIndex(player, v.id), type = 'prop' }
         end
     end
     return textures
@@ -612,58 +613,59 @@ end
 
 function GetMaxValues()
     maxModelValues = {
-        ["arms"]        = {type = "character", item = 0, texture = 0},
-        ["eye_color"]   = {type = "hair", item = 0, texture = 0},
-        ["t-shirt"]     = {type = "character", item = 0, texture = 0},
-        ["torso2"]      = {type = "character", item = 0, texture = 0},
-        ["pants"]       = {type = "character", item = 0, texture = 0},
-        ["shoes"]       = {type = "character", item = 0, texture = 0},
-        ["face"]        = {type = "hair", item = 0, texture = 0},
-        ["vest"]        = {type = "character", item = 0, texture = 0},
-        ["accessory"]   = {type = "character", item = 0, texture = 0},
-        ["decals"]      = {type = "character", item = 0, texture = 0},
-        ["bag"]         = {type = "character", item = 0, texture = 0},
-        ["moles"]       = {type = "hair", item = 0, texture = 0},
-        ["hair"]        = {type = "barber", item = 0, texture = 0},
-        ["eyebrows"]    = {type = "barber", item = 0, texture = 0},
-        ["beard"]       = {type = "barber", item = 0, texture = 0},
-        ["eye_opening"]   = {type = "hair",  id = 1},
-        ["jaw_bone_width"]       = {type = "hair", item = 0, texture = 0},
-        ["jaw_bone_back_lenght"]       = {type = "hair", item = 0, texture = 0},
-        ["lips_thickness"]       = {type = "hair", item = 0, texture = 0},
-        ["cheek_1"]       = {type = "hair", item = 0, texture = 0},
-        ["cheek_2"]       = {type = "hair", item = 0, texture = 0},
-        ["cheek_3"]       = {type = "hair", item = 0, texture = 0},
-        ["eyebrown_high"]       = {type = "hair", item = 0, texture = 0},
-        ["eyebrown_forward"]       = {type = "hair", item = 0, texture = 0},
-        ["nose_0"]       = {type = "hair", item = 0, texture = 0},
-        ["nose_1"]       = {type = "hair", item = 0, texture = 0},
-        ["nose_2"]       = {type = "hair", item = 0, texture = 0},
-        ["nose_3"]       = {type = "hair", item = 0, texture = 0},
-        ["nose_4"]       = {type = "hair", item = 0, texture = 0},
-        ["nose_5"]       = {type = "hair", item = 0, texture = 0},
-        ["chimp_bone_lowering"]       = {type = "hair", item = 0, texture = 0},
-        ["chimp_bone_lenght"]       = {type = "hair", item = 0, texture = 0},
-        ["chimp_bone_width"]       = {type = "hair", item = 0, texture = 0},
-        ["chimp_hole"]       = {type = "hair", item = 0, texture = 0},
-        ["neck_thikness"]       = {type = "hair", item = 0, texture = 0},
-        ["blush"]       = {type = "barber", item = 0, texture = 0},
-        ["lipstick"]    = {type = "barber", item = 0, texture = 0},
-        ["makeup"]      = {type = "barber", item = 0, texture = 0},
-        ["ageing"]      = {type = "hair", item = 0, texture = 0},
-        ["mask"]        = {type = "accessoires", item = 0, texture = 0},
-        ["hat"]         = {type = "accessoires", item = 0, texture = 0},
-        ["glass"]       = {type = "accessoires", item = 0, texture = 0},
-        ["ear"]         = {type = "accessoires", item = 0, texture = 0},
-        ["watch"]       = {type = "accessoires", item = 0, texture = 0},
-        ["bracelet"]    = {type = "accessoires", item = 0, texture = 0},
-        
+        ["arms"]                 = { type = "character", item = 0, texture = 0 },
+        ["eye_color"]            = { type = "hair", item = 0, texture = 0 },
+        ["t-shirt"]              = { type = "character", item = 0, texture = 0 },
+        ["torso2"]               = { type = "character", item = 0, texture = 0 },
+        ["pants"]                = { type = "character", item = 0, texture = 0 },
+        ["shoes"]                = { type = "character", item = 0, texture = 0 },
+        ["face"]                 = { type = "hair", item = 0, texture = 0 },
+        ["vest"]                 = { type = "character", item = 0, texture = 0 },
+        ["accessory"]            = { type = "character", item = 0, texture = 0 },
+        ["decals"]               = { type = "character", item = 0, texture = 0 },
+        ["bag"]                  = { type = "character", item = 0, texture = 0 },
+        ["moles"]                = { type = "hair", item = 0, texture = 0 },
+        ["hair"]                 = { type = "barber", item = 0, texture = 0 },
+        ["eyebrows"]             = { type = "barber", item = 0, texture = 0 },
+        ["beard"]                = { type = "barber", item = 0, texture = 0 },
+        ["eye_opening"]          = { type = "hair", id = 1 },
+        ["jaw_bone_width"]       = { type = "hair", item = 0, texture = 0 },
+        ["jaw_bone_back_lenght"] = { type = "hair", item = 0, texture = 0 },
+        ["lips_thickness"]       = { type = "hair", item = 0, texture = 0 },
+        ["cheek_1"]              = { type = "hair", item = 0, texture = 0 },
+        ["cheek_2"]              = { type = "hair", item = 0, texture = 0 },
+        ["cheek_3"]              = { type = "hair", item = 0, texture = 0 },
+        ["eyebrown_high"]        = { type = "hair", item = 0, texture = 0 },
+        ["eyebrown_forward"]     = { type = "hair", item = 0, texture = 0 },
+        ["nose_0"]               = { type = "hair", item = 0, texture = 0 },
+        ["nose_1"]               = { type = "hair", item = 0, texture = 0 },
+        ["nose_2"]               = { type = "hair", item = 0, texture = 0 },
+        ["nose_3"]               = { type = "hair", item = 0, texture = 0 },
+        ["nose_4"]               = { type = "hair", item = 0, texture = 0 },
+        ["nose_5"]               = { type = "hair", item = 0, texture = 0 },
+        ["chimp_bone_lowering"]  = { type = "hair", item = 0, texture = 0 },
+        ["chimp_bone_lenght"]    = { type = "hair", item = 0, texture = 0 },
+        ["chimp_bone_width"]     = { type = "hair", item = 0, texture = 0 },
+        ["chimp_hole"]           = { type = "hair", item = 0, texture = 0 },
+        ["neck_thikness"]        = { type = "hair", item = 0, texture = 0 },
+        ["blush"]                = { type = "barber", item = 0, texture = 0 },
+        ["lipstick"]             = { type = "barber", item = 0, texture = 0 },
+        ["makeup"]               = { type = "barber", item = 0, texture = 0 },
+        ["ageing"]               = { type = "hair", item = 0, texture = 0 },
+        ["mask"]                 = { type = "accessoires", item = 0, texture = 0 },
+        ["hat"]                  = { type = "accessoires", item = 0, texture = 0 },
+        ["glass"]                = { type = "accessoires", item = 0, texture = 0 },
+        ["ear"]                  = { type = "accessoires", item = 0, texture = 0 },
+        ["watch"]                = { type = "accessoires", item = 0, texture = 0 },
+        ["bracelet"]             = { type = "accessoires", item = 0, texture = 0 },
+
     }
     local ped = PlayerPedId()
     for k, v in pairs(clothingCategorys) do
         if v.type == "variation" then
             maxModelValues[k].item = GetNumberOfPedDrawableVariations(ped, v.id)
-            maxModelValues[k].texture = GetNumberOfPedTextureVariations(ped, v.id, GetPedDrawableVariation(ped, v.id)) -1
+            maxModelValues[k].texture = GetNumberOfPedTextureVariations(ped, v.id, GetPedDrawableVariation(ped, v.id)) -
+                1
         end
 
         if v.type == "hair" then
@@ -697,7 +699,7 @@ function GetMaxValues()
         end
 
         if v.type == "moles" then
-            maxModelValues[k].item = GetNumHeadOverlayValues(9) -1
+            maxModelValues[k].item = GetNumHeadOverlayValues(9) - 1
             maxModelValues[k].texture = 10
         end
 
@@ -715,7 +717,6 @@ function GetMaxValues()
             maxModelValues[k].item = 30
             maxModelValues[k].texture = 0
         end
-
     end
     SendNUIMessage({
         action = "getData",
@@ -727,7 +728,7 @@ function GetMaxValues()
     })
 end
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     Wait(5000)
     GetMaxValues()
 end)
@@ -737,18 +738,14 @@ end)
 
 RegisterCommand('fixskin', function()
     Core.FixSkin()
- 
 end)
 
 Citizen.CreateThread(function()
-   
     DisableIdleCamera(true)
-  
 end)
 
 RegisterNUICallback('updateProps', function(data)
-    
-    for k,v in pairs(clothingCategorys) do
+    for k, v in pairs(clothingCategorys) do
         if v.type == 'prop' then
             if v.id == data.component then
                 SetPedPropIndex(PlayerPedId(), data.component, data.texture, data.variation, 0)
@@ -772,8 +769,6 @@ function SetPedClothes()
     end)
 end
 
-
-
 function LoadPed(data)
     LoadPlayerWeapons()
     local player = PlayerPedId()
@@ -786,15 +781,15 @@ function LoadPed(data)
     local headOverlay = data.headOverlay
     local headStructure = data.headStructure
     local model = GetEntityModel(PlayerPedId())
-    
+
     TriggerEvent('Skin:fix')
-    for k,v in pairs(drawables) do
+    for k, v in pairs(drawables) do
         local tn = tostring(k)
-     
+
         if v.type == "variation" then
             SetPedComponentVariation(player, v["1"], v["2"], drawtextures[k]["2"], 3)
         end
-        
+
         if v.type == "ageing" then
             SetPedHeadOverlay(player, v["1"], v["2"], v["2"])
         end
@@ -817,19 +812,17 @@ function LoadPed(data)
             SetPedFaceFeature(player, v["1"], v["2"])
         end
 
-        for a,b in pairs(drawtextures) do
+        for a, b in pairs(drawtextures) do
             if a == k then
-                
                 if tonumber(k) == 0 then
-                    
                     SetPedComponentVariation(player, v["1"], v["2"], b["2"], 3)
-                    SetPedHeadBlendData(player, v["2"],  v["2"], b["2"], b["2"], b["2"], b["2"], 1.0, 1.0, 1.0, true)
+                    SetPedHeadBlendData(player, v["2"], v["2"], b["2"], b["2"], b["2"], b["2"], 1.0, 1.0, 1.0, true)
                 elseif tonumber(k) == 2 then
                     SetPedComponentVariation(player, v["1"], v["2"], b["2"], 3)
                 end
             end
         end
-       
+
         -- if v.type == 'face' then
         --     SetPedComponentVariation(player, v["1"], v["2"], drawtextures[k]["2"], 3)
         --     SetPedHeadBlendData(player, v["2"],  v["2"], drawtextures[k]["2"], drawtextures[k]["2"], drawtextures[k]["2"], drawtextures[k]["2"], 1.0, 1.0, 1.0, true)
@@ -839,14 +832,12 @@ function LoadPed(data)
         --     print(je(drawtextures))
         --     SetPedComponentVariation(player, k, v["2"], drawtextures[k]["2"], 3)
         -- end
-       
     end
 
-    for k,v in pairs(props) do
-        
+    for k, v in pairs(props) do
         local tn = tostring(k)
         if v.type == "prop" then
-            for a,b in pairs(proptextures) do
+            for a, b in pairs(proptextures) do
                 if a == k then
                     if tonumber(k) == 0 then
                         SetPedPropIndex(player, v["1"], v["2"], b["2"], 0)
@@ -857,23 +848,19 @@ function LoadPed(data)
             end
         end
     end
-
-    
 end
 
-
 RegisterNUICallback('updateClothing', function(data)
-    for k,v in pairs(clothingCategorys) do
+    for k, v in pairs(clothingCategorys) do
         if v.id == data.component then
-            
-
             if v.type == "variation" then
                 SetPedComponentVariation(player, data.component, data.texture, data.variation, 3)
             end
 
             if v.type == 'face' then
                 SetPedComponentVariation(player, data.component, data.texture, data.variation, 3)
-                SetPedHeadBlendData(player, data.texture,  data.texture, data.variation, data.variation, data.variation, data.variation, 1.0, 1.0, 1.0, true)
+                SetPedHeadBlendData(player, data.texture, data.texture, data.variation, data.variation, data.variation,
+                    data.variation, 1.0, 1.0, 1.0, true)
             end
 
             if v.type == 'hair' then
@@ -888,7 +875,7 @@ RegisterNUICallback('updateClothing', function(data)
                 SetPedHeadOverlay(player, data.component, data.texture, data.variation)
             end
 
-            
+
 
             if v.type == "eye_color" then
                 SetPedEyeColor(player, data.component)
@@ -911,5 +898,4 @@ RegisterNUICallback('updateClothing', function(data)
             end
         end
     end
-    
 end)

@@ -63,7 +63,7 @@ Core.CreateCallback('Factions:GetFactionMembers', function(source, cb, id)
     local result = exports.oxmysql:executeSync("SELECT * FROM players")
     if result[1] then
         local members = {}
-        for k,v in pairs(result) do
+        for k, v in pairs(result) do
             local pData = json.decode(v.data)
             local fData = pData.faction
             if fData and fData.id == id then
@@ -83,33 +83,30 @@ Core.CreateCallback('Factions:GetFactionMembers', function(source, cb, id)
     end
 end)
 
-Core.CreateCallback('Factions:KickMember', function(source, cb, id, identifier)
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
+Core.CreateCallback('Factions:KickMember', function(source, cb, identifier)
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", { identifier })
     if result[1] then
         local pData = json.decode(result[1].data)
         local fData = pData.faction
-        if fData and fData.id == id then
 
-            fData.id = 0
-            fData.name = 'None'
-            fData.rank = 0
-            fData.rankName = 'None'
-            fData.rankColor = 0
-            pData.faction = fData
-            
-            exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+        fData.id = 0
+        fData.name = 'None'
+        fData.rank = 0
+        fData.rankName = 'None'
+        fData.rankColor = 0
+        pData.faction = fData
 
-            cb(true)
-        else
-            cb(false)
-        end
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+            { json.encode(pData), identifier })
+
+        cb(true)
     else
         cb(false)
     end
 end)
 
 Core.CreateCallback('Factions:AddMember', function(source, cb, fName, identifier)
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", { identifier })
     if result[1] then
         local pData = json.decode(result[1].data)
         local fData = pData.faction
@@ -122,7 +119,8 @@ Core.CreateCallback('Factions:AddMember', function(source, cb, fName, identifier
 
         pData.faction = fData
 
-        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+            { json.encode(pData), identifier })
         cb(true)
     else
         cb(false)
@@ -130,7 +128,7 @@ Core.CreateCallback('Factions:AddMember', function(source, cb, fName, identifier
 end)
 
 Core.CreateCallback('Factions:AddMemberWithRank', function(source, cb, fName, rank, identifier)
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", { identifier })
     if not factions[fName].ranks[rank] then
         cb(false)
         return
@@ -147,7 +145,8 @@ Core.CreateCallback('Factions:AddMemberWithRank', function(source, cb, fName, ra
 
         pData.faction = fData
 
-        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+            { json.encode(pData), identifier })
         cb(true)
     else
         cb(false)
@@ -161,7 +160,8 @@ Core.CreateCallback('EMS:Heal', function(source, cb, player)
         Player.dead = false
         TriggerClientEvent("Notify:Send", player, "EMS", "Ai fost tratat de catre un medic!", "success")
         TriggerClientEvent('Player:UpdateData', player, Player)
-        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(Player), Player.identifier})
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+            { json.encode(Player), Player.identifier })
 
         cb(true)
     else
@@ -170,7 +170,7 @@ Core.CreateCallback('EMS:Heal', function(source, cb, player)
 end)
 
 Core.CreateCallback('Factions:RemoveMember', function(source, cb, identifier)
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", { identifier })
     if result[1] then
         local pData = json.decode(result[1].data)
         local fData = pData.faction
@@ -182,7 +182,8 @@ Core.CreateCallback('Factions:RemoveMember', function(source, cb, identifier)
 
         pData.faction = fData
 
-        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+        exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+            { json.encode(pData), identifier })
         cb(true)
     else
         cb(false)
@@ -190,20 +191,21 @@ Core.CreateCallback('Factions:RemoveMember', function(source, cb, identifier)
 end)
 
 Core.CreateCallback('Factions:DemoteMember', function(source, cb, identifier)
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", { identifier })
     if result[1] then
         local pData = json.decode(result[1].data)
         if factions[pData.faction.name].ranks[pData.faction.rank - 1] then
             pData.faction.rank = pData.faction.rank - 1
             pData.faction.rank = tonumber(pData.faction.rank)
-            for k,v in pairs(factions[pData.faction.name].ranks) do
+            for k, v in pairs(factions[pData.faction.name].ranks) do
                 if v.id == pData.faction.rank then
                     pData.faction.rankName = v.rank
                     pData.faction.salary = v.salary
                     pData.faction.rankColor = v.color
                 end
             end
-            exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+            exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+                { json.encode(pData), identifier })
             cb(true)
         else
             cb(false)
@@ -214,14 +216,14 @@ Core.CreateCallback('Factions:DemoteMember', function(source, cb, identifier)
 end)
 
 Core.CreateCallback('Factions:PromoteMember', function(source, cb, identifier)
-    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", {identifier})
+    local result = exports.oxmysql:executeSync("SELECT * FROM players WHERE identifier = ?", { identifier })
     if result[1] then
         local pData = json.decode(result[1].data)
         local fData = pData.faction
 
         if factions[fData.name].ranks[fData.rank + 1] then
             fData.rank = fData.rank + 1
-            for k,v in pairs(factions[fData.name].ranks) do
+            for k, v in pairs(factions[fData.name].ranks) do
                 if v.id == fData.rank then
                     fData.rankName = v.rank
                     fData.salary = v.salary
@@ -229,8 +231,9 @@ Core.CreateCallback('Factions:PromoteMember', function(source, cb, identifier)
                 end
             end
             pData.faction = fData
-    
-            exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?", {json.encode(pData), identifier})
+
+            exports.oxmysql:executeSync("UPDATE players SET data = ? WHERE identifier = ?",
+                { json.encode(pData), identifier })
             cb(true)
         else
             cb(false)
@@ -239,4 +242,3 @@ Core.CreateCallback('Factions:PromoteMember', function(source, cb, identifier)
         cb(false)
     end
 end)
-

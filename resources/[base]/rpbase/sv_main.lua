@@ -50,8 +50,6 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
             for k, v in pairs(Inventory) do
                 if v.type == 'ammo' then
                     if PlayerAmmo[v.name] then
-                        if v.amount == PlayerAmmo[v.name] then return end
-                        -- print('[F]PlayerAmmo['..v.name..'] = '..PlayerAmmo[v.name])
                         v.amount = PlayerAmmo[v.name]
                         exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?',
                             { json.encode(pData), pData.identifier })
@@ -59,7 +57,7 @@ Core.CreateCallback('Core:UpdatePlayerAmmo', function(source, cb, ammoTable)
 
                         return
                     else
-                        -- print('[NF]PlayerAmmo['..v.name..'] = '..v.amount)
+                        print('[NF]PlayerAmmo[' .. v.name .. '] = ' .. v.amount)
                         v.amount = PlayerAmmo[v.name]
                         exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?',
                             { json.encode(pData), pData.identifier })
@@ -85,6 +83,26 @@ Core.CreateCallback('Core:IsOnline', function(source, cb, id)
         end
     end
     cb(isOnline)
+end)
+
+Core.CreateCallback('Core:GetNearestPlayerData', function(source, cb)
+    local ped = GetPlayerPed(source)
+    local pos = GetEntityCoords(ped)
+
+    local players = GetPlayers()
+    for k, v in pairs(players) do
+        local targetped = GetPlayerPed(v)
+        local targetPos = GetEntityCoords(targetped)
+        local dist = #(pos - targetPos)
+        if targetped ~= ped and dist < 3.0 then
+            local pData = Core.GetPlayerData(v)
+            pData.ped = targetped
+            pData.source = v
+            pData.pedcoords = targetPos
+            cb(pData)
+        end
+    end
+    cb(false)
 end)
 
 Core.CreateCallback('Core:GetNearestPlayer', function(source, cb)
@@ -376,13 +394,13 @@ Core.CreateCallback('Server:SetWeather', function(source, cb, weather)
 end)
 
 Core.CreateCallback('Server:SyncWeather', function(source, cb)
-    local players = GetPlayers()
+    local src = source
     if not currentWeather then
         currentWeather = 'EXTRASUNNY'
     end
-    for k, v in pairs(players) do
-        TriggerClientEvent('Client:SyncWeather', v, currentWeather)
-    end
+
+    TriggerClientEvent('Client:SyncWeather', src, currentWeather)
+
     cb(currentWeather)
 end)
 
@@ -434,6 +452,7 @@ RegisterNetEvent("showPlayerNametags", function()
 end)
 
 Core.CreateCallback('Player:SetRouting', function(source, cb, routing)
+    print('Player:SetRouting', source, routing)
     SetPlayerRoutingBucket(source, routing)
     cb(true)
 end)
