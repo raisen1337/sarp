@@ -12,7 +12,7 @@ Core.CreateCallback('Turfs:GetTurfById', function(source, cb, id)
 end)
 
 Core.GetTurfById = function(id)
-    local turf = exports.oxmysql:executeSync("SELECT * FROM turfs WHERE id = ?",{id})
+    local turf = exports.oxmysql:executeSync("SELECT * FROM turfs WHERE id = ?", { id })
     if turf then
         return turf
     end
@@ -21,16 +21,16 @@ end
 
 Core.CreateCallback('Turfs:CreateTurf', function(source, cb, data)
     local src = source
-    
+
     local turf = Core.CreateTurf(data)
     if turf then
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Ai creat un turf pentru: '..data.mafia..'!'}
+            args = { '^1[TURFS]^0: Ai creat un turf pentru: ' .. data.mafia .. '!' }
         })
         cb(true)
     else
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Nu s-a putut crea un turf pentru: '..data.mafia..'!'}
+            args = { '^1[TURFS]^0: Nu s-a putut crea un turf pentru: ' .. data.mafia .. '!' }
         })
         --print('[SERVER]: Nu s-a putut crea un turf pentru: '..data.mafia..'!')
         cb(false)
@@ -46,13 +46,13 @@ Core.CreateCallback('Turfs:DeleteTurf', function(source, cb, id)
     local turf = Core.DeleteTurf(id)
     if turf then
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Ai sters un turf cu id-ul: '..id..'!'}
+            args = { '^1[TURFS]^0: Ai sters un turf cu id-ul: ' .. id .. '!' }
         })
         cb(true)
         return
     else
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Nu s-a putut sterge un turf cu id-ul: '..id..'!'}
+            args = { '^1[TURFS]^0: Nu s-a putut sterge un turf cu id-ul: ' .. id .. '!' }
         })
         --print('[SERVER]: Nu s-a putut sterge un turf cu id-ul: '..id..'!')
         cb(false)
@@ -68,13 +68,13 @@ Core.CreateCallback('Turfs:DeleteAllTurfs', function(source, cb)
     local turf = Core.DeleteAllTurfs()
     if turf then
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Ai sters toate turf-urile!'}
+            args = { '^1[TURFS]^0: Ai sters toate turf-urile!' }
         })
         cb(true)
         return
     else
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Nu s-au putut sterge toate turf-urile!'}
+            args = { '^1[TURFS]^0: Nu s-au putut sterge toate turf-urile!' }
         })
         --print('[SERVER]: Nu s-au putut sterge toate turf-urile!')
         cb(false)
@@ -105,7 +105,7 @@ end)
 
 Core.IsAttacked = function(id)
     if not table.empty(attacks) then
-        for k,v in pairs(attacks) do
+        for k, v in pairs(attacks) do
             if k == id then
                 --print('Turf '..id..' is attacked')
                 return v
@@ -126,7 +126,7 @@ Core.CreateCallback('Turf:IsOwnedByTeam', function(source, cb, id, team)
 end)
 
 Core.IsOwnedByTeam = function(id, team)
-    local turf = exports.oxmysql:executeSync("SELECT * FROM turfs WHERE id = ?",{id})
+    local turf = exports.oxmysql:executeSync("SELECT * FROM turfs WHERE id = ?", { id })
     if turf then
         local turf = turf[1]
         if turf.owned == team then
@@ -148,7 +148,7 @@ end)
 
 function Core.GetAttackData(id)
     if not table.empty(attacks) then
-        for k,v in pairs(attacks) do
+        for k, v in pairs(attacks) do
             if k == id then
                 return v
             end
@@ -163,24 +163,24 @@ Core.CreateCallback('Turf:GetAllKills', function(source, cb, teamA, teamB)
         defenders = 0
     }
     if not table.empty(attacks) then
-       local attackersKills = 0
-       local defendersKills = 0
-        for k,v in pairs(attacks) do
+        local attackersKills = 0
+        local defendersKills = 0
+        for k, v in pairs(attacks) do
             if v.attacker == teamA then
-                for k,v in pairs(v.attackers) do
+                for k, v in pairs(v.attackers) do
                     attackersKills = attackersKills + v.kills
                 end
             elseif v.defender == teamA then
-                for k,v in pairs(v.defenders) do
+                for k, v in pairs(v.defenders) do
                     attackersKills = attackersKills + v.kills
                 end
             end
             if v.attacker == teamB then
-                for k,v in pairs(v.attackers) do
+                for k, v in pairs(v.attackers) do
                     defendersKills = defendersKills + v.kills
                 end
             elseif v.defender == teamB then
-                for k,v in pairs(v.defenders) do
+                for k, v in pairs(v.defenders) do
                     defendersKills = defendersKills + v.kills
                 end
             end
@@ -210,7 +210,7 @@ Core.CreateCallback('Turfs:PlayerKilled', function(source, cb, killerId)
     else
         TriggerClientEvent('Turfs:AddKill', -1, GetPlayerName(src), GetPlayerName(killerId))
     end
-    exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', {je(pData), pData.identifier})
+    exports.oxmysql:execute('UPDATE players SET data = ? WHERE identifier = ?', { je(pData), pData.identifier })
     if attacks and not table.empty(attacks) then
         for _, v in pairs(attacks) do
             if v.attacked then
@@ -254,16 +254,15 @@ Core.CreateCallback('Turfs:PlayerKilled', function(source, cb, killerId)
 end)
 
 Core.AttackTurf = function(id, team)
-    
     local turf = Core.GetTurfById(id)
     turf = json.decode(turf[1].data)
-    
+
     local returnInfo = "Turf attacked"
     local returnType = 'success'
     if turf.mafia == team then
-       returnInfo = "Turf already owned."
-       returnType = 'error'
-       return returnInfo, returnType
+        returnInfo = "Turf already owned."
+        returnType = 'error'
+        return returnInfo, returnType
     end
 
     if turf.attack then
@@ -274,14 +273,20 @@ Core.AttackTurf = function(id, team)
 
     local players = GetPlayers()
     local defenders = 0
-    for k,v in pairs(players) do
+    for k, v in pairs(players) do
         local src = v
         if Core.IsPlayerInTurfGang(src, turf.mafia) then
             defenders = defenders + 1
         end
     end
 
-   
+    if defenders < 3 then
+        returnInfo = "Not enough defenders."
+        returnType = 'error'
+        return returnInfo, returnType
+    end
+
+
     attacks[id] = {
         id = id,
         attacker = team,
@@ -293,9 +298,9 @@ Core.AttackTurf = function(id, team)
         attackers = {}
     }
 
-    for k,v in pairs(players) do
+    for k, v in pairs(players) do
         local src = v
-       
+
         if Core.IsPlayerInTurfGang(src, team) then
             table.insert(attacks[id].attackers, {
                 src = src,
@@ -307,7 +312,7 @@ Core.AttackTurf = function(id, team)
         end
     end
 
-    for k,v in pairs(players) do
+    for k, v in pairs(players) do
         local src = v
         if Core.IsPlayerInTurfGang(src, turf.mafia) then
             table.insert(attacks[id].defenders, {
@@ -345,7 +350,7 @@ end
 
 Core.GetTurfTime = function(id)
     if not table.empty(attacks) then
-        for k,v in pairs(attacks) do
+        for k, v in pairs(attacks) do
             if k == id then
                 return v.time
             end
@@ -356,7 +361,7 @@ end
 
 Core.GetTurfKills = function(id, team)
     if not table.empty(attacks) then
-        for k,v in pairs(attacks) do
+        for k, v in pairs(attacks) do
             if k == id then
                 if v.attacker == team then
                     return v.attackers
@@ -371,7 +376,7 @@ end
 
 Core.GetTurfAttacker = function(id)
     if not table.empty(attacks) then
-        for k,v in pairs(attacks) do
+        for k, v in pairs(attacks) do
             if k == id then
                 return v.attacker
             end
@@ -382,7 +387,7 @@ end
 
 Core.GetTurfDefender = function(id)
     if not table.empty(attacks) then
-        for k,v in pairs(attacks) do
+        for k, v in pairs(attacks) do
             if k == id then
                 return v.defender
             end
@@ -432,13 +437,13 @@ Core.CreateCallback('Turfs:IsPlayerInTurfGang', function(source, cb, src, team)
     cb(isInGang)
 end)
 
-Citizen.CreateThread(function ()
+Citizen.CreateThread(function()
     while true do
         local wait = 1000
         Wait(wait)
 
         if not table.empty(attacks) then
-            for k,v in pairs(attacks) do
+            for k, v in pairs(attacks) do
                 if v.time > 0 then
                     if v.time - 1 > 0 then
                         v.time = v.time - 1
@@ -490,9 +495,9 @@ Citizen.CreateThread(function ()
                             Core.UpdateTurf(k, turf)
                             TriggerClientEvent('Turf:AttackEnded', -1, turf.id)
                             TriggerClientEvent('chat:addMessage', -1, {
-                                args = {'^1[TURFS]^0: Turful '..k..' a fost castigat de '..v.defender..'!'}
+                                args = { '^1[TURFS]^0: Turful ' .. k .. ' a fost castigat de ' .. v.defender .. '!' }
                             })
-                            print('[SERVER]: Turful '..k..' a fost castigat de '..v.defender..'!')
+                            print('[SERVER]: Turful ' .. k .. ' a fost castigat de ' .. v.defender .. '!')
                             attacks[k] = nil
                         elseif kills.defenders < kills.attackers then
                             --attackers win
@@ -503,9 +508,9 @@ Citizen.CreateThread(function ()
                             Core.UpdateTurf(k, turf)
                             TriggerClientEvent('Turf:AttackEnded', -1, turf.id)
                             TriggerClientEvent('chat:addMessage', -1, {
-                                args = {'^1[TURFS]^0: Turful '..k..' a fost castigat de '..v.attacker..'!'}
+                                args = { '^1[TURFS]^0: Turful ' .. k .. ' a fost castigat de ' .. v.attacker .. '!' }
                             })
-                            print('[SERVER]: Turful '..k..' a fost castigat de '..v.attacker..'!')
+                            print('[SERVER]: Turful ' .. k .. ' a fost castigat de ' .. v.attacker .. '!')
                             attacks[k] = nil
                         elseif kills.defenders == kills.attackers then
                             --draw
@@ -515,9 +520,9 @@ Citizen.CreateThread(function ()
                             Core.UpdateTurf(k, turf)
                             TriggerClientEvent('Turf:AttackEnded', -1, turf.id)
                             TriggerClientEvent('chat:addMessage', -1, {
-                                args = {'^1[TURFS]^0: Turful '..k..' a fost egal!'}
+                                args = { '^1[TURFS]^0: Turful ' .. k .. ' a fost egal!' }
                             })
-                            print('[SERVER]: Turful '..k..' a fost egal!')
+                            print('[SERVER]: Turful ' .. k .. ' a fost egal!')
                             attacks[k] = nil
                         end
                     end
@@ -531,17 +536,20 @@ Core.CreateCallback('Turfs:AttackTurf', function(source, cb, id, team)
     local src = source
     local a = false
     local turf, error = Core.AttackTurf(id, team)
-    
+    local players = GetPlayers()
+
+
+
     if not error == 'error' then
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: '..turf..' ['..id..']!'}
+            args = { '^1[TURFS]^0: ' .. turf .. ' [' .. id .. ']!' }
         })
         a = true
         cb(true)
         return
     else
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: '..turf..' ['..id..']!'}
+            args = { '^1[TURFS]^0: ' .. turf .. ' [' .. id .. ']!' }
         })
         a = false
         cb(false)
@@ -560,7 +568,7 @@ Core.DeleteAllTurfs = function()
 end
 
 Core.DeleteTurf = function(id)
-    local turf = exports.oxmysql:executeSync("DELETE FROM turfs WHERE id = ?",{id})
+    local turf = exports.oxmysql:executeSync("DELETE FROM turfs WHERE id = ?", { id })
     if turf then
         return turf
     end
@@ -579,7 +587,7 @@ end)
 
 Core.GetAllTurfs = function()
     local result = exports.oxmysql:executeSync("SELECT * FROM turfs")
-    
+
     if result then
         return result
     else
@@ -595,13 +603,13 @@ Core.CreateCallback('Turfs:StopAttacks', function(source, cb)
     local turf = Core.StopAttacks()
     if turf then
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Ai oprit toate atacurile!'}
+            args = { '^1[TURFS]^0: Ai oprit toate atacurile!' }
         })
         cb(true)
         return
     else
         TriggerClientEvent('chat:addMessage', src, {
-            args = {'^1[TURFS]^0: Nu s-au putut opri toate atacurile!'}
+            args = { '^1[TURFS]^0: Nu s-au putut opri toate atacurile!' }
         })
         --print('[SERVER]: Nu s-au putut opri toate atacurile!')
         cb(false)
@@ -610,9 +618,9 @@ end)
 
 Core.StopAttacks = function()
     attacks = {}
- 
+
     local turfs = Core.GetAllTurfs()
-    for k,v in pairs(turfs) do
+    for k, v in pairs(turfs) do
         local turf = json.decode(v.data)
         turf.attack = false
         Core.UpdateTurf(v.id, turf)
@@ -623,7 +631,7 @@ end
 Core.CreateCallback('Turfs:IsKillerInAttack', function(source, cb, id)
     local src = source
     local turf = Core.IsKillerInAttack(id)
-    
+
     if turf then
         cb(turf)
     else
@@ -657,11 +665,11 @@ Core.GetMafiaKills = function(faction)
     if not table.empty(attacks) then
         for _, attack in pairs(attacks) do
             if attack.defender == faction then
-                for k,v in pairs(attack.defenders) do
+                for k, v in pairs(attack.defenders) do
                     kills = kills + v.kills
                 end
             else
-                for k,v in pairs(attack.attackers) do
+                for k, v in pairs(attack.attackers) do
                     kills = kills + v.kills
                 end
             end
@@ -674,13 +682,13 @@ end
 Core.TurfAddScore = function(faction, turf, score)
     if attacks[turf] then
         if attacks[turf].attacker == faction then
-            for k,v in pairs(attacks[turf].attackers) do
+            for k, v in pairs(attacks[turf].attackers) do
                 if v.team == faction then
                     v.kills = v.kills + score
                 end
             end
         elseif attacks[turf].defender == faction then
-            for k,v in pairs(attacks[turf].defenders) do
+            for k, v in pairs(attacks[turf].defenders) do
                 if v.team == faction then
                     v.kills = v.kills + score
                 end
@@ -691,9 +699,8 @@ end
 
 Core.IsKillerInAttack = function(id)
     if not table.empty(attacks) then
-        for k,v in pairs(attacks) do
-            
-            for k,v in pairs(v.attackers) do
+        for k, v in pairs(attacks) do
+            for k, v in pairs(v.attackers) do
                 if v.src == id then
                     return Core.GetPlayerData(v.src)
                 end
@@ -714,7 +721,7 @@ Core.CreateCallback('Turfs:UpdateTurf', function(source, cb, id, data)
 end)
 
 Core.UpdateTurf = function(id, data)
-    local turf = exports.oxmysql:executeSync("UPDATE turfs SET data = ? WHERE id = ?", {je(data), id})
+    local turf = exports.oxmysql:executeSync("UPDATE turfs SET data = ? WHERE id = ?", { je(data), id })
     --reload turfs
     local turfs = Core.GetAllTurfs()
     if turfs then
@@ -724,7 +731,8 @@ Core.UpdateTurf = function(id, data)
 end
 
 Core.CreateTurf = function(data)
-    local result = exports.oxmysql:executeSync('SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "turfs"')
+    local result = exports.oxmysql:executeSync(
+        'SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "turfs"')
 
     if result[1] then
         local nextAutoIncrement = result[1]['AUTO_INCREMENT']
@@ -733,6 +741,6 @@ Core.CreateTurf = function(data)
         data.id = 1
     end
 
-    exports.oxmysql:executeSync("INSERT INTO turfs(owned, data) VALUES(?, ?)", {data.mafia, json.encode(data)})
+    exports.oxmysql:executeSync("INSERT INTO turfs(owned, data) VALUES(?, ?)", { data.mafia, json.encode(data) })
     return true
 end

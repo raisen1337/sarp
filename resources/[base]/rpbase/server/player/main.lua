@@ -50,6 +50,11 @@ Config.Items = {
         type = "weapon",
     },
     {
+        model = "weapon_assaultrifle",
+        name = "AK47",
+        type = "weapon",
+    },
+    {
         model = "weapon_stungun_mp",
         name = "Taser",
         type = "weapon",
@@ -82,6 +87,11 @@ Config.Items = {
     {
         model = "weapon_smg",
         name = "SMG",
+        type = "weapon",
+    },
+    {
+        model = "weapon_bat",
+        name = "Bata",
         type = "weapon",
     },
     {
@@ -392,10 +402,10 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                             { json.encode(pData), pData.identifier })
                     else
                         deferrals.done("You have been banned from this server for: " ..
-                        pData.banReason ..
-                        ". Please visit " ..
-                        Discord .. " to appeal your ban and obtain info about it. Your BanID is: [" .. pData.banId ..
-                        "].")
+                            pData.banReason ..
+                            ". Please visit " ..
+                            Discord .. " to appeal your ban and obtain info about it. Your BanID is: [" .. pData.banId ..
+                            "].")
                     end
                 else
                     local result2 = exports.oxmysql:executeSync('SELECT * FROM players')
@@ -427,10 +437,10 @@ local function OnPlayerConnecting(name, setKickReason, deferrals)
                     if foundMatch then
                         Wait(0)
                         deferrals.done("You have been banned from this server for: " ..
-                        foundData.banReason ..
-                        ". Please visit " ..
-                        Discord ..
-                        " to appeal your ban and obtain info about it. Your BanID is: [" .. foundData.banId .. "].")
+                            foundData.banReason ..
+                            ". Please visit " ..
+                            Discord ..
+                            " to appeal your ban and obtain info about it. Your BanID is: [" .. foundData.banId .. "].")
                     end
                     if not foundMatch then
                         Wait(0)
@@ -1128,7 +1138,8 @@ Core.CreateCallback('Police:SetWanted', function(source, cb, id, level, reason)
         pData.wantedReason = reason
     end
 
-    exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", { json.encode(pData), GetPlayerSteamId(id) })
+    exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?",
+        { json.encode(pData), GetPlayerSteamId(id) })
     cb(true)
 end)
 
@@ -1179,7 +1190,8 @@ Core.CreateCallback('PayDay:Finish', function(source, cb)
 
     pData.cash = pData.cash + totalPay
 
-    exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?", { json.encode(pData), GetPlayerSteamId(src) })
+    exports.oxmysql:query("UPDATE players SET data = ? WHERE identifier = ?",
+        { json.encode(pData), GetPlayerSteamId(src) })
     cb(pdData)
 end)
 

@@ -170,7 +170,36 @@ end)
 --     end
 -- end)
 
+Citizen.CreateThread(function()
+    while true do
+        Wait(1000)
+        while not LoggedIn do
+            Wait(1000)
+        end
 
+        while not PlayerData or table.empty(PlayerData) do
+            Wait(1000)
+        end
+        if IsEntityDead(PlayerPedId()) and not PlayerData.dead then
+            PlayerData.dead = true
+
+            Core.SavePlayer()
+            comaTime = 300
+            SendNUIMessage({
+                action = "showDeathScreen",
+                time = comaTime,
+            })
+            SetEntityInvincible(PlayerPedId(), true)
+            SetEntityHealth(PlayerPedId(), 200)
+            ResurrectPed(PlayerPedId())
+            ReviveInjuredPed(PlayerPedId())
+            ClearPedTasksImmediately(PlayerPedId())
+            NetworkResurrectLocalPlayer(GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false)
+            SetEntityHealth(PlayerPedId(), 200)
+            SetEntityInvincible(PlayerPedId(), false)
+        end
+    end
+end)
 
 Citizen.CreateThread(function()
     while true do
@@ -192,8 +221,8 @@ Citizen.CreateThread(function()
                 SetEntityHealth(PlayerPedId(), 200)
                 SetEntityInvincible(PlayerPedId(), false)
 
-                comaTime = 300
                 pHealth = 200
+                comaTime = 300
                 SendNUIMessage({
                     action = "showDeathScreen",
                     time = comaTime,
@@ -321,7 +350,7 @@ PlayerSpawned = function()
         Core.TriggerCallback("Houses:Get", function(data)
             loadHouses(data)
         end)
-        LoadFactions()
+
         SetEntityCoords(PlayerPedId(), mugShot.characterPos[1], mugShot.characterPos[2], mugShot.characterPos[3] - 1)
         SetEntityHeading(PlayerPedId(), mugShot.characterPos[4])
         FreezeEntityPosition(PlayerPedId(), true)
@@ -411,7 +440,7 @@ PlayerSpawned = function()
         Core.TriggerCallback("Houses:Get", function(data)
             loadHouses(data)
         end)
-        LoadFactions()
+
 
 
         ClientVehicles = GetVehicles()

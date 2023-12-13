@@ -18,7 +18,23 @@ LoadFactions = function()
     end)
 end
 
+Citizen.CreateThread(function()
+    while true do
+        local wait = 5000
+        while not LoggedIn do
+            Wait(1000)
+        end
 
+        while not PlayerData or table.empty(PlayerData) do
+            Wait(1000)
+        end
+        while not Factions or table.empty(Factions) do
+            Wait(1000)
+            LoadFactions()
+        end
+        Wait(wait)
+    end
+end)
 
 local canSpawnVehicle = false
 
@@ -108,7 +124,11 @@ RegisterCommand('faction', function()
                                             end
                                             currentCar = CreateCar(v.model, PlayerCoords(),
                                                 GetEntityHeading(PlayerPedId()), true, true, true,
-                                                'PD' .. math.random(1000, 9999))
+                                                'LS' .. math.random(1000, 9999))
+                                            if Factions[fData.name].vehColors then
+                                                SetVehicleColours(currentCar, Factions[fData.name].vehColors[1],
+                                                    Factions[fData.name].vehColors[2])
+                                            end
                                         end)
                                     end
                                 end
@@ -139,7 +159,7 @@ RegisterCommand('faction', function()
                                             end
                                             currentCar = CreateCar(v.model, PlayerCoords(),
                                                 playerFaction.coords.helicopter.w, true, true, true,
-                                                'PD' .. math.random(1000, 9999))
+                                                'FV' .. math.random(1000, 9999))
                                         end)
                                         MenuV:OpenMenu(factionVehicles)
                                     end

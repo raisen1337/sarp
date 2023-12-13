@@ -264,6 +264,7 @@ AddEventHandler('onResourceStop', function(resource)
 end)
 
 
+
 RegisterCommand('attack', function()
     if inAttack then
         return
@@ -273,9 +274,12 @@ RegisterCommand('attack', function()
             for k, v in pairs(Turfs) do
                 if v.id == Turf.id then
                     if not v.attack then
-                        Core.TriggerCallback('Turfs:AttackTurf', function(canAttack)
+                        print(Factions[PlayerData.faction.name].type)
+                        if Factions[PlayerData.faction.name].type == 'mafie' then
+                            Core.TriggerCallback('Turfs:AttackTurf', function(canAttack)
 
-                        end, v.id, PlayerData.faction.name)
+                            end, v.id, PlayerData.faction.name)
+                        end
                     else
                         -- print('Already attacked')
                     end
